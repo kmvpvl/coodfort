@@ -1,0 +1,64 @@
+openapi: '3.0.2'
+info:
+  title: COODFort
+  version: '1.0'
+servers:
+  - url: http://localhost:8000
+    description: Local server
+components:
+  securitySchemes:
+    COODFortTGUserId:
+      type: apiKey
+      in: header
+      name: coodfort-tguid
+    TGQueryCheckString:
+      type: apiKey
+      in: header
+      name: coodfort-tgquerycheckstring
+    COODFortLogin:
+      type: apiKey
+      in: header
+      name: coodfort-login
+    COODFortPassword:
+      type: apiKey
+      in: header
+      name: coodfort-password
+paths:
+  /version:
+    get:
+      operationId: version
+      security: []
+      responses:
+        '200': 
+          description: OK
+  /tgconfig:
+    get:
+      operationId: tgconfig
+      security: []
+      responses:
+        '200': 
+          description: OK
+  /telegram:
+    post:
+      operationId: telegram
+      security: []
+      responses:
+        '200':
+          description: OK
+  /eatery/new:
+    post:
+      operationId: newEatery
+      responses:
+        '200':
+          description: OK
+  /eatery/edit:
+    post:
+      operationId: updateEatery
+      responses:
+        '200':
+          description: OK
+security:
+  - COODFortTGUserId: []
+    TGQueryCheckString: []
+  - COODFortLogin: []
+    COODFortPassword: []
