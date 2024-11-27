@@ -10,6 +10,9 @@ class MConsole {
     sqld(...optionalParams: any[]): void {
         if (this.isDev || this.attr.includes("SQLD")) console.log(...optionalParams);
     }
+    auth(...optionalParams: any[]): void {
+        if (this.isDev || this.attr.includes("AUTH")) console.log(...optionalParams);
+    }
 }
 export function mConsoleInit() {
     mconsole = new MConsole();

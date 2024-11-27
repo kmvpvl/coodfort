@@ -1,15 +1,19 @@
 import { configDotenv } from "dotenv";
 import express, { Request, Response } from "express";
 import { Eatery } from "./model/eateries";
-import { mConsoleInit } from "./model/console";
-import OpenAPIBackend from "openapi-backend";
+import { mconsole, mConsoleInit } from "./model/console";
+import OpenAPIBackend, {Context} from "openapi-backend";
 import path from "path";
 import fs from "fs";
 import { randomUUID } from "crypto";
 import colours from "./model/colours";
+import { WorkflowError } from "./model/sqlproto";
 
 configDotenv();
 mConsoleInit();
+
+interface AuthUser {guest?: {}, employee?: {}};
+
 const PORT = process.env.PORT || 8000;
 
 const api = new OpenAPIBackend({
@@ -17,7 +21,7 @@ const api = new OpenAPIBackend({
 });
 api.init();
 api.register({
-    version: async (c, req, res, person) => {
+    version: async (c, req, res) => {
         try {
             const pkg = require("../package.json");
             return res.status(200).json({ ok: true, version: pkg.version });
@@ -25,41 +29,48 @@ api.register({
             return res.status(400).json(e);
         }
     },
-    tgconfig: async (c, req, res, person) => {
+    tgconfig: async (c: Context, req: Request, res: Response) => {
         return res.status(200).json({ ok: true });
     },
-    //supportsendmessagetouser: async (c, req, res, user) => supportsendmessagetouser(c, req, res, user, bot),
-    telegram: async (c, req, res, user) => res.status(200).json({ ok: true }),
-    newEatery: async (c, req, res, user) => res.status(200).json({ ok: true }),
-    updateEatery: async (c, req, res, user) => res.status(200).json({ ok: true }),
+    telegram: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true }),
+    newEatery: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true, guest: user.guest }),
+    updateEatery: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true, guest: user.guest  }),
 
-    validationFail: (c, req, res) => res.status(400).json({ ok: false, err: c.validation.errors }),
-    notFound: (c, req, res) => {
+    validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
+    notFound: (c: Context, req: Request, res: Response) => {
         const p = path.join(__dirname, '..', 'public', req.path);
         if (fs.existsSync(p)) {
             return res.sendFile(p);
         }
         return res.status(404).json({ ok: false, err: `File '${req.path}' not found` });
     },
-    notImplemented: (c, req, res) => res.status(500).json({ ok: false, err: `'${req.path}' not implemented` }),
-    unauthorizedHandler: (c, req, res) => res.status(401).json({ ok: false, err: 'not auth' })
+    notImplemented: (c: Context, req: Request, res: Response) => res.status(500).json({ ok: false, err: `'${req.path}' not implemented` }),
+    unauthorizedHandler: (c: Context, req: Request, res: Response) => res.status(401).json({ ok: false, err: 'not auth' })
 });
 
-api.registerSecurityHandler('COODFortTGUserId', async (context, req, res) => {
-    return true;
+api.registerSecurityHandler('COODFortTGUserId', (c: Context, req: Request, res: Response, user: AuthUser) => {
+    const tguid = req.headers["coodfort-tguid"];
+    mconsole.auth(`COODFortTGUserId security check. coodfort-tguid = ${tguid === undefined?"-":tguid}`);
+    return tguid !== undefined;
 });
-api.registerSecurityHandler('TGQueryCheckString', async (context, req, res) => {
-    return true;
+api.registerSecurityHandler('TGQueryCheckString', (c: Context, req: Request, res: Response, user: AuthUser) => {
+    const check = req.headers["coodfort-tgquerycheckstring"];
+    mconsole.auth(`TGQueryCheckString security check. coodfort-tgquerycheckstring = ${check !== undefined?check:"-"}`);
+    return check !== undefined;
 });
-api.registerSecurityHandler('COODFortLogin', async (context, req, res) => {
-    return true;
+api.registerSecurityHandler('COODFortLogin', (c: Context, req: Request, res: Response, user: AuthUser) => {
+    const login = req.headers["coodfort-login"];
+    mconsole.auth(`COODFortLogin security check. coodfort-login = ${login === undefined?"-":login}`);
+    return login !== undefined;
 });
-api.registerSecurityHandler('COODFortPassword', async (context, req, res) => {
-    return true;
+api.registerSecurityHandler('COODFortPassword', (c: Context, req: Request, res: Response, user: AuthUser) => {
+    const password = req.headers["coodfort-password"];
+    mconsole.auth(`COODFortPassword security check. coodfort-password = ${password === undefined?"-":password}`);
+    return password !== undefined;
 });
 
 
-const app = express()
+export const app = express()
 app.use(express.json())
 
 // use as express middleware
@@ -70,18 +81,30 @@ app.use(async (req: Request, res: Response) => {
     req.headers["coodfort-start"] = requestStart.toISOString();
     console.log(`🚀 ${requestStart.toISOString()} - [${requestUUID}] - ${req.method} ${colours.fg.yellow}${req.path}\n${colours.fg.blue}headers: ${Object.keys(req.headersDistinct).filter(v => v.startsWith("misiscoin-")).map(v => `${v} = '${req.headersDistinct[v]}'`).join(", ")}\nbody: ${Object.keys(req.body).map(v => `${v} = '${req.body[v]}'`).join(", ")}\nquery: ${Object.keys(req.query).map(v => `${v} = '${req.query[v]}'`).join(", ")}${colours.reset}`);
 
-    const stguid = req.headers["coodfort-tguid"] as string;
     let ret;
+    const tguid = req.headers["coodfort-tguid"];
+    const login = req.headers["coodfort-login"];
 
+    const user: AuthUser = {
+    }
+
+    const e = new Eatery(1);
+    try {
+        const p = await e.load()
+        console.log(e.data);
+    } catch(e: any) {
+        console.log((e as WorkflowError).json);
+    }
+    
     try {
         ret = await api.handleRequest({
             method: req.method,
             path: req.path,
             body: req.body,
             query: req.query as { [key: string]: string },
-            headers: req.headers as { [key: string]: string }
+            headers: req.headers as { [key: string]: string },
         },
-            req, res, undefined);
+            req, res, user);
     } catch (e) {
         ret = res.status(500).json({ ok: false, err: e });
     }

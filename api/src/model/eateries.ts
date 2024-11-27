@@ -5,7 +5,7 @@ interface ITimeSlot {
 
 }
 
-interface IEaterySchema extends WorkflowObjectSchema{
+interface IEaterySchema extends WorkflowObjectSchema {
 
 }
 
@@ -22,6 +22,7 @@ export interface IEatery extends IWorkflowObject {
     tags?: string;
     cuisines?: string;
     avgbillwoalcohol?: number;
+    published: boolean;
 }
 
 export class Eatery extends WorkflowObject<IEatery, IEaterySchema> {
@@ -31,24 +32,26 @@ export class Eatery extends WorkflowObject<IEatery, IEaterySchema> {
             tableName: "eateries",
             relatedTablesPrefix: "eatery_",
             fields: [
-                {name:`name`, sql:'varchar(1024) NOT NULL'},
-                {name:`rating`, sql:'float DEFAULT NULL'},
-                {name:`url`, sql:'varchar(2048) DEFAULT NULL'},
-                {name:`photos`, sql:'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))'},
-                {name:`descriptions`, sql:'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`descriptions`))'},
-                {name:`tags`, sql:'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`tags`))'},
-                {name:`cuisines`, sql:'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`cuisines`))'},
-                {name:`avgbillwoalcohol`, sql:'float DEFAULT NULL'},
-            ], 
+                { name: `name`, sql: 'varchar(1024) NOT NULL' },
+                { name: `rating`, sql: 'float DEFAULT NULL' },
+                { name: `url`, sql: 'varchar(2048) DEFAULT NULL' },
+                { name: `photos`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))' },
+                { name: `descriptions`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`descriptions`))' },
+                { name: `tags`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`tags`))' },
+                { name: `cuisines`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`cuisines`))' },
+                { name: `avgbillwoalcohol`, sql: 'float DEFAULT NULL' },
+                { name: `published`, sql: 'tinyint(1) NOT NULL DEFAULT 0' },
+            ],
             related: [
                 {
                     tableName: 'tables',
                     idFieldName: "id",
                     fields: [
-                    //{name:`eatery_id`, sql: 'bigint(20) NOT NULL'},
-                    {name:`name`, sql:'varchar(1024) NOT NULL'},
-                    {name:`rating`, sql:'float DEFAULT NULL'},
-                ]}
+                        //{name:`eatery_id`, sql: 'bigint(20) NOT NULL'},
+                        { name: `name`, sql: 'varchar(1024) NOT NULL' },
+                        { name: `rating`, sql: 'float DEFAULT NULL' },
+                    ]
+                }
             ]
         };
     }
@@ -57,7 +60,7 @@ export class Eatery extends WorkflowObject<IEatery, IEaterySchema> {
 /**
  * 
  */
-interface IEmployeeSchema extends WorkflowObjectSchema{
+interface IEmployeeSchema extends WorkflowObjectSchema {
 
 }
 
@@ -79,15 +82,15 @@ export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema> {
             tableName: "employees",
             relatedTablesPrefix: "employee_",
             fields: [
-                {name:`login`, sql:'varchar(128) NOT NULL'},
-                {name:`hash`, sql:'varchar(128) NOT NULL'},
-                {name:`name`, sql:'varchar(128) NOT NULL'},
-                {name:`rating`, sql:'float DEFAULT NULL'},
-                {name:`awards`, sql:'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))'},
-                {name:`photos`, sql:'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))'},
-                {name:`bio`, sql:'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`descriptions`))'},
-                {name:`tags`, sql:'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`tags`))'},
-            ], 
+                { name: `login`, sql: 'varchar(128) NOT NULL' },
+                { name: `hash`, sql: 'varchar(128) NOT NULL' },
+                { name: `name`, sql: 'varchar(128) NOT NULL' },
+                { name: `rating`, sql: 'float DEFAULT NULL' },
+                { name: `awards`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))' },
+                { name: `photos`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))' },
+                { name: `bio`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`descriptions`))' },
+                { name: `tags`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`tags`))' },
+            ],
         };
     }
 
@@ -96,7 +99,7 @@ export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema> {
         return hash;
     }
 
-    checkHash(secretKey: string): boolean {
+    checkSecretKey(secretKey: string): boolean {
         const hash = this.calcHash(secretKey);
         return this.data.hash === hash;
     }
