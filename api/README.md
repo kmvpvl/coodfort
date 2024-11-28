@@ -52,11 +52,49 @@ Makes changes to existing Eatery object. User MUST be Employee and have permissi
 ### Working with EMPLOYEE class
 Working with|Methods
 -|-
-Employee root object|[employee/new](#post-employeenew), employee/edit
+Employee root object|[employee/new](#post-employeenew), employee/edit, employee/view
 Invitations from Eateries|employee/acceptInvitation, employee/rejectInvitation
 
 #### POST `employee/new`
-Creates new Employee object. 
+Creates new Employee object. This method is used for Employee registration by web application. If you want register new Employee by Telegram, use `/start` command.
+
+[!CAUTION] This method doesn't require any security schema. 
+
+*Parameters*
+Mand|Parameter|Where|Type|Description
+-|-|-|-|-
+✅|coodfort-login|header|string|Login name of Employee
+✅|coodfort-password|header|string|Password of Employee
+❌|name|requestBody|string|Display name of Employee
+❌|bio|requestBody|string|Bio of Employee
+❌|tags|requestBody|Comma separated string|Tags of Employee
+
+*Returns*
+
+HTTP status|Condition|Response body
+-|-|-
+200|New Employee was created successfully| See below
+400|Employee wasn't created because Login name already exists|See below
+
+Response body if successful
+```javascript
+{
+    ok: true, 
+    employee: IEmployee
+}
+```
+Response body if error
+```javascript
+{
+    ok: false,
+    error: {
+        code: code_number,
+        shortName: short_string_error,
+        message: error_description
+    } 
+}
+```
+
 
 ### Working with GUEST class
 Working with|Methods

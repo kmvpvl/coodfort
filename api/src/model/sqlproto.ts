@@ -5,11 +5,12 @@ import { mconsole } from './console';
 export namespace Types {
     export type ObjectId = number;
 }
-enum WorkflowErrorCode {
+export enum WorkflowErrorCode {
     unknown,
     abstract_method,
     sql_connection_error,
     sql_not_found,
+    parameter_expected,
 }
 export class WorkflowError extends Error {
     code: WorkflowErrorCode;
@@ -61,11 +62,17 @@ export type TableFieldSchema = {
     sql: string;
 }
 
+export type TableIndexSchema = {
+    fields: string[];
+    indexType: string;
+}
+
 export interface WorkflowObjectSchema {
     tableName: string;
     relatedTablesPrefix?: string;
     idFieldName: string;
     fields: TableFieldSchema[];
+    indexes?: TableIndexSchema[];
     related?: WorkflowObjectSchema[];
 }
 
@@ -245,13 +252,19 @@ export abstract class WorkflowObject<DataType extends IWorkflowObject, DBSchema 
 
     protected async createMainTable() {
         mconsole.sqlinfo(`Creating main table of schema '${this.schema.tableName}'`);
-        const sql = `CREATE TABLE IF NOT EXISTS \`${this.schema.tableName}\`(
+        let sql = `CREATE TABLE IF NOT EXISTS \`${this.schema.tableName}\`(
         ${this.schema.fields.map(field => `\`${field.name}\` ${field.sql}`).join(",")}, 
         ${WorkflowObjectBaseSchema.map(field => `\`${field.name}\` ${field.sql}`).join(",")}, 
         PRIMARY KEY (\`${this.schema.idFieldName}\`)) 
         ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;`;
         mconsole.sqlq(`sql = '${sql}'`, []);
         await this.sqlConnection.query(sql);
+        if (this.schema.indexes !== undefined) for (const key of this.schema.indexes) {
+            sql = `ALTER TABLE \`${this.schema.tableName}\` ADD ${key.indexType} (${key.fields.map(field=>`\`${field}\``).join(",")});`;
+            mconsole.sqlq(`sql = '${sql}'`, []);
+            await this.sqlConnection.query(sql);
+            mconsole.sqlinfo(`Index of '${this.schema.tableName}' has created successfully`);
+        }
         mconsole.sqlinfo(`Main table of schema '${this.schema.tableName}' has created successfully`);
     }
 
@@ -268,6 +281,13 @@ export abstract class WorkflowObject<DataType extends IWorkflowObject, DBSchema 
         mconsole.sqlq(`sql = '${sql}'`, []);
         await this.sqlConnection.query(sql);
         mconsole.sqlinfo(`Related table '${tableSchema.tableName}' of schema '${this.schema.tableName}' has created successfully`);
+
+        if (tableSchema.indexes !== undefined) for (const key of tableSchema.indexes) {
+            sql = `ALTER TABLE \`${this.schema.relatedTablesPrefix + tableSchema.tableName}\` ADD ${key.indexType} (${key.fields.map(field=>`\`${field}\``).join(",")});`;
+            mconsole.sqlq(`sql = '${sql}'`, []);
+            await this.sqlConnection.query(sql);
+            mconsole.sqlinfo(`Index of '${this.schema.relatedTablesPrefix + tableSchema.tableName}' has created successfully`);
+        }
 
         mconsole.sqlinfo(`Creating foreign key for related table ${tableSchema.tableName}' of schema '${this.schema.tableName}'`);
         sql = `

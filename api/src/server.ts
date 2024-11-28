@@ -8,11 +8,11 @@ import fs from "fs";
 import { randomUUID } from "crypto";
 import colours from "./model/colours";
 import { WorkflowError } from "./model/sqlproto";
+import { AuthUser } from "./model/security";
+import { newEmployee } from "./api/employee";
 
 configDotenv();
 mConsoleInit();
-
-interface AuthUser {guest?: {}, employee?: {}};
 
 const PORT = process.env.PORT || 8000;
 
@@ -35,6 +35,7 @@ api.register({
     telegram: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true }),
     newEatery: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true, guest: user.guest }),
     updateEatery: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true, guest: user.guest  }),
+    newEmployee: newEmployee,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {
@@ -77,8 +78,6 @@ app.use(express.json())
 app.use(async (req: Request, res: Response) => {
     const requestUUID = randomUUID();
     const requestStart = new Date();
-    req.headers["coodfort-uuid"] = requestUUID;
-    req.headers["coodfort-start"] = requestStart.toISOString();
     console.log(`🚀 ${requestStart.toISOString()} - [${requestUUID}] - ${req.method} ${colours.fg.yellow}${req.path}\n${colours.fg.blue}headers: ${Object.keys(req.headersDistinct).filter(v => v.startsWith("misiscoin-")).map(v => `${v} = '${req.headersDistinct[v]}'`).join(", ")}\nbody: ${Object.keys(req.body).map(v => `${v} = '${req.body[v]}'`).join(", ")}\nquery: ${Object.keys(req.query).map(v => `${v} = '${req.query[v]}'`).join(", ")}${colours.reset}`);
 
     let ret;
@@ -86,14 +85,6 @@ app.use(async (req: Request, res: Response) => {
     const login = req.headers["coodfort-login"];
 
     const user: AuthUser = {
-    }
-
-    const e = new Eatery(1);
-    try {
-        const p = await e.load()
-        console.log(e.data);
-    } catch(e: any) {
-        console.log((e as WorkflowError).json);
     }
     
     try {
@@ -109,7 +100,6 @@ app.use(async (req: Request, res: Response) => {
         ret = res.status(500).json({ ok: false, err: e });
     }
     const requestEnd = new Date();
-    req.headers["coodfort-request-end"] = requestEnd.toISOString();
     console.log(`🏁 ${requestStart.toISOString()} - [${requestUUID}] - ${req.method} ${res.statusCode >= 200 && res.statusCode < 400 ? colours.fg.green : colours.fg.red}${req.path}${colours.reset} - ${res.statusCode} - ${requestEnd.getTime() - requestStart.getTime()} ms`);
     return ret;
 });

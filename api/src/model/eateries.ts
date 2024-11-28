@@ -32,7 +32,7 @@ export class Eatery extends WorkflowObject<IEatery, IEaterySchema> {
             tableName: "eateries",
             relatedTablesPrefix: "eatery_",
             fields: [
-                { name: `name`, sql: 'varchar(1024) NOT NULL' },
+                { name: `name`, sql: 'varchar(128) NOT NULL' },
                 { name: `rating`, sql: 'float DEFAULT NULL' },
                 { name: `url`, sql: 'varchar(2048) DEFAULT NULL' },
                 { name: `photos`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))' },
@@ -67,12 +67,12 @@ interface IEmployeeSchema extends WorkflowObjectSchema {
 interface IEmployee extends IWorkflowObject {
     login: number | string;     /**Telegram ID or login or phone */
     hash: string;               /** */
-    name: string;
-    rating: number;
-    awards: string;
-    photos: string;
-    bio: string;
-    tags: string;
+    name?: string;
+    rating?: number;
+    awards?: string;
+    photos?: string;
+    bio?: string;
+    tags?: string;
 }
 
 export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema> {
@@ -84,23 +84,26 @@ export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema> {
             fields: [
                 { name: `login`, sql: 'varchar(128) NOT NULL' },
                 { name: `hash`, sql: 'varchar(128) NOT NULL' },
-                { name: `name`, sql: 'varchar(128) NOT NULL' },
+                { name: `name`, sql: 'varchar(128) DEFAULT NULL' },
                 { name: `rating`, sql: 'float DEFAULT NULL' },
                 { name: `awards`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))' },
                 { name: `photos`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))' },
-                { name: `bio`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`descriptions`))' },
-                { name: `tags`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`tags`))' },
+                { name: `bio`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL' },
+                { name: `tags`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL' },
             ],
+            indexes: [
+                {fields: ["login"], indexType: "UNIQUE"}
+            ]
         };
     }
 
-    private calcHash(secretKey: string): string {
-        const hash = createHmac("sha256", `${this.data.login} ${secretKey}`).digest("hex");
+    static calcHash(login: string, secretKey: string): string {
+        const hash = createHmac("sha256", `${login} ${secretKey}`).digest("hex");
         return hash;
     }
 
     checkSecretKey(secretKey: string): boolean {
-        const hash = this.calcHash(secretKey);
+        const hash = Employee.calcHash(this.data.login.toString(), secretKey);
         return this.data.hash === hash;
     }
 }

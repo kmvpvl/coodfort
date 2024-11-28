@@ -57,6 +57,14 @@ paths:
       responses:
         '200':
           description: OK
+  /employee/new:
+    post:
+      operationId: newEmployee
+      security: []      
+      responses:
+        '200':
+          description: OK
+
 security:
   - COODFortTGUserId: []
     TGQueryCheckString: []
