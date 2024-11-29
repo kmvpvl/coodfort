@@ -2,7 +2,7 @@ import { Context } from "openapi-backend";
 import { AuthUser } from "../model/security";
 import { Request, Response } from "express";
 import { Employee } from "../model/eateries";
-import { WorkflowError, WorkflowErrorCode } from "../model/sqlproto";
+import { DocumentError, DocumentErrorCode } from "../model/sqlproto";
 
 
 export async function newEmployee(c: Context, req: Request, res: Response, user: AuthUser) {
@@ -13,8 +13,8 @@ export async function newEmployee(c: Context, req: Request, res: Response, user:
     const tags = req.body.tags;
 
     try {
-        if (login === undefined) throw new WorkflowError(WorkflowErrorCode.parameter_expected, `Path '${req.path}' expects parameter 'login'`);
-        if (password === undefined) throw new WorkflowError(WorkflowErrorCode.parameter_expected, `Path '${req.path}' expects parameter 'password'`);
+        if (login === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Path '${req.path}' expects parameter 'login'`);
+        if (password === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Path '${req.path}' expects parameter 'password'`);
         const newEmpl = new Employee({
             login: login,
             hash: Employee.calcHash(login, password),
@@ -25,7 +25,7 @@ export async function newEmployee(c: Context, req: Request, res: Response, user:
         await newEmpl.save();
         return res.status(200).json({ ok: true, employee: newEmpl.data })
     } catch (e: any) {
-        if (e instanceof WorkflowError) return res.status(400).json({ ok: false, error: (e as WorkflowError).json });
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: (e as DocumentError).json });
         return res.status(400).json({ ok: false, error: e })
     }
 }

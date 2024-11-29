@@ -7,7 +7,7 @@ import path from "path";
 import fs from "fs";
 import { randomUUID } from "crypto";
 import colours from "./model/colours";
-import { WorkflowError } from "./model/sqlproto";
+import { DocumentError } from "./model/sqlproto";
 import { AuthUser } from "./model/security";
 import { newEmployee } from "./api/employee";
 import { newEatery } from "./api/eatery";

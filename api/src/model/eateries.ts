@@ -1,19 +1,19 @@
 import { createHmac } from "crypto";
-import { IWorkflowObject, Types, WorkflowError, WorkflowErrorCode, WorkflowObject, WorkflowDataSchema, WorkflowWFSchema, WorkflowStatus } from "./sqlproto";
+import { IDocument, Types, DocumentError, DocumentErrorCode, Document, DocumentDataSchema, DocumentWFSchema, WorkflowStatus } from "./sqlproto";
 
 interface ITimeSlot {
 
 }
 
-interface IEateryDataSchema extends WorkflowDataSchema {
+interface IEateryDataSchema extends DocumentDataSchema {
 
 }
 
-interface IEateryWFSchema extends WorkflowWFSchema {
+interface IEateryWFSchema extends DocumentWFSchema {
 
 }
 
-export interface IEatery extends IWorkflowObject {
+export interface IEatery extends IDocument {
     name: string;
     employees: {
         employeeId: Types.ObjectId;
@@ -32,7 +32,7 @@ export interface IEatery extends IWorkflowObject {
     published?: boolean;
 }
 
-export class Eatery extends WorkflowObject<IEatery, IEateryDataSchema, IEateryWFSchema> {
+export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema> {
     get dataSchema(): IEateryDataSchema {
         return {
             idFieldName: "id",
@@ -84,11 +84,11 @@ export class Eatery extends WorkflowObject<IEatery, IEateryDataSchema, IEateryWF
 /**
  * 
  */
-interface IEmployeeSchema extends WorkflowDataSchema {
+interface IEmployeeSchema extends DocumentDataSchema {
 
 }
 
-interface IEmployee extends IWorkflowObject {
+interface IEmployee extends IDocument {
     login: number | string;     /**Telegram ID or login or phone */
     hash: string;               /** */
     name?: string;
@@ -99,7 +99,7 @@ interface IEmployee extends IWorkflowObject {
     tags?: string;
 }
 
-export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema, IEateryWFSchema> {
+export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSchema> {
     get dataSchema(): IEmployeeSchema {
         return {
             idFieldName: "id",
@@ -132,7 +132,7 @@ export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema, IEatery
     }
 
     async createEatery(eateryData: IEatery): Promise<Eatery> {
-        if (this.id === undefined) throw new WorkflowError(WorkflowErrorCode.abstract_method, `Load`);
+        if (this.id === undefined) throw new DocumentError(DocumentErrorCode.abstract_method, `Load`);
         eateryData.createdByUser = this.data.login.toString();
         eateryData.changedByUser = this.data.login.toString();
         eateryData.employees.push({ employeeId: this.id, roles: "Administrator" });
@@ -142,14 +142,14 @@ export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema, IEatery
         return eatery;
     }
 
-    get wfSchema(): WorkflowWFSchema {
+    get wfSchema(): DocumentWFSchema {
         return {
             initialState: WorkflowStatus.Done
         }
     }
 }
 
-interface IBooking extends IWorkflowObject {
+interface IBooking extends IDocument {
     eateryId: Types.ObjectId;
     mnemNumber: string;
     mainGuestId: Types.ObjectId;
@@ -159,37 +159,37 @@ interface IBooking extends IWorkflowObject {
     timeSlot: ITimeSlot;
 }
 
-interface IGuest extends IWorkflowObject {
+interface IGuest extends IDocument {
 
 }
 
-interface IMeal extends IWorkflowObject {
+interface IMeal extends IDocument {
 
 }
 
-interface IOrder extends IWorkflowObject {
+interface IOrder extends IDocument {
 
 }
 
-interface ITable extends IWorkflowObject {
+interface ITable extends IDocument {
     name: string;
     guestCountMax?: number;
     guestCountComfort?: number;
     timeSlots?: [ITimeSlot];
 }
 
-interface IEntertainment extends IWorkflowObject {
+interface IEntertainment extends IDocument {
 
 }
 
-interface IDeliveryPartner extends IWorkflowObject {
+interface IDeliveryPartner extends IDocument {
 
 }
 
-interface IInvoice extends IWorkflowObject {
+interface IInvoice extends IDocument {
 
 }
 
-interface IPayment extends IWorkflowObject {
+interface IPayment extends IDocument {
 
 }
