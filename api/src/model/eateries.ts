@@ -1,11 +1,15 @@
 import { createHmac } from "crypto";
-import { IWorkflowObject, Types, WorkflowError, WorkflowErrorCode, WorkflowObject, WorkflowObjectSchema } from "./sqlproto";
+import { IWorkflowObject, Types, WorkflowError, WorkflowErrorCode, WorkflowObject, WorkflowDataSchema, WorkflowWFSchema, WorkflowStatus } from "./sqlproto";
 
 interface ITimeSlot {
 
 }
 
-interface IEaterySchema extends WorkflowObjectSchema {
+interface IEateryDataSchema extends WorkflowDataSchema {
+
+}
+
+interface IEateryWFSchema extends WorkflowWFSchema {
 
 }
 
@@ -28,8 +32,8 @@ export interface IEatery extends IWorkflowObject {
     published?: boolean;
 }
 
-export class Eatery extends WorkflowObject<IEatery, IEaterySchema> {
-    get schema(): IEaterySchema {
+export class Eatery extends WorkflowObject<IEatery, IEateryDataSchema, IEateryWFSchema> {
+    get dataSchema(): IEateryDataSchema {
         return {
             idFieldName: "id",
             tableName: "eateries",
@@ -66,12 +70,21 @@ export class Eatery extends WorkflowObject<IEatery, IEaterySchema> {
             ]
         };
     }
+
+    get wfSchema(): IEateryWFSchema {
+        return {
+            initialState: WorkflowStatus.Registered,
+            transfers: [
+                { from: WorkflowStatus.Registered, to: WorkflowStatus.Approved }
+            ]
+        }
+    }
 }
 
 /**
  * 
  */
-interface IEmployeeSchema extends WorkflowObjectSchema {
+interface IEmployeeSchema extends WorkflowDataSchema {
 
 }
 
@@ -86,8 +99,8 @@ interface IEmployee extends IWorkflowObject {
     tags?: string;
 }
 
-export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema> {
-    get schema(): IEmployeeSchema {
+export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema, IEateryWFSchema> {
+    get dataSchema(): IEmployeeSchema {
         return {
             idFieldName: "id",
             tableName: "employees",
@@ -103,7 +116,7 @@ export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema> {
                 { name: `tags`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL' },
             ],
             indexes: [
-                {fields: ["login"], indexType: "UNIQUE"}
+                { fields: ["login"], indexType: "UNIQUE" }
             ]
         };
     }
@@ -114,7 +127,7 @@ export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema> {
     }
 
     checkSecretKey(secretKey?: string): boolean {
-        const hash = Employee.calcHash(this.data.login.toString(), secretKey === undefined?"":secretKey);
+        const hash = Employee.calcHash(this.data.login.toString(), secretKey === undefined ? "" : secretKey);
         return this.data.hash === hash;
     }
 
@@ -122,11 +135,17 @@ export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema> {
         if (this.id === undefined) throw new WorkflowError(WorkflowErrorCode.abstract_method, `Load`);
         eateryData.createdByUser = this.data.login.toString();
         eateryData.changedByUser = this.data.login.toString();
-        eateryData.employees.push({employeeId: this.id, roles: "Administrator"});
+        eateryData.employees.push({ employeeId: this.id, roles: "Administrator" });
         const eatery = new Eatery(eateryData);
 
         await eatery.save();
         return eatery;
+    }
+
+    get wfSchema(): WorkflowWFSchema {
+        return {
+            initialState: WorkflowStatus.Done
+        }
     }
 }
 

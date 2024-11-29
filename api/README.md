@@ -30,7 +30,7 @@ Name|Description
 ### Working with EATERY class
 Working with|Methods
 -|-
-Eatery root object and master data| [eatery/new](#post-eaterynew), eatery/edit,  eatery/publish
+Eatery root object and master data| [eatery/new](#post-eaterynew), [eatery/edit](#post-eateryedit),  eatery/publish
 Employees of Eatery| eatery/employee/invite, eatery/employee/edit, eatery/employee/fire
 Delivery partners of Eatery| eatery/deliveryPartner/add,  eatery/deliveryPartner/edit
 PaymentMethods of Eatery| eatery/paymentMethod/add,  eatery/paymentMethod/edit
@@ -82,8 +82,52 @@ Response body if error
 }
 ```
 
-
 #### POST `eatery/edit`
+Changes Eatery data. User MUST:
+* be Employee 
+* belong to the Eatery
+* have role MDM.
+
+*Parameters*
+Mand|Parameter|Where|Type|Description
+-|-|-|-|-
+✅|coodfort-login|header|string|Login name of Employee
+✅|coodfort-password|header|string|Password of Employee
+✅|id|requestBody|number|Unique id of Eatery
+✅|name|requestBody|string|Name of Eatery
+❌|description|requestBody|string|Description of Eatery
+❌|url|requestBody|string|URL to Eatery
+❌|cuisines|requestBody|Comma separated string|List of cuisines
+❌|tags|requestBody|Comma separated string|Tags of Eatery
+
+*Returns*
+
+HTTP status|Condition|Response body
+-|-|-
+200|Eatery was changed successfully| See below
+400|Eatery wasn't changed because mandatory feilds are undefined|See below
+401|Eatery wasn't changed because Employee sent wrong login-password pair|See below
+403|Eatery wasn't changed because Employee was blocked
+
+Response body if successful
+```javascript
+{
+    ok: true, 
+    employee: IEatery
+}
+```
+Response body if error
+```javascript
+{
+    ok: false,
+    error: {
+        code: code_number,
+        shortName: short_string_error,
+        message: error_description
+    } 
+}
+```
+
 #### POST `eatery/publish`
 Makes changes to existing Eatery object. User MUST be Employee and have permissions of role [MDM](#mdm-role).
 #### POST `eatery/employee/invite`
