@@ -1,6 +1,6 @@
 import { configDotenv } from "dotenv";
 import express, { Request, Response } from "express";
-import { Eatery } from "./model/eateries";
+import { Eatery, Employee } from "./model/eateries";
 import { mconsole, mConsoleInit } from "./model/console";
 import OpenAPIBackend, {Context} from "openapi-backend";
 import path from "path";
@@ -10,6 +10,7 @@ import colours from "./model/colours";
 import { WorkflowError } from "./model/sqlproto";
 import { AuthUser } from "./model/security";
 import { newEmployee } from "./api/employee";
+import { newEatery } from "./api/eatery";
 
 configDotenv();
 mConsoleInit();
@@ -33,7 +34,7 @@ api.register({
         return res.status(200).json({ ok: true });
     },
     telegram: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true }),
-    newEatery: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true, guest: user.guest }),
+    newEatery: newEatery,
     updateEatery: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true, guest: user.guest  }),
     newEmployee: newEmployee,
 
@@ -65,9 +66,9 @@ api.registerSecurityHandler('COODFortLogin', (c: Context, req: Request, res: Res
     return login !== undefined;
 });
 api.registerSecurityHandler('COODFortPassword', (c: Context, req: Request, res: Response, user: AuthUser) => {
-    const password = req.headers["coodfort-password"];
+    const password = req.headers["coodfort-password"] as string;
     mconsole.auth(`COODFortPassword security check. coodfort-password = ${password === undefined?"-":password}`);
-    return password !== undefined;
+    return user.employee?.checkSecretKey(password);
 });
 
 
@@ -84,7 +85,15 @@ app.use(async (req: Request, res: Response) => {
     const tguid = req.headers["coodfort-tguid"];
     const login = req.headers["coodfort-login"];
 
-    const user: AuthUser = {
+    const user: AuthUser = {};
+    if (login !== undefined) {
+        try {
+            user.employee = new Employee("login", login);
+            await user.employee.load();
+            if (user.employee.data.blocked) return res.status(403).json({ok: false, error:{message: `User was blocked`}});
+        } catch (e: any) {
+            user.employee = undefined;
+        }
     }
     
     try {
@@ -97,7 +106,7 @@ app.use(async (req: Request, res: Response) => {
         },
             req, res, user);
     } catch (e) {
-        ret = res.status(500).json({ ok: false, err: e });
+        ret = res.status(500).json({ ok: false, error: e });
     }
     const requestEnd = new Date();
     console.log(`🏁 ${requestStart.toISOString()} - [${requestUUID}] - ${req.method} ${res.statusCode >= 200 && res.statusCode < 400 ? colours.fg.green : colours.fg.red}${req.path}${colours.reset} - ${res.statusCode} - ${requestEnd.getTime() - requestStart.getTime()} ms`);

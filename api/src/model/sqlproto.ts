@@ -81,21 +81,29 @@ export abstract class WorkflowObject<DataType extends IWorkflowObject, DBSchema 
     protected _schema?: DBSchema;
     protected _id?: Types.ObjectId;
     protected _data?: DataType;
+    protected _byUniqField?: {field: string, value: any};
     constructor(id: Types.ObjectId);
     constructor(data: DataType);
-    constructor(id: Types.ObjectId, data?: DataType) {
-        if (id === undefined && data === undefined) {
-            throw new WorkflowError(WorkflowErrorCode.unknown, `Couldn't create class '${this.constructor.name}' without data`)
-        } else {
-            if (typeof id === 'object') data = id;
-            if (data !== undefined) {
-                if (data?.id !== undefined) this._id = data.id;
-                else this._id = undefined;
-                this._data = data;
-            } else {
-                this._id = id;
-            }
-        }
+    constructor(field: string, uniqueValue: any);
+    constructor(...arg: any[]) {
+        switch (arg.length) {
+            case 0:
+                throw new WorkflowError(WorkflowErrorCode.unknown, `Couldn't create class '${this.constructor.name}' without data`)
+            case 1: 
+                if ((typeof arg[0] === 'object') && arg[0] !== undefined) { 
+                    if (arg[0].id !== undefined) this._id = arg[0].id;
+                    else this._id = undefined;
+                    this._data = arg[0];
+                } else {
+                    this._id = arg[0];
+                }
+                break;
+            case 2:
+                this._byUniqField = {field: arg[0], value: arg[1]};
+                break;
+            default:
+                throw new WorkflowError(WorkflowErrorCode.unknown, `Couldn't create class '${this.constructor.name}' too much data`)
+        } 
     }
 
     get schema(): DBSchema {
@@ -302,6 +310,16 @@ export abstract class WorkflowObject<DataType extends IWorkflowObject, DBSchema 
     protected async loadFromDB(): Promise<DataType> {
         await WorkflowObject.createSQLConnection();
         let [rows, fields]: [DataType[], FieldPacket[]] = [[], []];
+        if (this.id === undefined) {
+            if (this._byUniqField === undefined) throw new WorkflowError(WorkflowErrorCode.parameter_expected, `Unique value of object '${this.constructor.name}' is undefined and id is undefined too`);
+
+            const sql = `SELECT \`id\` from \`${this.schema.tableName}\` WHERE \`${this._byUniqField.field}\` = ?`;
+            mconsole.sqlq(sql, [this._byUniqField.value]);
+            [rows, fields] = await this.sqlConnection.query<[]>(sql, [this._byUniqField.value]);
+            if (rows.length === 1) this._id = rows[0].id;
+            else throw new WorkflowError(WorkflowErrorCode.sql_not_found, `There're ${rows.length} of records in '${this.schema.tableName}'. Searched value '${this._byUniqField.value}' by field '${this._byUniqField.field}' Expected: 1`);
+            mconsole.sqld(`Found only id = '${this._id}' in ${this.schema.tableName} by field '${this._byUniqField.field}' = '${this._byUniqField.value}' `);
+        }
         while (true) {
             try {
                 [rows, fields] = await this.sqlConnection.query<[]>(`select * from \`${this.schema.tableName}\` where \`${this.schema.idFieldName}\` = ?`, [this.id]);

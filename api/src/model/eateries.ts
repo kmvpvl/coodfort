@@ -1,5 +1,5 @@
 import { createHmac } from "crypto";
-import { IWorkflowObject, Types, WorkflowObject, WorkflowObjectSchema } from "./sqlproto";
+import { IWorkflowObject, Types, WorkflowError, WorkflowErrorCode, WorkflowObject, WorkflowObjectSchema } from "./sqlproto";
 
 interface ITimeSlot {
 
@@ -11,18 +11,21 @@ interface IEaterySchema extends WorkflowObjectSchema {
 
 export interface IEatery extends IWorkflowObject {
     name: string;
-    employeeIds: Types.ObjectId[];
+    employees: {
+        employeeId: Types.ObjectId;
+        roles: string;
+    }[];
     tables: ITable[];
     deliveryPartnerIds: Types.ObjectId[];
     entertainmentIds: Types.ObjectId[];
     rating?: number;
     url?: string;
     photos?: string;
-    descriptions?: string;
+    description?: string;
     tags?: string;
     cuisines?: string;
     avgbillwoalcohol?: number;
-    published: boolean;
+    published?: boolean;
 }
 
 export class Eatery extends WorkflowObject<IEatery, IEaterySchema> {
@@ -35,10 +38,10 @@ export class Eatery extends WorkflowObject<IEatery, IEaterySchema> {
                 { name: `name`, sql: 'varchar(128) NOT NULL' },
                 { name: `rating`, sql: 'float DEFAULT NULL' },
                 { name: `url`, sql: 'varchar(2048) DEFAULT NULL' },
-                { name: `photos`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))' },
-                { name: `descriptions`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`descriptions`))' },
-                { name: `tags`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`tags`))' },
-                { name: `cuisines`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`cuisines`))' },
+                { name: `photos`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL' },
+                { name: `description`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL' },
+                { name: `tags`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL' },
+                { name: `cuisines`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL' },
                 { name: `avgbillwoalcohol`, sql: 'float DEFAULT NULL' },
                 { name: `published`, sql: 'tinyint(1) NOT NULL DEFAULT 0' },
             ],
@@ -47,11 +50,19 @@ export class Eatery extends WorkflowObject<IEatery, IEaterySchema> {
                     tableName: 'tables',
                     idFieldName: "id",
                     fields: [
-                        //{name:`eatery_id`, sql: 'bigint(20) NOT NULL'},
                         { name: `name`, sql: 'varchar(1024) NOT NULL' },
                         { name: `rating`, sql: 'float DEFAULT NULL' },
                     ]
+                },
+                {
+                    tableName: 'employees',
+                    idFieldName: "id",
+                    fields: [
+                        { name: `employeeId`, sql: 'bigint(20) NOT NULL' },
+                        { name: `roles`, sql: 'varchar(2048) DEFAULT NULL' },
+                    ]
                 }
+
             ]
         };
     }
@@ -102,9 +113,20 @@ export class Employee extends WorkflowObject<IEmployee, IEmployeeSchema> {
         return hash;
     }
 
-    checkSecretKey(secretKey: string): boolean {
-        const hash = Employee.calcHash(this.data.login.toString(), secretKey);
+    checkSecretKey(secretKey?: string): boolean {
+        const hash = Employee.calcHash(this.data.login.toString(), secretKey === undefined?"":secretKey);
         return this.data.hash === hash;
+    }
+
+    async createEatery(eateryData: IEatery): Promise<Eatery> {
+        if (this.id === undefined) throw new WorkflowError(WorkflowErrorCode.abstract_method, `Load`);
+        eateryData.createdByUser = this.data.login.toString();
+        eateryData.changedByUser = this.data.login.toString();
+        eateryData.employees.push({employeeId: this.id, roles: "Administrator"});
+        const eatery = new Eatery(eateryData);
+
+        await eatery.save();
+        return eatery;
     }
 }
 

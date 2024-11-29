@@ -7,7 +7,7 @@ beforeAll(() => {
     jest.spyOn(console, 'warn').mockImplementation(jest.fn());
     jest.spyOn(console, 'log').mockImplementation(jest.fn());
     jest.spyOn(console, 'debug').mockImplementation(jest.fn());
-    
+
 });
 
 afterAll(done => {
@@ -15,9 +15,13 @@ afterAll(done => {
     done();
 })
 
-describe('\'employee/new\' path test', ()=> {
-    test('Create new Employee', async ()=> {
-        const newEmployee = await request(app).post("/employee/new")
+describe('employee -> eatery', ()=> {
+/**
+ * SUCCESS
+ * Creating new Employee who shall become owner of Eatery
+ */
+    test('Creating new Employee who shall become owner of Eatery', async ()=> {
+        const owner = await request(app).post("/employee/new")
             .set('content-type', 'application/json')
             .set('coodfort-login', 'new_employee')
             .set('coodfort-password', 'password_of_new_employee')
@@ -25,24 +29,76 @@ describe('\'employee/new\' path test', ()=> {
                 name: "Name of new Employee",
                 bio: "Bio of new Employee",
                 tags:"tag1,tag2,tag3"
-            });
-        expect(newEmployee.statusCode).toBe(200);
+        });
+        expect(owner.statusCode).toBe(200);
     });
-    test('Attempt to create Employee with the same login', async () => {
-        const newEmployee = await request(app).post("/employee/new")
+/**
+ * ERROR - 401 by WRONG LOGIN and password
+ * Creating new Eatery by owner
+ */
+    test('Creating new Eatery with wrong credentials of user', async ()=> {
+        let newEatery = await request(app).post("/eatery/new")
+        .set('content-type', 'application/json')
+        .set('coodfort-login', 'wrong_login')
+        .set('coodfort-password', 'password_of_new_employee')
+        .send({
+            name: "Name of new Eatery",
+            description: "Long-long-too-long description",
+            url: "https://test.te",
+            tags:"tag1,tag2,tag3"
+        });
+        expect(newEatery.statusCode).toBe(401);
+
+        newEatery = await request(app).post("/eatery/new")
+        .set('content-type', 'application/json')
+        .set('coodfort-login', 'new_employee')
+        .set('coodfort-password', 'wrong_password')
+        .send({
+            name: "Name of new Eatery",
+            description: "Long-long-too-long description",
+            url: "https://test.te",
+            tags:"tag1,tag2,tag3"
+        });
+        expect(newEatery.statusCode).toBe(401);
+    });
+
+/**
+ * ERROR - 400 Expected parameter
+ * Creating new Eatery by owner
+ */
+    test('Creating new Eatery without mandatory property Name', async ()=> {
+        const newEatery = await request(app).post("/eatery/new")
             .set('content-type', 'application/json')
             .set('coodfort-login', 'new_employee')
             .set('coodfort-password', 'password_of_new_employee')
             .send({
-                name: "Name of new Employee",
-                bio: "Bio of new Employee",
+                name1: "Name of new Eatery",
+                description: "Long-long-too-long description",
+                url: "https://test.te",
                 tags:"tag1,tag2,tag3"
-            });
-        expect(newEmployee.statusCode).toBe(400);
-    })
+        });
+        expect(newEatery.statusCode).toBe(400);
+    });
+/**
+ * SUCCESS
+ * Creating new Eatery by owner
+ */
+    test('Creating new Eatery', async ()=> {
+        const newEatery = await request(app).post("/eatery/new")
+            .set('content-type', 'application/json')
+            .set('coodfort-login', 'new_employee')
+            .set('coodfort-password', 'password_of_new_employee')
+            .send({
+                name: "Name of new Eatery",
+                description: "Long-long-too-long description",
+                url: "https://test.te",
+                tags:"tag1,tag2,tag3"
+        });
+        expect(newEatery.statusCode).toBe(200);
+    });
 });
 
-describe('creating structure', ()=>{
+describe('Checking Employee security', ()=>{
     beforeAll(()=>{
         console.debug("before all");
     });
@@ -54,14 +110,20 @@ describe('creating structure', ()=>{
         console.debug("before each");
     });
 
-    test('test1', async ()=> {
-        console.debug(1);
-        const t = request(app);
-        const a = await t.post("/eatery/edit");
+    test('Attempt to create Eatery with blank login and password', async ()=> {
+        const a = await request(app).post("/eatery/new");
         expect(a.statusCode).toBe(401)
     })
-    test('test2', ()=> {
-        console.debug(2);
-        expect(true).toBe(true);
+    test('Attempt to create Employee with the same login', async () => {
+        const newEmployee = await request(app).post("/employee/new")
+            .set('content-type', 'application/json')
+            .set('coodfort-login', 'new_employee')
+            .set('coodfort-password', 'password_of_new_employee')
+            .send({
+                name: "Name of new Employee",
+                bio: "Bio of new Employee",
+                tags:"tag1,tag2,tag3"
+            });
+        expect(newEmployee.statusCode).toBe(400);
     })
 })
