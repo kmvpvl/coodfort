@@ -1,3 +1,3 @@
-import { Employee } from "./eateries";
+import { Employee } from "./eatery";
 
 export interface AuthUser {guest?: {}, employee?: Employee};

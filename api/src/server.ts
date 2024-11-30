@@ -1,13 +1,13 @@
 import { configDotenv } from "dotenv";
 import express, { Request, Response } from "express";
-import { Eatery, Employee } from "./model/eateries";
+import { Eatery, Employee } from "./model/eatery";
 import { mconsole, mConsoleInit } from "./model/console";
 import OpenAPIBackend, {Context} from "openapi-backend";
 import path from "path";
 import fs from "fs";
 import { randomUUID } from "crypto";
 import colours from "./model/colours";
-import { DocumentError } from "./model/sqlproto";
+import { DocumentError } from "./model/protodocument";
 import { AuthUser } from "./model/security";
 import { newEmployee } from "./api/employee";
 import { newEatery } from "./api/eatery";

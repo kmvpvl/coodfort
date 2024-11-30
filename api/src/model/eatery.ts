@@ -1,15 +1,15 @@
 import { createHmac } from "crypto";
-import { IDocument, Types, DocumentError, DocumentErrorCode, Document, DocumentDataSchema, DocumentWFSchema, WorkflowStatus } from "./sqlproto";
+import { IDocument, Types, DocumentError, DocumentErrorCode, Document, IDocumentDataSchema, IDocumentWFSchema, WorkflowStatusCode } from "./protodocument";
 
 interface ITimeSlot {
 
 }
 
-interface IEateryDataSchema extends DocumentDataSchema {
+interface IEateryDataSchema extends IDocumentDataSchema {
 
 }
 
-interface IEateryWFSchema extends DocumentWFSchema {
+interface IEateryWFSchema extends IDocumentWFSchema {
 
 }
 
@@ -73,9 +73,20 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
 
     get wfSchema(): IEateryWFSchema {
         return {
-            initialState: WorkflowStatus.Registered,
+            tableName: "eateries",
+            initialState: WorkflowStatusCode.registered,
             transfers: [
-                { from: WorkflowStatus.Registered, to: WorkflowStatus.Approved }
+                { from: WorkflowStatusCode.registered, to: WorkflowStatusCode.approved }
+            ],
+            related: [
+                {tableName: "tables", 
+                    initialState: WorkflowStatusCode.draft, 
+                    transfers:[{from: WorkflowStatusCode.draft, to: WorkflowStatusCode.approved}]
+                },
+                {tableName: "employees", 
+                    initialState: WorkflowStatusCode.draft, 
+                    transfers:[{from: WorkflowStatusCode.draft, to: WorkflowStatusCode.approved}]
+                }
             ]
         }
     }
@@ -84,7 +95,7 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
 /**
  * 
  */
-interface IEmployeeSchema extends DocumentDataSchema {
+interface IEmployeeSchema extends IDocumentDataSchema {
 
 }
 
@@ -142,9 +153,10 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
         return eatery;
     }
 
-    get wfSchema(): DocumentWFSchema {
+    get wfSchema(): IDocumentWFSchema {
         return {
-            initialState: WorkflowStatus.Done
+            tableName: "eatery",
+            initialState: WorkflowStatusCode.done
         }
     }
 }

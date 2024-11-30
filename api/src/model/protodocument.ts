@@ -5,13 +5,26 @@ import { mconsole } from './console';
 export namespace Types {
     export type ObjectId = number;
 }
+
 export enum DocumentErrorCode {
     unknown,
     abstract_method,
     sql_connection_error,
     sql_not_found,
     parameter_expected,
+    wf_suspense
 }
+
+export enum WorkflowStatusCode {
+    draft,
+    registered,
+    approved,
+    processing,
+    done,
+    review,
+    closed,
+}
+
 export class DocumentError extends Error {
     code: DocumentErrorCode;
     constructor(code: DocumentErrorCode, message?: string) {
@@ -27,16 +40,6 @@ export class DocumentError extends Error {
     }
 }
 
-export enum WorkflowStatus {
-    "Draft",
-    "Registered",
-    "Approved",
-    "Processing",
-    "Done",
-    "Review",
-    "Closed",
-}
-
 export interface IDocument {
     id?: Types.ObjectId;
     blocked?: boolean;
@@ -44,10 +47,10 @@ export interface IDocument {
     changed?: Date;
     createdByUser?: string;
     changedByUser?: string;
-    wfStatus?: WorkflowStatus;
+    wfStatus?: WorkflowStatusCode;
 }
 
-export const DocumentBaseSchema: TableFieldSchema[] = [
+export const DocumentBaseSchema: ITableFieldSchema[] = [
     { name: `id`, sql: 'bigint(20) NOT NULL AUTO_INCREMENT' },
     { name: `blocked`, sql: 'tinyint(1) NOT NULL DEFAULT 0' },
     { name: `wfStatus`, sql: 'INT(11) NULL' },
@@ -57,34 +60,36 @@ export const DocumentBaseSchema: TableFieldSchema[] = [
     { name: `changed`, sql: 'timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()' },
 ]
 
-export type TableFieldSchema = {
+export type ITableFieldSchema = {
     name: string;
     sql: string;
 }
 
-export type TableIndexSchema = {
+export type ITableIndexSchema = {
     fields: string[];
     indexType: string;
 }
 
-export interface DocumentDataSchema {
+export interface IDocumentDataSchema {
     tableName: string;
     relatedTablesPrefix?: string;
     idFieldName: string;
-    fields: TableFieldSchema[];
-    indexes?: TableIndexSchema[];
-    related?: DocumentDataSchema[];
+    fields: ITableFieldSchema[];
+    indexes?: ITableIndexSchema[];
+    related?: IDocumentDataSchema[];
 }
 
-export type DocumentWFSchema = {
-    initialState: WorkflowStatus;
+export type IDocumentWFSchema = {
+    tableName: string;
+    initialState: WorkflowStatusCode;
     transfers?: {
-        from: WorkflowStatus,
-        to: WorkflowStatus
-    }[]
+        from: WorkflowStatusCode,
+        to: WorkflowStatusCode
+    }[],
+    related?: IDocumentWFSchema[];
 }
 
-export abstract class Document<DataType extends IDocument, DBSchema extends DocumentDataSchema, WFSchema extends DocumentWFSchema> {
+export abstract class Document<DataType extends IDocument, DBSchema extends IDocumentDataSchema, WFSchema extends IDocumentWFSchema> {
     private static _sqlConnection?: Connection;
     protected _dataSchema?: DBSchema;
     protected _id?: Types.ObjectId;
@@ -289,7 +294,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends Docu
         mconsole.sqlinfo(`Main table of schema '${this.dataSchema.tableName}' has created successfully`);
     }
 
-    protected async createRelatedTable(tableSchema: DocumentDataSchema) {
+    protected async createRelatedTable(tableSchema: IDocumentDataSchema) {
         mconsole.sqlinfo(`Creating related table '${tableSchema.tableName}' of schema '${this.dataSchema.tableName}'`);
 
         let sql = `
@@ -374,7 +379,33 @@ export abstract class Document<DataType extends IDocument, DBSchema extends Docu
         }
     }
 
-    async changeWorkflowStatus(newStatus: WorkflowStatus) {
-
+    async wfNext(): Promise<WorkflowStatusCode>;
+    async wfNext(newStatus: WorkflowStatusCode): Promise<WorkflowStatusCode>;
+    async wfNext(predict: (availableStatuses: WorkflowStatusCode[])=>WorkflowStatusCode): Promise<WorkflowStatusCode>;
+    async wfNext(...arg: any[]): Promise<WorkflowStatusCode> {
+        const availableTransfers = this.wfSchema.transfers?.filter(transfer=>transfer.from === this.data.wfStatus);
+        let ret: WorkflowStatusCode;
+        switch(arg.length){
+            case 0:
+                if (availableTransfers?.length === 1) {
+                    ret = availableTransfers[0].to;
+                    break;
+                } else {
+                    throw new DocumentError(DocumentErrorCode.wf_suspense, `Couldn't process wfNext function because ambiguity in transfer table of '${this.constructor.name}' with id = '${this.id}'. Current wfStatus = '${this.data.wfStatus}'; availaible transfers are: ${availableTransfers}`)
+                }
+            case 1:
+                if (typeof arg[0] !== 'function') {
+                    ret = arg[0];
+                } else {
+                    const predict = arg[0];
+                    ret = predict(availableTransfers);
+                }
+                break;
+            default:
+                throw new DocumentError(DocumentErrorCode.wf_suspense, `Couldn't process wfNext function because ambiguity in transfer table of '${this.constructor.name}' with id = '${this.id}'. Current wfStatus = '${this.data.wfStatus}'; availaible transfers are: ${availableTransfers}`)
+        }
+        this.data.wfStatus = ret;
+        await this.save();
+        return ret;
     }
 }

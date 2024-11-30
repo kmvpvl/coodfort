@@ -1,8 +1,8 @@
 import { Context } from "openapi-backend";
 import { AuthUser } from "../model/security";
 import { Request, Response } from "express";
-import { Employee } from "../model/eateries";
-import { DocumentError, DocumentErrorCode } from "../model/sqlproto";
+import { Employee } from "../model/eatery";
+import { DocumentError, DocumentErrorCode } from "../model/protodocument";
 
 
 export async function newEmployee(c: Context, req: Request, res: Response, user: AuthUser) {
