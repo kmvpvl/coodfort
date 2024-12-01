@@ -30,7 +30,7 @@ Name|Description
 ### Working with EATERY class
 Working with|Methods
 -|-
-Eatery root object and master data| [eatery/new](#post-eaterynew), [eatery/edit](#post-eateryedit),  eatery/publish
+Eatery root object and master data| [eatery/new](#post-eaterynew), [eatery/update](#post-eateryupdate), [eatery/edit](#post-eateryedit),  eatery/approve
 Employees of Eatery| eatery/employee/invite, eatery/employee/edit, eatery/employee/fire
 Delivery partners of Eatery| eatery/deliveryPartner/add,  eatery/deliveryPartner/edit
 PaymentMethods of Eatery| eatery/paymentMethod/add,  eatery/paymentMethod/edit
@@ -83,6 +83,8 @@ Response body if error
 ```
 
 #### POST `eatery/edit`
+
+#### POST `eatery/update`
 Changes Eatery data. User MUST:
 * be Employee 
 * belong to the Eatery
@@ -128,7 +130,7 @@ Response body if error
 }
 ```
 
-#### POST `eatery/publish`
+#### POST `eatery/approve`
 Makes changes to existing Eatery object. User MUST be Employee and have permissions of role [MDM](#mdm-role).
 #### POST `eatery/employee/invite`
 #### POST `eatery/employee/edit`

@@ -95,13 +95,16 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     protected _id?: Types.ObjectId;
     protected _data?: DataType;
     protected _byUniqField?: { field: string, value: any };
+    protected _collection?: Types.ObjectId[];
+    constructor();
     constructor(id: Types.ObjectId);
     constructor(data: DataType);
     constructor(field: string, uniqueValue: any);
     constructor(...arg: any[]) {
         switch (arg.length) {
             case 0:
-                throw new DocumentError(DocumentErrorCode.unknown, `Couldn't create class '${this.constructor.name}' without data`)
+                break;
+                //throw new DocumentError(DocumentErrorCode.unknown, `Couldn't create class '${this.constructor.name}' without data`)
             case 1:
                 if ((typeof arg[0] === 'object') && arg[0] !== undefined) {
                     if (arg[0].id !== undefined) this._id = arg[0].id;
@@ -216,6 +219,10 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
                 if (relObj.tableName in this.data) {
                     const arrProp = (this.data as any)[relObj.tableName];
                     for (const element of arrProp) {
+                        //calc initial state for child record
+                        const initialState = this.wfSchema.related?.filter(el=>el.tableName === relObj.tableName)?.at(0)?.initialState;
+                        if (element.wfStatus === undefined) element.wfStatus = initialState;
+
                         let schemaDefinedFields = relObj.fields;
                         let wfSchemaDefinedFields = DocumentBaseSchema;
                         if (element[relObj.idFieldName] === undefined) {
@@ -297,8 +304,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     protected async createRelatedTable(tableSchema: IDocumentDataSchema) {
         mconsole.sqlinfo(`Creating related table '${tableSchema.tableName}' of schema '${this.dataSchema.tableName}'`);
 
-        let sql = `
-        CREATE TABLE IF NOT EXISTS \`${this.dataSchema.relatedTablesPrefix + tableSchema.tableName}\`(
+        let sql = `CREATE TABLE IF NOT EXISTS \`${this.dataSchema.relatedTablesPrefix + tableSchema.tableName}\`(
         \`${this.dataSchema.relatedTablesPrefix + this.dataSchema.idFieldName}\` bigint(20) NOT NULL,
         ${tableSchema.fields.map(field => `\`${field.name}\` ${field.sql}`).join(",")}, 
         ${DocumentBaseSchema.map(field => `\`${field.name}\` ${field.sql}`).join(",")}, 
@@ -316,8 +322,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         }
 
         mconsole.sqlinfo(`Creating foreign key for related table ${tableSchema.tableName}' of schema '${this.dataSchema.tableName}'`);
-        sql = `
-        ALTER TABLE \`${this.dataSchema.relatedTablesPrefix + tableSchema.tableName}\` 
+        sql = `ALTER TABLE \`${this.dataSchema.relatedTablesPrefix + tableSchema.tableName}\` 
         ADD FOREIGN KEY (\`${this.dataSchema.relatedTablesPrefix}${this.dataSchema.idFieldName}\`) REFERENCES \`${this.dataSchema.tableName}\`(\`${this.dataSchema.idFieldName}\`) 
         ON DELETE RESTRICT ON UPDATE RESTRICT;`
         mconsole.sqlq(`sql = '${sql}'`, []);
@@ -407,5 +412,12 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         this.data.wfStatus = ret;
         await this.save();
         return ret;
+    }
+
+    async getCollection(whereTense: string, params: any[], orderTense: string, limit: number = 100):Promise<void> {
+        const sql = `SELECT \`${this.dataSchema.idFieldName}\` FROM \`${this.dataSchema.tableName}\` WHERE (${whereTense}) AND \`blocked\` = 0 ORDER ${orderTense} LIMIT ${limit}`;
+        mconsole.sqlq(sql, params);
+        const [rows, fields] = await this.sqlConnection.query<[]>(sql, params);
+        this._collection = rows;
     }
 }

@@ -29,7 +29,6 @@ export interface IEatery extends IDocument {
     tags?: string;
     cuisines?: string;
     avgbillwoalcohol?: number;
-    published?: boolean;
 }
 
 export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema> {
@@ -47,7 +46,6 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
                 { name: `tags`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL' },
                 { name: `cuisines`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL' },
                 { name: `avgbillwoalcohol`, sql: 'float DEFAULT NULL' },
-                { name: `published`, sql: 'tinyint(1) NOT NULL DEFAULT 0' },
             ],
             related: [
                 {
@@ -84,8 +82,7 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
                     transfers:[{from: WorkflowStatusCode.draft, to: WorkflowStatusCode.approved}]
                 },
                 {tableName: "employees", 
-                    initialState: WorkflowStatusCode.draft, 
-                    transfers:[{from: WorkflowStatusCode.draft, to: WorkflowStatusCode.approved}]
+                    initialState: WorkflowStatusCode.approved, 
                 }
             ]
         }

@@ -99,17 +99,6 @@ describe('employee -> eatery', ()=> {
 });
 
 describe('Checking Employee security', ()=>{
-    beforeAll(()=>{
-        console.debug("before all");
-    });
-    afterAll(()=> {
-        console.debug("after all");
-    });
-
-    beforeEach(()=>{
-        console.debug("before each");
-    });
-
     test('Attempt to create Eatery with blank login and password', async ()=> {
         const a = await request(app).post("/eatery/new");
         expect(a.statusCode).toBe(401)

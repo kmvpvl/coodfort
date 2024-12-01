@@ -10,7 +10,7 @@ import colours from "./model/colours";
 import { DocumentError } from "./model/protodocument";
 import { AuthUser } from "./model/security";
 import { newEmployee } from "./api/employee";
-import { newEatery } from "./api/eatery";
+import { updateEatery, newEatery } from "./api/eatery";
 
 configDotenv();
 mConsoleInit();
@@ -35,7 +35,7 @@ api.register({
     },
     telegram: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true }),
     newEatery: newEatery,
-    updateEatery: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true, guest: user.guest  }),
+    updateEatery: updateEatery,
     newEmployee: newEmployee,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
