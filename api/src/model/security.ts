@@ -1,3 +1,6 @@
-import { Employee } from "./eatery";
+import { Employee } from './eatery';
 
-export interface AuthUser {guest?: {}, employee?: Employee};
+export interface AuthUser {
+    guest?: object;
+    employee?: Employee;
+}
