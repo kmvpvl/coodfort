@@ -147,11 +147,11 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
                 { name: `rating`, sql: 'float DEFAULT NULL' },
                 {
                     name: `awards`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))',
+                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
                 },
                 {
                     name: `photos`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))',
+                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
                 },
                 {
                     name: `bio`,
