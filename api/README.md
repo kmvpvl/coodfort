@@ -30,16 +30,55 @@ Name|Description
 ### Working with EATERY class
 Working with|Methods
 -|-
-Eatery root object and master data| [eatery/new](#post-eaterynew), [eatery/update](#post-eateryupdate), [eatery/edit](#post-eateryedit),  eatery/approve
-Employees of Eatery| eatery/employee/invite, eatery/employee/edit, eatery/employee/fire
+Eatery root object and master data| [eatery/new](#post-eaterynew), [eatery/update](#post-eateryupdate), [eatery/view](#post-eateryview), eatery/checkout, eatery/checkin,  eatery/approve, eatery/table/new, eatery/table/update, eatery/table/block
+Employees of Eatery| eatery/employee/invite, eatery/employee/update, eatery/employee/fire
 Delivery partners of Eatery| eatery/deliveryPartner/add,  eatery/deliveryPartner/edit
 PaymentMethods of Eatery| eatery/paymentMethod/add,  eatery/paymentMethod/edit
-Promos and Discounts| eatery/promo/add,  eatery/promo/edit
+Promos and Discounts| eatery/promo/add, eatery/promo/edit
 Entertainment calendar of Eatery| eatery/entertainment/add,  eatery/entertainment/edit
 Meals and Drinks menu|eatery/meal/add, eatery/meal/edit, eatery/meal/search, eatery/meal/view
 Bookings|eatery/book/approve, eatery/book/reject
 Order|eatery/order/approve, eatery/order/reject, eatery/order/payment/recieve
 Payments|eatery/pay
+
+#### POST `eatery/view`
+Reveals information about Eatery by its unique id. If an Employee of Eatery requests the information then IEatory object includes the employees array. Else the employee array is absent
+
+*Parameters*
+Mand|Parameter|Where|Type|Description
+-|-|-|-|-
+✅|coodfort-login|header|string|Login name of Employee or Guest 
+✅|coodfort-password|header|string|Password of Employee or Guest
+✅|id|requestBody|number|Unique id of the Eatery
+
+*Returns*
+
+HTTP status|Condition|Response body
+-|-|-
+200|Information about Eatery was collected successfully| See below
+400|Some Request mandatory feilds are undefined|See below
+401|Eatery information couldn't be collected because Employee or Guest sent wrong login-password pair|See below
+403|Eatery information couldn't be collected because Employee or Guest was blocked
+
+Response body if successful
+```javascript
+{
+    ok: true, 
+    employee: IEatery
+}
+```
+Response body if error
+```javascript
+{
+    ok: false,
+    error: {
+        code: code_number,
+        shortName: short_string_error,
+        message: error_description
+    } 
+}
+```
+
 
 #### POST `eatery/new`
 Creates new Eatery. User MUST be Employee to create new Eatery. Guest can't create new Eatery. 
@@ -49,6 +88,7 @@ Mand|Parameter|Where|Type|Description
 ✅|coodfort-login|header|string|Login name of Employee (future owner of the Eatery)
 ✅|coodfort-password|header|string|Password of Employee (future owner of the Eatery)
 ✅|name|requestBody|string|Display name of Eatery
+❌|tables|requestBody|array of ITable|Tables of Eatery
 ❌|description|requestBody|string|Description of Eatery
 ❌|url|requestBody|string|URL to Eatery
 ❌|cuisines|requestBody|Comma separated string|List of cuisines
@@ -97,6 +137,7 @@ Mand|Parameter|Where|Type|Description
 ✅|coodfort-password|header|string|Password of Employee
 ✅|id|requestBody|number|Unique id of Eatery
 ✅|name|requestBody|string|Name of Eatery
+❌|tables|requestBody|array of ITable|Tables of Eatery
 ❌|description|requestBody|string|Description of Eatery
 ❌|url|requestBody|string|URL to Eatery
 ❌|cuisines|requestBody|Comma separated string|List of cuisines

@@ -1,14 +1,5 @@
 import { createHmac } from 'crypto';
-import {
-    IDocument,
-    Types,
-    DocumentError,
-    DocumentErrorCode,
-    Document,
-    IDocumentDataSchema,
-    IDocumentWFSchema,
-    WorkflowStatusCode,
-} from './protodocument';
+import { IDocument, Types, DocumentError, DocumentErrorCode, Document, IDocumentDataSchema, IDocumentWFSchema, WorkflowStatusCode } from './protodocument';
 
 interface ITimeSlot {}
 
@@ -16,11 +7,21 @@ interface IEateryDataSchema extends IDocumentDataSchema {}
 
 interface IEateryWFSchema extends IDocumentWFSchema {}
 
+export enum EateryRoleCode {
+    'supervisor' = 'supervisor',
+    'administrator' = 'administrator',
+    'MDM' = 'MDM',
+}
+
 export interface IEatery extends IDocument {
     name: string;
     employees: {
         employeeId: Types.ObjectId;
-        roles: string;
+        roles: EateryRoleCode;
+        objects?: {
+            type: string;
+            id: Types.ObjectId;
+        }[];
     }[];
     tables: ITable[];
     deliveryPartnerIds: Types.ObjectId[];
@@ -34,11 +35,7 @@ export interface IEatery extends IDocument {
     avgbillwoalcohol?: number;
 }
 
-export class Eatery extends Document<
-    IEatery,
-    IEateryDataSchema,
-    IEateryWFSchema
-> {
+export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema> {
     get dataSchema(): IEateryDataSchema {
         return {
             idFieldName: 'id',
@@ -115,6 +112,10 @@ export class Eatery extends Document<
             ],
         };
     }
+
+    checkRoles(roleToCheck: EateryRoleCode, employeeId: Types.ObjectId): boolean {
+        return this.data.employees.some(empl => empl.employeeId === employeeId && (empl.roles === roleToCheck || empl.roles === EateryRoleCode.administrator));
+    }
 }
 
 /**
@@ -133,11 +134,7 @@ interface IEmployee extends IDocument {
     tags?: string;
 }
 
-export class Employee extends Document<
-    IEmployee,
-    IEmployeeSchema,
-    IEateryWFSchema
-> {
+export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSchema> {
     get dataSchema(): IEmployeeSchema {
         return {
             idFieldName: 'id',
@@ -170,32 +167,31 @@ export class Employee extends Document<
     }
 
     static calcHash(login: string, secretKey: string): string {
-        const hash = createHmac('sha256', `${login} ${secretKey}`).digest(
-            'hex'
-        );
+        const hash = createHmac('sha256', `${login} ${secretKey}`).digest('hex');
         return hash;
     }
 
     checkSecretKey(secretKey?: string): boolean {
-        const hash = Employee.calcHash(
-            this.data.login.toString(),
-            secretKey === undefined ? '' : secretKey
-        );
+        const hash = Employee.calcHash(this.data.login.toString(), secretKey === undefined ? '' : secretKey);
         return this.data.hash === hash;
     }
 
     async createEatery(eateryData: IEatery): Promise<Eatery> {
-        if (this.id === undefined)
-            throw new DocumentError(DocumentErrorCode.abstract_method, `Load`);
-        eateryData.createdByUser = this.data.login.toString();
-        eateryData.changedByUser = this.data.login.toString();
         eateryData.employees.push({
             employeeId: this.id,
-            roles: 'Administrator',
+            roles: EateryRoleCode.administrator,
         });
         const eatery = new Eatery(eateryData);
 
-        await eatery.save();
+        await eatery.save(this.data.login.toString());
+        return eatery;
+    }
+
+    async updateEatery(eateryData: IEatery): Promise<Eatery> {
+        if (eateryData.id === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Parameter 'id' is mandatory`);
+        const eatery = new Eatery(eateryData.id);
+        await eatery.load();
+        if (!eatery.checkRoles(EateryRoleCode.MDM, this.id)) await eatery.save(this.data.login.toString());
         return eatery;
     }
 

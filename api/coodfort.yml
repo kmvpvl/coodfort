@@ -57,6 +57,12 @@ paths:
       responses:
         '200':
           description: OK
+  /eatery/view:
+    post:
+      operationId: viewEatery
+      responses:
+        '200':
+          description: OK
   /employee/new:
     post:
       operationId: newEmployee

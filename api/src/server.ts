@@ -10,7 +10,7 @@ import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
 import { AuthUser } from './model/security';
 import { newEmployee } from './api/employee';
-import { updateEatery, newEatery } from './api/eatery';
+import { updateEatery, newEatery, viewEatery } from './api/eatery';
 
 configDotenv();
 mConsoleInit();
@@ -33,71 +33,44 @@ api.register({
     tgconfig: async (c: Context, req: Request, res: Response) => {
         return res.status(200).json({ ok: true });
     },
-    telegram: async (c: Context, req: Request, res: Response, user: AuthUser) =>
-        res.status(200).json({ ok: true }),
+    telegram: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true }),
     newEatery: newEatery,
     updateEatery: updateEatery,
+    viewEatery: viewEatery,
     newEmployee: newEmployee,
 
-    validationFail: (c: Context, req: Request, res: Response) =>
-        res.status(400).json({ ok: false, err: c.validation.errors }),
+    validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {
         const p = path.join(__dirname, '..', 'public', req.path);
         if (fs.existsSync(p)) {
             return res.sendFile(p);
         }
-        return res
-            .status(404)
-            .json({ ok: false, err: `File '${req.path}' not found` });
+        return res.status(404).json({ ok: false, err: `File '${req.path}' not found` });
     },
-    notImplemented: (c: Context, req: Request, res: Response) =>
-        res
-            .status(500)
-            .json({ ok: false, err: `'${req.path}' not implemented` }),
-    unauthorizedHandler: (c: Context, req: Request, res: Response) =>
-        res.status(401).json({ ok: false, err: 'not auth' }),
+    notImplemented: (c: Context, req: Request, res: Response) => res.status(500).json({ ok: false, err: `'${req.path}' not implemented` }),
+    unauthorizedHandler: (c: Context, req: Request, res: Response) => res.status(401).json({ ok: false, err: 'not auth' }),
 });
 
-api.registerSecurityHandler(
-    'COODFortTGUserId',
-    (c: Context, req: Request, res: Response, user: AuthUser) => {
-        const tguid = req.headers['coodfort-tguid'];
-        mconsole.auth(
-            `COODFortTGUserId security check. coodfort-tguid = ${tguid === undefined ? '-' : tguid}`
-        );
-        return tguid !== undefined;
-    }
-);
-api.registerSecurityHandler(
-    'TGQueryCheckString',
-    (c: Context, req: Request, res: Response, user: AuthUser) => {
-        const check = req.headers['coodfort-tgquerycheckstring'];
-        mconsole.auth(
-            `TGQueryCheckString security check. coodfort-tgquerycheckstring = ${check !== undefined ? check : '-'}`
-        );
-        return check !== undefined;
-    }
-);
-api.registerSecurityHandler(
-    'COODFortLogin',
-    (c: Context, req: Request, res: Response, user: AuthUser) => {
-        const login = req.headers['coodfort-login'];
-        mconsole.auth(
-            `COODFortLogin security check. coodfort-login = ${login === undefined ? '-' : login}`
-        );
-        return login !== undefined;
-    }
-);
-api.registerSecurityHandler(
-    'COODFortPassword',
-    (c: Context, req: Request, res: Response, user: AuthUser) => {
-        const password = req.headers['coodfort-password'] as string;
-        mconsole.auth(
-            `COODFortPassword security check. coodfort-password = ${password === undefined ? '-' : password}`
-        );
-        return user.employee?.checkSecretKey(password);
-    }
-);
+api.registerSecurityHandler('COODFortTGUserId', (c: Context, req: Request, res: Response, user: AuthUser) => {
+    const tguid = req.headers['coodfort-tguid'];
+    mconsole.auth(`COODFortTGUserId security check. coodfort-tguid = ${tguid === undefined ? '-' : tguid}`);
+    return tguid !== undefined;
+});
+api.registerSecurityHandler('TGQueryCheckString', (c: Context, req: Request, res: Response, user: AuthUser) => {
+    const check = req.headers['coodfort-tgquerycheckstring'];
+    mconsole.auth(`TGQueryCheckString security check. coodfort-tgquerycheckstring = ${check !== undefined ? check : '-'}`);
+    return check !== undefined;
+});
+api.registerSecurityHandler('COODFortLogin', (c: Context, req: Request, res: Response, user: AuthUser) => {
+    const login = req.headers['coodfort-login'];
+    mconsole.auth(`COODFortLogin security check. coodfort-login = ${login === undefined ? '-' : login}`);
+    return login !== undefined;
+});
+api.registerSecurityHandler('COODFortPassword', (c: Context, req: Request, res: Response, user: AuthUser) => {
+    const password = req.headers['coodfort-password'] as string;
+    mconsole.auth(`COODFortPassword security check. coodfort-password = ${password === undefined ? '-' : password}`);
+    return user.employee?.checkSecretKey(password);
+});
 
 export const app = express();
 app.use(express.json());
@@ -107,15 +80,13 @@ app.use(async (req: Request, res: Response) => {
     const requestUUID = randomUUID();
     const requestStart = new Date();
     console.log(
-        `🚀 ${requestStart.toISOString()} - [${requestUUID}] - ${req.method} ${colours.fg.yellow}${req.path}\n${colours.fg.blue}headers: ${Object.keys(
-            req.headersDistinct
-        )
-            .filter((v) => v.startsWith('misiscoin-'))
-            .map((v) => `${v} = '${req.headersDistinct[v]}'`)
+        `🚀 ${requestStart.toISOString()} - [${requestUUID}] - ${req.method} ${colours.fg.yellow}${req.path}\n${colours.fg.blue}headers: ${Object.keys(req.headersDistinct)
+            .filter(v => v.startsWith('misiscoin-'))
+            .map(v => `${v} = '${req.headersDistinct[v]}'`)
             .join(', ')}\nbody: ${Object.keys(req.body)
-            .map((v) => `${v} = '${req.body[v]}'`)
+            .map(v => `${v} = '${req.body[v]}'`)
             .join(', ')}\nquery: ${Object.keys(req.query)
-            .map((v) => `${v} = '${req.query[v]}'`)
+            .map(v => `${v} = '${req.query[v]}'`)
             .join(', ')}${colours.reset}`
     );
 
