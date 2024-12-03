@@ -30,13 +30,13 @@ Name|Description
 ### Working with EATERY class
 Working with|Methods
 -|-
-Eatery root object and master data| [eatery/new](#post-eaterynew), [eatery/update](#post-eateryupdate), [eatery/view](#post-eateryview), eatery/checkout, eatery/checkin,  eatery/approve, eatery/table/new, eatery/table/update, eatery/table/block
+Eatery root object and master data| [eatery/new](#post-eaterynew), [eatery/update](#post-eateryupdate), [eatery/view](#post-eateryview), eatery/checkout, eatery/checkin,  [eatery/publish](#post-eaterypublish), eatery/table/new, eatery/table/update, eatery/table/block
 Employees of Eatery| eatery/employee/invite, eatery/employee/update, eatery/employee/fire
 Delivery partners of Eatery| eatery/deliveryPartner/add,  eatery/deliveryPartner/edit
 PaymentMethods of Eatery| eatery/paymentMethod/add,  eatery/paymentMethod/edit
 Promos and Discounts| eatery/promo/add, eatery/promo/edit
 Entertainment calendar of Eatery| eatery/entertainment/add,  eatery/entertainment/edit
-Meals and Drinks menu|eatery/meal/add, eatery/meal/edit, eatery/meal/search, eatery/meal/view
+Meals and Drinks menu|meal/add, meal/update, meal/spread, meal/search, meal/view
 Bookings|eatery/book/approve, eatery/book/reject
 Order|eatery/order/approve, eatery/order/reject, eatery/order/payment/recieve
 Payments|eatery/pay
@@ -59,6 +59,44 @@ HTTP status|Condition|Response body
 400|Some Request mandatory feilds are undefined|See below
 401|Eatery information couldn't be collected because Employee or Guest sent wrong login-password pair|See below
 403|Eatery information couldn't be collected because Employee or Guest was blocked
+
+Response body if successful
+```javascript
+{
+    ok: true, 
+    employee: IEatery
+}
+```
+Response body if error
+```javascript
+{
+    ok: false,
+    error: {
+        code: code_number,
+        shortName: short_string_error,
+        message: error_description
+    } 
+}
+```
+
+#### POST `eatery/publish`
+Sets `approve` status to Eatery object and reveals information about Eatery by its unique id. Employee MUST have `MDM` role to execute this operation
+
+*Parameters*
+Mand|Parameter|Where|Type|Description
+-|-|-|-|-
+✅|coodfort-login|header|string|Login name of Employee 
+✅|coodfort-password|header|string|Password of Employee
+✅|id|requestBody|number|Unique id of the Eatery
+
+*Returns*
+
+HTTP status|Condition|Response body
+-|-|-
+200|Information about Eatery was collected successfully| See below
+400|Some Request mandatory feilds are undefined|See below
+401|Eatery information couldn't be collected because Employee sent wrong login-password pair|See below
+403|Eatery information couldn't be collected because Employee was blocked
 
 Response body if successful
 ```javascript
