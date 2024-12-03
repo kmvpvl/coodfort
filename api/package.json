@@ -1,14 +1,14 @@
 {
   "name": "coodfort-api",
-  "version": "1.0.15",
+  "version": "1.0.25",
   "main": "dist/index.js",
   "scripts": {
     "start:dev": "nodemon src/server.ts",
+    "test": "cross-env jest --testTimeout=5000",
+    "commit_prepare": "npm version patch && npm run prettier && npm run test",
     "build": "npx tsc -p .",
-    "test": "npm version patch && cross-env jest --testTimeout=5000",
     "eslint": "npx eslint **/*.ts",
-    "prettier": "npx prettier -w **/*.ts",
-    "inc_version": "npm version minor"
+    "prettier": "npx prettier -w **/*.ts"
   },
   "author": "",
   "license": "ISC",

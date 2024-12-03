@@ -1,5 +1,6 @@
 import mysql, { Connection, FieldPacket, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { mconsole } from './console';
+import { Employee } from './eatery';
 
 export namespace Types {
     export type ObjectId = number;
@@ -421,14 +422,16 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         }
     }
 
-    async wfNext(): Promise<WorkflowStatusCode>;
-    async wfNext(newStatus: WorkflowStatusCode): Promise<WorkflowStatusCode>;
-    async wfNext(predict: (availableStatuses: WorkflowStatusCode[]) => WorkflowStatusCode): Promise<WorkflowStatusCode>;
+    async wfNext(employee: Employee): Promise<WorkflowStatusCode>;
+    async wfNext(employee: Employee, newStatus: WorkflowStatusCode): Promise<WorkflowStatusCode>;
+    async wfNext(employee: Employee, predict: (availableStatuses: WorkflowStatusCode[]) => WorkflowStatusCode): Promise<WorkflowStatusCode>;
     async wfNext(...arg: any[]): Promise<WorkflowStatusCode> {
         const availableTransfers = this.wfSchema.transfers?.filter(transfer => transfer.from === this.data.wfStatus);
         let ret: WorkflowStatusCode;
         switch (arg.length) {
             case 0:
+                throw new DocumentError(DocumentErrorCode.parameter_expected, `First parameter must be Employee who has MDM role`);
+            case 1:
                 if (availableTransfers?.length === 1) {
                     ret = availableTransfers[0].to;
                     break;
@@ -438,11 +441,11 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
                         `Couldn't process wfNext function because ambiguity in transfer table of '${this.constructor.name}' with id = '${this.id}'. Current wfStatus = '${this.data.wfStatus}'; availaible transfers are: ${availableTransfers}`
                     );
                 }
-            case 1:
-                if (typeof arg[0] !== 'function') {
-                    ret = arg[0];
+            case 2:
+                if (typeof arg[1] !== 'function') {
+                    ret = arg[1];
                 } else {
-                    const predict = arg[0];
+                    const predict = arg[1];
                     ret = predict(availableTransfers);
                 }
                 break;
@@ -453,7 +456,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
                 );
         }
         this.data.wfStatus = ret;
-        await this.save();
+        await this.save(arg[0].data.login);
         return ret;
     }
 

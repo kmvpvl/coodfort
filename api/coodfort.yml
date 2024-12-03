@@ -63,6 +63,12 @@ paths:
       responses:
         '200':
           description: OK
+  /eatery/publish:
+    post:
+      operationId: publishEatery
+      responses:
+        '200':
+          description: OK
   /employee/new:
     post:
       operationId: newEmployee

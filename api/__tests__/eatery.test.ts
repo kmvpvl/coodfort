@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, jest, test } from '@jest/globals';
 import { app, server } from '../src/server';
 import request from 'supertest';
+import { updateEatery } from '../src/api/eatery';
 
 beforeAll(() => {
     jest.spyOn(console, 'warn').mockImplementation(jest.fn());
@@ -100,8 +101,32 @@ describe('employee -> eatery', () => {
         expect(oldEatery.statusCode).toBe(200);
 
         oldEatery.body.eatery.tables.push(...[{ name: 'Inside table 101' }, { name: 'Inside table 102' }, { name: 'Inside table 103' }]);
+        oldEatery.body.eatery.name = 'Updateted name of Eatery';
+
         const updEatery = await request(app).post('/eatery/update').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(oldEatery.body.eatery);
         expect(updEatery.statusCode).toBe(200);
+        expect(updEatery.body.eatery.created === oldEatery.body.eatery.created).toBe(true);
+        //expect(updEatery.body.eatery.changed !== oldEatery.body.eatery.changed).toBe(true);
+    });
+
+    test('Updating Eatery1 by adding 2 new tables and update one o them', async () => {
+        const oldEatery = await request(app).post('/eatery/view').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send({
+            id: firstEateryId,
+        });
+        expect(oldEatery.statusCode).toBe(200);
+        oldEatery.body.eatery.tables.splice(0, 2);
+        oldEatery.body.eatery.tables[0].name = 'Updated name of table 103';
+        oldEatery.body.eatery.tables.push(...[{ name: 'New table 105' }, { name: 'New table 106' }]);
+        const updEatery = await request(app).post('/eatery/update').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(oldEatery.body.eatery);
+        expect(updEatery.statusCode).toBe(200);
+        expect(updEatery.body.eatery.tables.length).toBe(3);
+    });
+
+    test('Publishing Eatery1', async () => {
+        const oldEatery = await request(app).post('/eatery/publish').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send({
+            id: firstEateryId,
+        });
+        expect(oldEatery.statusCode).toBe(200);
     });
 });
 

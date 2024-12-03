@@ -68,3 +68,19 @@ export async function viewEatery(c: Context, req: Request, res: Response, user: 
         else return res.status(400).json({ ok: false, error: e });
     }
 }
+
+export async function publishEatery(c: Context, req: Request, res: Response, user: AuthUser) {
+    try {
+        if (req.body.id === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Parameter 'id' is mandatory`);
+        const id = req.body.id as Types.ObjectId;
+        const eatery = new Eatery(id);
+        await eatery.load();
+
+        if (user.employee !== undefined && !eatery.checkRoles(EateryRoleCode.MDM, user.employee.id)) return res.status(403).json({ ok: false, error: { message: 'Unauthorized user' } });
+        if (user.employee !== undefined) await eatery.wfNext(user.employee);
+        return res.status(200).json({ ok: true, eatery: eatery.data });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });
+        else return res.status(400).json({ ok: false, error: e });
+    }
+}

@@ -10,7 +10,7 @@ import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
 import { AuthUser } from './model/security';
 import { newEmployee } from './api/employee';
-import { updateEatery, newEatery, viewEatery } from './api/eatery';
+import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
 
 configDotenv();
 mConsoleInit();
@@ -37,6 +37,7 @@ api.register({
     newEatery: newEatery,
     updateEatery: updateEatery,
     viewEatery: viewEatery,
+    publishEatery: publishEatery,
     newEmployee: newEmployee,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
