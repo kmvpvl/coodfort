@@ -193,7 +193,12 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         SET ${schemaDefinedFields.map(field => `\`${field.name}\` = ?`).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''} 
         ${wfSchemaDefinedFields.map(field => `\`${field.name}\` = ?`).join(',')}
         WHERE \`${this.dataSchema.idFieldName}\` = ?`;
-        const params = [...schemaDefinedFields.map(field => (this.data as any)[field.name]), ...wfSchemaDefinedFields.map(field => (this.data as any)[field.name])];
+        const params = [...schemaDefinedFields.map(field => {
+            const fieldData = (this.data as any)[field.name];
+            if (typeof fieldData === 'object' || Array.isArray(fieldData)) {
+                return JSON.stringify(fieldData)
+            } else return fieldData;
+        }), ...wfSchemaDefinedFields.map(field => (this.data as any)[field.name])];
         if (this._id !== undefined) params.push(this._id);
         mconsole.sqlq(sql, params);
 

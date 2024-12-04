@@ -11,6 +11,7 @@ import { DocumentError } from './model/protodocument';
 import { AuthUser } from './model/security';
 import { newEmployee } from './api/employee';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
+import { newMeal } from './api/meal';
 
 configDotenv();
 mConsoleInit();
@@ -39,6 +40,7 @@ api.register({
     viewEatery: viewEatery,
     publishEatery: publishEatery,
     newEmployee: newEmployee,
+    newMeal: newMeal,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {

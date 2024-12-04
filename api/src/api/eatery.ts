@@ -1,9 +1,8 @@
 import { Context } from 'openapi-backend';
 import { AuthUser } from '../model/security';
-import e, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { Eatery, EateryRoleCode, IEatery } from '../model/eatery';
 import { DocumentError, DocumentErrorCode, Types } from '../model/protodocument';
-import { error } from 'console';
 
 function eateryDataFromBody(req: Request): IEatery {
     if (req.body.name === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Parameter 'name' is mandatory`);

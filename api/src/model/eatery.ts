@@ -1,7 +1,12 @@
 import { createHmac } from 'crypto';
 import { IDocument, Types, DocumentError, DocumentErrorCode, Document, IDocumentDataSchema, IDocumentWFSchema, WorkflowStatusCode } from './protodocument';
 
-interface ITimeSlot {}
+export interface ITimeSlot {}
+
+export interface IRating {
+    ratingValue: number;
+    ratingCount: number;
+}
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
 
@@ -214,8 +219,6 @@ interface IBooking extends IDocument {
 }
 
 interface IGuest extends IDocument {}
-
-interface IMeal extends IDocument {}
 
 interface IOrder extends IDocument {}
 
