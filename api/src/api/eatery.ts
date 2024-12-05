@@ -12,9 +12,12 @@ function eateryDataFromBody(req: Request): IEatery {
         employees: [],
         deliveryPartnerIds: [],
         entertainmentIds: [],
-        description: req.body.description,
-        url: req.body.url,
+
+        descriptions: req.body.descriptions,
+        urls: req.body.urls,
         cuisines: req.body.cuisines,
+        averageBills: req.body.averageBills,
+        photos: req.body.photos,
         tags: req.body.tags,
     };
     return eateryData;

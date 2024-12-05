@@ -8,7 +8,7 @@ export async function newEmployee(c: Context, req: Request, res: Response, user:
     const login = req.headers['coodfort-login'] as string;
     const password = req.headers['coodfort-password'] as string;
     const name = req.body.name;
-    const bio = req.body.bio;
+    const bios = req.body.bios;
     const tags = req.body.tags;
 
     try {
@@ -18,7 +18,7 @@ export async function newEmployee(c: Context, req: Request, res: Response, user:
             login: login,
             hash: Employee.calcHash(login, password),
             name: name,
-            bio: bio,
+            bios: bios,
             tags: tags,
         });
         await newEmpl.save(login);

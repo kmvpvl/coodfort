@@ -91,8 +91,8 @@ describe('employee -> eatery', () => {
             .set('coodfort-password', 'password_of_new_employee')
             .send({
                 name1: 'Name of new Eatery',
-                description: 'Long-long-too-long description',
-                url: 'https://test.te',
+                descriptions: [{ url: 'https://test.te1#2', html: 'Long-long-too-long description1' }],
+                urls: [{ url: 'https://test.te1', caption: 'Main url' }],
                 tags: ['tag1', 'tag2', 'tag3'],
             });
         expect(newEatery.statusCode).toBe(400);
@@ -109,8 +109,8 @@ describe('employee -> eatery', () => {
             .set('coodfort-password', 'password_of_new_employee')
             .send({
                 name: 'Name of new Eatery1',
-                description: 'Long-long-too-long description1',
-                url: 'https://test.te1',
+                descriptions: [{ url: 'https://test.te1#2', html: 'Long-long-too-long description1' }],
+                urls: [{ url: 'https://test.te1', caption: 'Main url' }],
                 tags: ['tag1', 'tag2', 'tag3'],
             });
         firstEateryId = newEatery.body.eatery.id;
@@ -125,8 +125,8 @@ describe('employee -> eatery', () => {
             .set('coodfort-password', 'password_of_new_employee')
             .send({
                 name: 'Name of new Eatery2',
-                description: 'Long-long-too-long description',
-                url: 'https://test.te',
+                descriptions: [{ url: 'https://test.te1#2', html: 'Long-long-too-long description1' }],
+                urls: [{ url: 'https://test.te1', caption: 'Main url' }],
                 tags: ['tag1', 'tag2', 'tag3'],
                 tables: [{ name: 'Outside table 1' }, { name: 'Outside table 2' }],
             });

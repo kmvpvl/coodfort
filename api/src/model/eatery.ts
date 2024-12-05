@@ -5,13 +5,22 @@ export interface ITimeSlot {}
 
 export interface IPhoto {
     url: string;
-    caption?: string;
-    tags?: string[];
+    caption?: Types.MLString;
+    tags?: Types.MLString[];
 }
 
 export interface IRating {
     ratingValue: number;
     ratingCount: number;
+}
+
+export interface IAward {
+    awardName: Types.MLString;
+    logo?: {
+        url?: string;
+        html?: Types.MLString;
+    };
+    url: string;
 }
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
@@ -24,8 +33,15 @@ export enum EateryRoleCode {
     'MDM' = 'MDM',
 }
 
+interface ITable extends IDocument {
+    name: Types.MLString;
+    guestCountMax?: number;
+    guestCountComfort?: number;
+    timeSlots?: ITimeSlot[];
+}
+
 export interface IEatery extends IDocument {
-    name: string;
+    name: Types.MLString;
     employees: {
         employeeId: Types.ObjectId;
         roles: EateryRoleCode;
@@ -37,13 +53,14 @@ export interface IEatery extends IDocument {
     tables: ITable[];
     deliveryPartnerIds: Types.ObjectId[];
     entertainmentIds: Types.ObjectId[];
-    rating?: number;
-    url?: string;
+    rating?: IRating;
+    urls?: { url: string; caption: Types.MLString }[];
     photos?: IPhoto[];
-    description?: string;
-    tags?: string[];
-    cuisines?: string;
-    avgbillwoalcohol?: number;
+    descriptions?: { url?: string; html: Types.MLString }[];
+    tags?: Types.MLString[];
+    awards?: IAward[];
+    cuisines?: Types.MLString[];
+    averageBills?: { cuisine: Types.MLString; withAlcohol: number; withoutAlcohol: number }[];
 }
 
 export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema> {
@@ -53,22 +70,23 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
             tableName: 'eateries',
             relatedTablesPrefix: 'eatery_',
             fields: [
-                { name: `name`, type: 'varchar(128)', required: true },
-                { name: `rating`, type: 'float' },
-                { name: `url`, type: 'varchar(2048)' },
+                { name: `name`, type: 'json', required: true },
+                { name: `rating`, type: 'json' },
+                { name: `urls`, type: 'json' },
                 { name: `photos`, type: 'json' },
-                { name: `description`, type: 'json' },
+                { name: `descriptions`, type: 'json' },
                 { name: `tags`, type: 'json' },
                 { name: `cuisines`, type: 'json' },
-                { name: `avgbillwoalcohol`, type: 'float' },
+                { name: `awards`, type: 'json' },
+                { name: `averageBills`, type: 'json' },
             ],
             related: [
                 {
                     tableName: 'tables',
                     idFieldName: 'id',
                     fields: [
-                        { name: `name`, type: 'varchar(1024)', required: true },
-                        { name: `rating`, type: 'float' },
+                        { name: `name`, type: 'json', required: true },
+                        { name: `rating`, type: 'json' },
                     ],
                 },
                 {
@@ -126,11 +144,11 @@ interface IEmployee extends IDocument {
     login: number | string /**Telegram ID or login or phone */;
     hash: string /** */;
     name?: string;
-    rating?: number;
-    awards?: string;
-    photos?: string;
-    bio?: string;
-    tags?: string[];
+    rating?: IRating;
+    awards?: IAward[];
+    photos?: IPhoto[];
+    bios?: Types.MLString[];
+    tags?: Types.MLString[];
 }
 
 export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSchema> {
@@ -143,10 +161,10 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
                 { name: `login`, type: 'varchar(128)', required: true },
                 { name: `hash`, type: 'varchar(128)', required: true },
                 { name: `name`, type: 'varchar(128)' },
-                { name: `rating`, type: 'float' },
+                { name: `ratings`, type: 'json' },
                 { name: `awards`, type: 'json' },
                 { name: `photos`, type: 'json' },
-                { name: `bio`, type: 'json' },
+                { name: `bios`, type: 'json' },
                 { name: `tags`, type: 'json' },
             ],
             indexes: [{ fields: ['login'], indexType: 'UNIQUE' }],
@@ -203,13 +221,6 @@ interface IBooking extends IDocument {
 interface IGuest extends IDocument {}
 
 interface IOrder extends IDocument {}
-
-interface ITable extends IDocument {
-    name: string;
-    guestCountMax?: number;
-    guestCountComfort?: number;
-    timeSlots?: [ITimeSlot];
-}
 
 interface IEntertainment extends IDocument {}
 

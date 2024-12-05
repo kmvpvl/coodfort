@@ -1,10 +1,10 @@
 {
   "name": "coodfort-api",
-  "version": "1.0.29",
+  "version": "1.0.31",
   "main": "dist/index.js",
   "scripts": {
     "start:dev": "nodemon src/server.ts",
-    "test": "cross-env jest --testTimeout=5000",
+    "test": "cross-env jest -i --testTimeout=5000",
     "commit_prepare": "npm version patch && npm run prettier && npm run test",
     "build": "npx tsc -p .",
     "eslint": "npx eslint **/*.ts",

@@ -4,6 +4,7 @@ import { Employee } from './eatery';
 
 export namespace Types {
     export type ObjectId = number;
+    export type MLString = string;
 }
 
 export enum DocumentErrorCode {
@@ -395,7 +396,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
                             [rows, fields] = await this.sqlConnection.query<any[]>(`SELECT * FROM \`${this.dataSchema.relatedTablesPrefix + relObj.tableName}\` WHERE \`${this.dataSchema.relatedTablesPrefix + relObj.idFieldName}\` = ?`, [this.id]);
 
                             (parentObj as any)[relObj.tableName] = rows;
-                            for (const row in rows) {
+                            for (const row of rows) {
                                 relObj.fields.forEach(field => {
                                     if (field.type === 'json') (row as any)[field.name] = JSON.parse((row as any)[field.name]);
                                     if ((row as any)[field.name] === null) (row as any)[field.name] = undefined;
