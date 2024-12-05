@@ -381,9 +381,11 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
             const parentObj = rows[0];
             this.dataSchema.fields.forEach(field => {
                 if (field.type === 'json') (parentObj as any)[field.name] = JSON.parse((parentObj as any)[field.name]);
+                if ((parentObj as any)[field.name] === null) (parentObj as any)[field.name] = undefined;
             });
             DocumentBaseSchema.forEach(field => {
                 if (field.type === 'json') (parentObj as any)[field.name] = JSON.parse((parentObj as any)[field.name]);
+                if ((parentObj as any)[field.name] === null) (parentObj as any)[field.name] = undefined;
             });
             if (this.dataSchema.related !== undefined) {
                 for (const relObj of this.dataSchema.related) {
@@ -396,9 +398,11 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
                             for (const row in rows) {
                                 relObj.fields.forEach(field => {
                                     if (field.type === 'json') (row as any)[field.name] = JSON.parse((row as any)[field.name]);
+                                    if ((row as any)[field.name] === null) (row as any)[field.name] = undefined;
                                 });
                                 DocumentBaseSchema.forEach(field => {
                                     if (field.type === 'json') (row as any)[field.name] = JSON.parse((row as any)[field.name]);
+                                    if ((row as any)[field.name] === null) (row as any)[field.name] = undefined;
                                 });
                             }
                             break;

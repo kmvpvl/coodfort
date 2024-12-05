@@ -3,6 +3,12 @@ import { IDocument, Types, DocumentError, DocumentErrorCode, Document, IDocument
 
 export interface ITimeSlot {}
 
+export interface IPhoto {
+    url: string;
+    caption?: string;
+    tags?: string[];
+}
+
 export interface IRating {
     ratingValue: number;
     ratingCount: number;
@@ -33,9 +39,9 @@ export interface IEatery extends IDocument {
     entertainmentIds: Types.ObjectId[];
     rating?: number;
     url?: string;
-    photos?: string;
+    photos?: IPhoto[];
     description?: string;
-    tags?: string;
+    tags?: string[];
     cuisines?: string;
     avgbillwoalcohol?: number;
 }
@@ -124,7 +130,7 @@ interface IEmployee extends IDocument {
     awards?: string;
     photos?: string;
     bio?: string;
-    tags?: string;
+    tags?: string[];
 }
 
 export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSchema> {
@@ -138,22 +144,10 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
                 { name: `hash`, type: 'varchar(128)', required: true },
                 { name: `name`, type: 'varchar(128)' },
                 { name: `rating`, type: 'float' },
-                {
-                    name: `awards`,
-                    type: 'json',
-                },
-                {
-                    name: `photos`,
-                    type: 'json',
-                },
-                {
-                    name: `bio`,
-                    type: 'json',
-                },
-                {
-                    name: `tags`,
-                    type: 'json',
-                },
+                { name: `awards`, type: 'json' },
+                { name: `photos`, type: 'json' },
+                { name: `bio`, type: 'json' },
+                { name: `tags`, type: 'json' },
             ],
             indexes: [{ fields: ['login'], indexType: 'UNIQUE' }],
         };

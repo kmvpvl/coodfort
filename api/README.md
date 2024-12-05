@@ -130,7 +130,7 @@ Mand|Parameter|Where|Type|Description
 ❌|description|requestBody|string|Description of Eatery
 ❌|url|requestBody|string|URL to Eatery
 ❌|cuisines|requestBody|Comma separated string|List of cuisines
-❌|tags|requestBody|Comma separated string|Tags of Eatery
+❌|tags|requestBody|Array of strings|Tags of Eatery
 
 *Returns*
 
@@ -179,7 +179,7 @@ Mand|Parameter|Where|Type|Description
 ❌|description|requestBody|string|Description of Eatery
 ❌|url|requestBody|string|URL to Eatery
 ❌|cuisines|requestBody|Comma separated string|List of cuisines
-❌|tags|requestBody|Comma separated string|Tags of Eatery
+❌|tags|requestBody|Array of strings|Tags of Eatery
 
 *Returns*
 
@@ -232,7 +232,7 @@ Mand|Parameter|Where|Type|Description
 ✅|coodfort-password|header|string|Password of Employee
 ❌|name|requestBody|string|Display name of Employee
 ❌|bio|requestBody|string|Bio of Employee
-❌|tags|requestBody|Comma separated string|Tags of Employee
+❌|tags|requestBody|Array of strings|Tags of Employee
 
 *Returns*
 

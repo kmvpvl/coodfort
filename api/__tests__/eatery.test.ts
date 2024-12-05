@@ -35,11 +35,16 @@ describe('employee -> eatery', () => {
      * Creating new Employee who shall become owner of Eatery
      */
     test('Creating new Employee who shall become owner of Eatery', async () => {
-        const owner = await request(app).post('/employee/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send({
-            name: 'Name of new Employee',
-            bio: 'Bio of new Employee',
-            tags: 'tag1,tag2,tag3',
-        });
+        const owner = await request(app)
+            .post('/employee/new')
+            .set('content-type', 'application/json')
+            .set('coodfort-login', 'new_employee')
+            .set('coodfort-password', 'password_of_new_employee')
+            .send({
+                name: 'Name of new Employee',
+                bio: 'Bio of new Employee',
+                tags: ['tag1', 'tag2', 'tag3'],
+            });
         expect(owner.statusCode).toBe(200);
     });
     /**
@@ -47,20 +52,30 @@ describe('employee -> eatery', () => {
      * Creating new Eatery by owner
      */
     test('Creating new Eatery with wrong credentials of user', async () => {
-        let newEatery = await request(app).post('/eatery/new').set('content-type', 'application/json').set('coodfort-login', 'wrong_login').set('coodfort-password', 'password_of_new_employee').send({
-            name: 'Name of new Eatery',
-            description: 'Long-long-too-long description',
-            url: 'https://test.te',
-            tags: 'tag1,tag2,tag3',
-        });
+        let newEatery = await request(app)
+            .post('/eatery/new')
+            .set('content-type', 'application/json')
+            .set('coodfort-login', 'wrong_login')
+            .set('coodfort-password', 'password_of_new_employee')
+            .send({
+                name: 'Name of new Eatery',
+                description: 'Long-long-too-long description',
+                url: 'https://test.te',
+                tags: ['tag1', 'tag2', 'tag3'],
+            });
         expect(newEatery.statusCode).toBe(401);
 
-        newEatery = await request(app).post('/eatery/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'wrong_password').send({
-            name: 'Name of new Eatery',
-            description: 'Long-long-too-long description',
-            url: 'https://test.te',
-            tags: 'tag1,tag2,tag3',
-        });
+        newEatery = await request(app)
+            .post('/eatery/new')
+            .set('content-type', 'application/json')
+            .set('coodfort-login', 'new_employee')
+            .set('coodfort-password', 'wrong_password')
+            .send({
+                name: 'Name of new Eatery',
+                description: 'Long-long-too-long description',
+                url: 'https://test.te',
+                tags: ['tag1', 'tag2', 'tag3'],
+            });
         expect(newEatery.statusCode).toBe(401);
     });
 
@@ -69,12 +84,17 @@ describe('employee -> eatery', () => {
      * Creating new Eatery by owner
      */
     test('Creating new Eatery without mandatory property Name', async () => {
-        const newEatery = await request(app).post('/eatery/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send({
-            name1: 'Name of new Eatery',
-            description: 'Long-long-too-long description',
-            url: 'https://test.te',
-            tags: 'tag1,tag2,tag3',
-        });
+        const newEatery = await request(app)
+            .post('/eatery/new')
+            .set('content-type', 'application/json')
+            .set('coodfort-login', 'new_employee')
+            .set('coodfort-password', 'password_of_new_employee')
+            .send({
+                name1: 'Name of new Eatery',
+                description: 'Long-long-too-long description',
+                url: 'https://test.te',
+                tags: ['tag1', 'tag2', 'tag3'],
+            });
         expect(newEatery.statusCode).toBe(400);
     });
     /**
@@ -82,12 +102,17 @@ describe('employee -> eatery', () => {
      * Creating new Eatery by owner
      */
     test('Creating new Eatery without tables', async () => {
-        const newEatery = await request(app).post('/eatery/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send({
-            name: 'Name of new Eatery1',
-            description: 'Long-long-too-long description1',
-            url: 'https://test.te1',
-            tags: 'tag1,tag2,tag3',
-        });
+        const newEatery = await request(app)
+            .post('/eatery/new')
+            .set('content-type', 'application/json')
+            .set('coodfort-login', 'new_employee')
+            .set('coodfort-password', 'password_of_new_employee')
+            .send({
+                name: 'Name of new Eatery1',
+                description: 'Long-long-too-long description1',
+                url: 'https://test.te1',
+                tags: ['tag1', 'tag2', 'tag3'],
+            });
         firstEateryId = newEatery.body.eatery.id;
         expect(newEatery.statusCode).toBe(200);
     });
@@ -102,7 +127,7 @@ describe('employee -> eatery', () => {
                 name: 'Name of new Eatery2',
                 description: 'Long-long-too-long description',
                 url: 'https://test.te',
-                tags: 'tag1,tag2,tag3',
+                tags: ['tag1', 'tag2', 'tag3'],
                 tables: [{ name: 'Outside table 1' }, { name: 'Outside table 2' }],
             });
         expect(newEatery.statusCode).toBe(200);
@@ -115,7 +140,7 @@ describe('employee -> eatery', () => {
         expect(oldEatery.statusCode).toBe(200);
 
         oldEatery.body.eatery.tables.push(...[{ name: 'Inside table 101' }, { name: 'Inside table 102' }, { name: 'Inside table 103' }]);
-        oldEatery.body.eatery.name = 'Updateted name of Eatery';
+        oldEatery.body.eatery.name = 'Updateted name of Eatery1';
 
         const updEatery = await request(app).post('/eatery/update').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(oldEatery.body.eatery);
         expect(updEatery.statusCode).toBe(200);
@@ -150,11 +175,16 @@ describe('Checking Employee security', () => {
         expect(a.statusCode).toBe(401);
     });
     test('Attempt to create Employee with the same login', async () => {
-        const newEmployee = await request(app).post('/employee/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send({
-            name: 'Name of new Employee',
-            bio: 'Bio of new Employee',
-            tags: 'tag1,tag2,tag3',
-        });
+        const newEmployee = await request(app)
+            .post('/employee/new')
+            .set('content-type', 'application/json')
+            .set('coodfort-login', 'new_employee')
+            .set('coodfort-password', 'password_of_new_employee')
+            .send({
+                name: 'Name of new Employee',
+                bio: 'Bio of new Employee',
+                tags: ['tag1', 'tag2', 'tag3'],
+            });
         expect(newEmployee.statusCode).toBe(400);
     });
 });
