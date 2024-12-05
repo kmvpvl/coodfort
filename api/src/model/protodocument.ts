@@ -51,21 +51,23 @@ export interface IDocument {
 }
 
 export const DocumentBaseSchema: ITableFieldSchema[] = [
-    { name: `id`, sql: 'bigint(20) NOT NULL AUTO_INCREMENT' },
-    { name: `blocked`, sql: 'tinyint(1) NOT NULL DEFAULT 0' },
-    { name: `wfStatus`, sql: 'INT(11) NULL' },
-    { name: `createdByUser`, sql: 'varchar(128) NULL' },
-    { name: `changedByUser`, sql: 'varchar(128) NULL' },
-    { name: `created`, sql: 'timestamp NOT NULL DEFAULT current_timestamp()' },
-    {
-        name: `changed`,
-        sql: 'timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()',
-    },
+    { name: `id`, type: 'bigint(20)', required: true, autoIncrement: true },
+    { name: `blocked`, type: 'tinyint(1)', required: true, default: '0' },
+    { name: `wfStatus`, type: 'INT(11)' },
+    { name: `createdByUser`, type: 'varchar(128)' },
+    { name: `changedByUser`, type: 'varchar(128)' },
+    { name: `created`, type: 'timestamp', required: true, default: 'current_timestamp()' },
+    { name: `changed`, type: 'timestamp', required: true, default: 'current_timestamp()', onUpdate: 'current_timestamp()' },
 ];
 
 export interface ITableFieldSchema {
     name: string;
-    sql: string;
+    type: string;
+    required?: boolean;
+    autoIncrement?: boolean;
+    default?: string;
+    onUpdate?: string;
+    check?: string;
 }
 
 export interface ITableIndexSchema {
@@ -181,24 +183,13 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         }
         let sql: string;
         if (this._id === undefined)
-            sql = `INSERT INTO \`${this.dataSchema.tableName}\` (
-        ${schemaDefinedFields.map(field => `\`${field.name}\``).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''}
-        ${wfSchemaDefinedFields.map(field => `\`${field.name}\``).join(',')}
-        ) VALUES (
-        ${schemaDefinedFields.map(field => `?`).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''}
-        ${wfSchemaDefinedFields.map(field => `?`).join(',')}
-        )`;
+            sql = `INSERT INTO \`${this.dataSchema.tableName}\` (${schemaDefinedFields.map(field => `\`${field.name}\``).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''} ${wfSchemaDefinedFields.map(field => `\`${field.name}\``).join(',')}) VALUES (${schemaDefinedFields.map(field => `?`).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''} ${wfSchemaDefinedFields.map(field => `?`).join(',')})`;
         else
-            sql = `UPDATE \`${this.dataSchema.tableName}\`
-        SET ${schemaDefinedFields.map(field => `\`${field.name}\` = ?`).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''} 
-        ${wfSchemaDefinedFields.map(field => `\`${field.name}\` = ?`).join(',')}
-        WHERE \`${this.dataSchema.idFieldName}\` = ?`;
-        const params = [...schemaDefinedFields.map(field => {
-            const fieldData = (this.data as any)[field.name];
-            if (typeof fieldData === 'object' || Array.isArray(fieldData)) {
-                return JSON.stringify(fieldData)
-            } else return fieldData;
-        }), ...wfSchemaDefinedFields.map(field => (this.data as any)[field.name])];
+            sql = `UPDATE \`${this.dataSchema.tableName}\` SET ${schemaDefinedFields.map(field => `\`${field.name}\` = ?`).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''} ${wfSchemaDefinedFields.map(field => `\`${field.name}\` = ?`).join(',')} WHERE \`${this.dataSchema.idFieldName}\` = ?`;
+        const params = [
+            ...schemaDefinedFields.map(field => (field.type === 'json' ? JSON.stringify((this.data as any)[field.name]) : (this.data as any)[field.name])),
+            ...wfSchemaDefinedFields.map(field => (field.type === 'json' ? JSON.stringify((this.data as any)[field.name]) : (this.data as any)[field.name])),
+        ];
         if (this._id !== undefined) params.push(this._id);
         mconsole.sqlq(sql, params);
 
@@ -265,24 +256,16 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
                         }
 
                         if (element[relObj.idFieldName] === undefined) {
-                            sql = `INSERT INTO \`${this.dataSchema.relatedTablesPrefix + relObj.tableName}\`(
-                            \`${this.dataSchema.relatedTablesPrefix + this.dataSchema.idFieldName}\`,
-                            ${schemaDefinedFields.map(field => `\`${field.name}\``).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''}
-                            ${wfSchemaDefinedFields.map(field => `\`${field.name}\``).join(',')}
-                            ) VALUES (
-                            ?,
-                            ${schemaDefinedFields.map(field => `?`).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''}
-                            ${wfSchemaDefinedFields.map(field => `?`).join(',')}
-                            )`;
+                            sql = `INSERT INTO \`${this.dataSchema.relatedTablesPrefix + relObj.tableName}\`(\`${this.dataSchema.relatedTablesPrefix + this.dataSchema.idFieldName}\`, ${schemaDefinedFields.map(field => `\`${field.name}\``).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''} ${wfSchemaDefinedFields.map(field => `\`${field.name}\``).join(',')}) VALUES (?, ${schemaDefinedFields.map(field => `?`).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''} ${wfSchemaDefinedFields.map(field => `?`).join(',')})`;
                         } else {
                             childRows = childRows.filter(rec => rec[relObj.idFieldName] !== element[relObj.idFieldName]);
-                            sql = `UPDATE \`${this.dataSchema.relatedTablesPrefix + relObj.tableName}\`
-                            SET \`${this.dataSchema.relatedTablesPrefix + this.dataSchema.idFieldName}\` = ?,
-                            ${schemaDefinedFields.map(field => `\`${field.name}\` = ?`).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''} 
-                            ${wfSchemaDefinedFields.map(field => `\`${field.name}\` = ?`).join(',')}
-                            WHERE \`${relObj.idFieldName}\` = ?`;
+                            sql = `UPDATE \`${this.dataSchema.relatedTablesPrefix + relObj.tableName}\` SET \`${this.dataSchema.relatedTablesPrefix + this.dataSchema.idFieldName}\` = ?, ${schemaDefinedFields.map(field => `\`${field.name}\` = ?`).join(',')}${wfSchemaDefinedFields.length !== 0 ? ',' : ''} ${wfSchemaDefinedFields.map(field => `\`${field.name}\` = ?`).join(',')} WHERE \`${relObj.idFieldName}\` = ?`;
                         }
-                        const params = [this._id, ...schemaDefinedFields.map(field => (element as any)[field.name]), ...wfSchemaDefinedFields.map(field => (element as any)[field.name])];
+                        const params = [
+                            this._id,
+                            ...schemaDefinedFields.map(field => (field.type === 'json' ? JSON.stringify((element as any)[field.name]) : (element as any as any)[field.name])),
+                            ...wfSchemaDefinedFields.map(field => (field.type === 'json' ? JSON.stringify((element as any)[field.name]) : (element as any)[field.name])),
+                        ];
                         if (element[relObj.idFieldName] !== undefined) params.push(element[relObj.idFieldName]);
                         mconsole.sqlq(sql, params);
                         while (true) {
@@ -327,13 +310,13 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         }
     }
 
+    protected buildSQL(field: ITableFieldSchema): string {
+        return `\`${field.name}\` ${field.type === 'json' ? 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin' : field.type} ${field.required ? 'NOT NULL' : field.default !== undefined ? `DEFAULT ${field.default}` : 'DEFAULT NULL'} ${field.autoIncrement ? 'AUTO_INCREMENT' : ''} ${field.default !== undefined && field.required ? `DEFAULT ${field.default}` : ''} ${field.onUpdate !== undefined ? `ON UPDATE ${field.onUpdate}` : ''}`;
+    }
+
     protected async createMainTable() {
         mconsole.sqlinfo(`Creating main table of schema '${this.dataSchema.tableName}'`);
-        let sql = `CREATE TABLE IF NOT EXISTS \`${this.dataSchema.tableName}\`(
-        ${this.dataSchema.fields.map(field => `\`${field.name}\` ${field.sql}`).join(',')}, 
-        ${DocumentBaseSchema.map(field => `\`${field.name}\` ${field.sql}`).join(',')}, 
-        PRIMARY KEY (\`${this.dataSchema.idFieldName}\`)) 
-        ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;`;
+        let sql = `CREATE TABLE IF NOT EXISTS \`${this.dataSchema.tableName}\`(${this.dataSchema.fields.map(field => this.buildSQL(field)).join(',')}, ${DocumentBaseSchema.map(field => this.buildSQL(field)).join(',')}, PRIMARY KEY (\`${this.dataSchema.idFieldName}\`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;`;
         mconsole.sqlq(`sql = '${sql}'`, []);
         await this.sqlConnection.query(sql);
         if (this.dataSchema.indexes !== undefined)
@@ -349,12 +332,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     protected async createRelatedTable(tableSchema: IDocumentDataSchema) {
         mconsole.sqlinfo(`Creating related table '${tableSchema.tableName}' of schema '${this.dataSchema.tableName}'`);
 
-        let sql = `CREATE TABLE IF NOT EXISTS \`${this.dataSchema.relatedTablesPrefix + tableSchema.tableName}\`(
-        \`${this.dataSchema.relatedTablesPrefix + this.dataSchema.idFieldName}\` bigint(20) NOT NULL,
-        ${tableSchema.fields.map(field => `\`${field.name}\` ${field.sql}`).join(',')}, 
-        ${DocumentBaseSchema.map(field => `\`${field.name}\` ${field.sql}`).join(',')}, 
-        PRIMARY KEY (\`${tableSchema.idFieldName}\`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;`;
+        let sql = `CREATE TABLE IF NOT EXISTS \`${this.dataSchema.relatedTablesPrefix + tableSchema.tableName}\`(\`${this.dataSchema.relatedTablesPrefix + this.dataSchema.idFieldName}\` bigint(20) NOT NULL, ${tableSchema.fields.map(field => this.buildSQL(field)).join(',')}, ${DocumentBaseSchema.map(field => this.buildSQL(field)).join(',')}, PRIMARY KEY (\`${tableSchema.idFieldName}\`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;`;
         mconsole.sqlq(`sql = '${sql}'`, []);
         await this.sqlConnection.query(sql);
         mconsole.sqlinfo(`Related table '${tableSchema.tableName}' of schema '${this.dataSchema.tableName}' has created successfully`);
@@ -368,9 +346,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
             }
 
         mconsole.sqlinfo(`Creating foreign key for related table ${tableSchema.tableName}' of schema '${this.dataSchema.tableName}'`);
-        sql = `ALTER TABLE \`${this.dataSchema.relatedTablesPrefix + tableSchema.tableName}\` 
-        ADD FOREIGN KEY (\`${this.dataSchema.relatedTablesPrefix}${this.dataSchema.idFieldName}\`) REFERENCES \`${this.dataSchema.tableName}\`(\`${this.dataSchema.idFieldName}\`) 
-        ON DELETE RESTRICT ON UPDATE RESTRICT;`;
+        sql = `ALTER TABLE \`${this.dataSchema.relatedTablesPrefix + tableSchema.tableName}\` ADD FOREIGN KEY (\`${this.dataSchema.relatedTablesPrefix}${this.dataSchema.idFieldName}\`) REFERENCES \`${this.dataSchema.tableName}\`(\`${this.dataSchema.idFieldName}\`) ON DELETE RESTRICT ON UPDATE RESTRICT;`;
         mconsole.sqlq(`sql = '${sql}'`, []);
         await this.sqlConnection.query(sql);
         mconsole.sqlinfo(`Foreign key for related table ${tableSchema.tableName}' of schema '${this.dataSchema.tableName}' has created successfully`);
@@ -403,13 +379,28 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         }
         if (rows.length === 1) {
             const parentObj = rows[0];
+            this.dataSchema.fields.forEach(field => {
+                if (field.type === 'json') (parentObj as any)[field.name] = JSON.parse((parentObj as any)[field.name]);
+            });
+            DocumentBaseSchema.forEach(field => {
+                if (field.type === 'json') (parentObj as any)[field.name] = JSON.parse((parentObj as any)[field.name]);
+            });
             if (this.dataSchema.related !== undefined) {
                 for (const relObj of this.dataSchema.related) {
                     let [rows, fields]: [any[], FieldPacket[]] = [[], []];
                     while (true) {
                         try {
                             [rows, fields] = await this.sqlConnection.query<any[]>(`SELECT * FROM \`${this.dataSchema.relatedTablesPrefix + relObj.tableName}\` WHERE \`${this.dataSchema.relatedTablesPrefix + relObj.idFieldName}\` = ?`, [this.id]);
+
                             (parentObj as any)[relObj.tableName] = rows;
+                            for (const row in rows) {
+                                relObj.fields.forEach(field => {
+                                    if (field.type === 'json') (row as any)[field.name] = JSON.parse((row as any)[field.name]);
+                                });
+                                DocumentBaseSchema.forEach(field => {
+                                    if (field.type === 'json') (row as any)[field.name] = JSON.parse((row as any)[field.name]);
+                                });
+                            }
                             break;
                         } catch (e: any) {
                             if (e.code === 'ER_NO_SUCH_TABLE') {

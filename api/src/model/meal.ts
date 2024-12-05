@@ -16,30 +16,30 @@ interface IMealWFSchema extends IDocumentWFSchema {}
 export class Meal extends Document<IMeal, IMealDataSchema, IMealWFSchema> {
     get dataSchema(): IMealDataSchema {
         return {
-            idFieldName: "id",
-            tableName: "meals",
-            relatedTablesPrefix: "meal_",
+            idFieldName: 'id',
+            tableName: 'meals',
+            relatedTablesPrefix: 'meal_',
             fields: [
-                { name: `eateryAuthorId`, sql: 'INT(20) NOT NULL' },
-                { name: `name`, sql: 'varchar(128) NOT NULL' },
-                { name: `description`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL' },
-                { name: `volumeOptions`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin CHECK (json_valid(`volumeOptions`))' },
-                { name: `rating`, sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`rating`))' },
+                { name: `eateryAuthorId`, type: 'INT(20)', required: true },
+                { name: `name`, type: 'varchar(128)', required: true },
+                { name: `description`, type: 'json' },
+                { name: `volumeOptions`, type: 'json' },
+                { name: `rating`, type: 'json' },
                 {
                     name: `awards`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`awards`))',
+                    type: 'json',
                 },
                 {
                     name: `photos`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`photos`))',
+                    type: 'json',
                 },
                 {
                     name: `tags`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
+                    type: 'json',
                 },
             ],
             indexes: [{ fields: ['name', 'eateryAuthorId'], indexType: 'UNIQUE' }],
-        }
+        };
     }
 
     get wfSchema(): IMealWFSchema {
@@ -55,5 +55,4 @@ export class Meal extends Document<IMeal, IMealDataSchema, IMealWFSchema> {
             related: [],
         };
     }
-
 }

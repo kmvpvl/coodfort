@@ -47,42 +47,30 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
             tableName: 'eateries',
             relatedTablesPrefix: 'eatery_',
             fields: [
-                { name: `name`, sql: 'varchar(128) NOT NULL' },
-                { name: `rating`, sql: 'float DEFAULT NULL' },
-                { name: `url`, sql: 'varchar(2048) DEFAULT NULL' },
-                {
-                    name: `photos`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
-                },
-                {
-                    name: `description`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
-                },
-                {
-                    name: `tags`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
-                },
-                {
-                    name: `cuisines`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
-                },
-                { name: `avgbillwoalcohol`, sql: 'float DEFAULT NULL' },
+                { name: `name`, type: 'varchar(128)', required: true },
+                { name: `rating`, type: 'float' },
+                { name: `url`, type: 'varchar(2048)' },
+                { name: `photos`, type: 'json' },
+                { name: `description`, type: 'json' },
+                { name: `tags`, type: 'json' },
+                { name: `cuisines`, type: 'json' },
+                { name: `avgbillwoalcohol`, type: 'float' },
             ],
             related: [
                 {
                     tableName: 'tables',
                     idFieldName: 'id',
                     fields: [
-                        { name: `name`, sql: 'varchar(1024) NOT NULL' },
-                        { name: `rating`, sql: 'float DEFAULT NULL' },
+                        { name: `name`, type: 'varchar(1024)', required: true },
+                        { name: `rating`, type: 'float' },
                     ],
                 },
                 {
                     tableName: 'employees',
                     idFieldName: 'id',
                     fields: [
-                        { name: `employeeId`, sql: 'bigint(20) NOT NULL' },
-                        { name: `roles`, sql: 'varchar(2048) DEFAULT NULL' },
+                        { name: `employeeId`, type: 'bigint(20)', required: true },
+                        { name: `roles`, type: 'varchar(2048)' },
                     ],
                 },
             ],
@@ -146,25 +134,25 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
             tableName: 'employees',
             relatedTablesPrefix: 'employee_',
             fields: [
-                { name: `login`, sql: 'varchar(128) NOT NULL' },
-                { name: `hash`, sql: 'varchar(128) NOT NULL' },
-                { name: `name`, sql: 'varchar(128) DEFAULT NULL' },
-                { name: `rating`, sql: 'float DEFAULT NULL' },
+                { name: `login`, type: 'varchar(128)', required: true },
+                { name: `hash`, type: 'varchar(128)', required: true },
+                { name: `name`, type: 'varchar(128)' },
+                { name: `rating`, type: 'float' },
                 {
                     name: `awards`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
+                    type: 'json',
                 },
                 {
                     name: `photos`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
+                    type: 'json',
                 },
                 {
                     name: `bio`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
+                    type: 'json',
                 },
                 {
                     name: `tags`,
-                    sql: 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL',
+                    type: 'json',
                 },
             ],
             indexes: [{ fields: ['login'], indexType: 'UNIQUE' }],
