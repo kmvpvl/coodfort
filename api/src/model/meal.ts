@@ -3,7 +3,7 @@ import { Document, IDocument, IDocumentDataSchema, IDocumentWFSchema, Types, Wor
 
 export interface IMeal extends IDocument {
     name: string;
-    eateryAuthorId: Types.ObjectId;
+    eateryAuthorId?: Types.ObjectId;
     description: Types.MLString;
     volumeOptions: Types.MLString[];
     rating?: IRating;
@@ -25,7 +25,7 @@ export class Meal extends Document<IMeal, IMealDataSchema, IMealWFSchema> {
             fields: [
                 { name: `eateryAuthorId`, type: 'INT(20)', required: true },
                 { name: `name`, type: 'varchar(128)', required: true },
-                { name: `description`, type: 'varchar(1024)' },
+                { name: `description`, type: 'json' },
                 { name: `volumeOptions`, type: 'json' },
                 { name: `rating`, type: 'json' },
                 { name: `awards`, type: 'json' },

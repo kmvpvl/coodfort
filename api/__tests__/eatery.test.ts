@@ -28,8 +28,9 @@ afterAll(done => {
     done();
 });
 
+let firstEateryId: number;
+
 describe('employee -> eatery', () => {
-    let firstEateryId: number;
     /**
      * SUCCESS
      * Creating new Employee who shall become owner of Eatery
@@ -186,5 +187,35 @@ describe('Checking Employee security', () => {
                 tags: ['tag1', 'tag2', 'tag3'],
             });
         expect(newEmployee.statusCode).toBe(400);
+    });
+});
+
+describe('Meals editing', () => {
+    test('Creating meal Salad', async () => {
+        const newMeal1 = await request(app)
+            .post('/meal/new')
+            .set('content-type', 'application/json')
+            .set('coodfort-login', 'new_employee')
+            .set('coodfort-password', 'password_of_new_employee')
+            .send({
+                eateryAuthorId: firstEateryId,
+                name: 'Фруктовый салат',
+                description: 'Салат из бананов, яблок и апельсинов со сметаной',
+                volumeOptions: ['235 гр. (75/75/75/10 гр.)'],
+            });
+        expect(newMeal1.statusCode).toBe(200);
+
+        const newMeal2 = await request(app)
+            .post('/meal/new')
+            .set('content-type', 'application/json')
+            .set('coodfort-login', 'new_employee')
+            .set('coodfort-password', 'password_of_new_employee')
+            .send({
+                eateryAuthorId: firstEateryId,
+                name: 'Американо',
+                description: 'Кофе американо (бразилия)',
+                volumeOptions: ['200 мл', '350 мл'],
+            });
+        expect(newMeal2.statusCode).toBe(200);
     });
 });

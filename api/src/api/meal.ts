@@ -7,10 +7,10 @@ import { IMeal, Meal } from '../model/meal';
 function mealDataFromBody(req: Request): IMeal {
     if (req.body.name === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Parameter 'name' is mandatory`);
     const mealData: IMeal = {
-        name: 'Фруктовый салат',
-        description: 'Салат из бананов, яблок и апельсинов со сметаной',
-        volumeOptions: ['235 гр. (75/75/75/10 гр.)'],
-        eateryAuthorId: 1,
+        eateryAuthorId: req.body.eateryAuthorId,
+        name: req.body.name,
+        description: req.body.description,
+        volumeOptions: req.body.volumeOptions,
     };
     return mealData;
 }
