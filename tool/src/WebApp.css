@@ -8,21 +8,27 @@
 }
 
 .web-app-logo {
-    margin: 0.5em;
+    padding: 0.5em;
     cursor: pointer;
     width: 100%;
     height: 100%;
-}
-.web-app-logo > div {
-    margin-left: auto;
-    margin-right: auto;
+    overflow: hidden;
     text-align: center;
-    font-size: xxx-large;
+    font-size: 3em;
+    display: grid;
+    grid-template-rows: auto auto;
 }
+
+.web-app-logo-container {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
 .web-app-logo > div > img {
-    min-height: 20%;
-    max-height: 8em;
-    max-width: 80%;
+    max-height: 80%;
+    max-width: 100%;
 }
 
 .webapp-container-notoken-choosen {
@@ -39,7 +45,8 @@
     padding: 0.75em;
     display: flex;
     flex-flow: column;
-    gap: 1em;
+    gap: 0.5em;
+    width: 100%;
 }
 
 .webapp-enter-info {
@@ -47,7 +54,7 @@
     padding: 0.75em;
     display: flex;
     flex-flow: column;
-    gap: 1em;
+    gap: 0.5em;
 }
 
 .webapp-choose-button > span:first-child {

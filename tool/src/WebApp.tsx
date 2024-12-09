@@ -130,7 +130,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 						this.setState(nState);
 					}}
 					className="web-app-logo">
-					<div>
+					<div className="web-app-logo-container">
 						<img src="./logo_large.svg" />
 					</div>
 					<div>CoodFort</div>
