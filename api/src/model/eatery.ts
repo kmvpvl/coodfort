@@ -1,5 +1,6 @@
 import { createHmac } from 'crypto';
 import { IDocument, Types, DocumentError, DocumentErrorCode, Document, IDocumentDataSchema, IDocumentWFSchema, WorkflowStatusCode } from './protodocument';
+import { IMeal } from './meal';
 
 export interface ITimeSlot {}
 
@@ -33,7 +34,7 @@ export enum EateryRoleCode {
     'MDM' = 'MDM',
 }
 
-interface ITable extends IDocument {
+export interface ITable extends IDocument {
     name: Types.MLString;
     guestCountMax?: number;
     guestCountComfort?: number;
@@ -61,6 +62,7 @@ export interface IEatery extends IDocument {
     awards?: IAward[];
     cuisines?: Types.MLString[];
     averageBills?: { cuisine: Types.MLString; withAlcohol: number; withoutAlcohol: number }[];
+    menuId?: Types.ObjectId;
 }
 
 export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema> {
@@ -79,6 +81,7 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
                 { name: `cuisines`, type: 'json' },
                 { name: `awards`, type: 'json' },
                 { name: `averageBills`, type: 'json' },
+                { name: `menuId`, type: 'BIGINT(20)', required: false },
             ],
             related: [
                 {

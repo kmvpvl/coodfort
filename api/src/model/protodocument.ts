@@ -3,8 +3,48 @@ import { mconsole } from './console';
 import { Employee } from './eatery';
 
 export namespace Types {
+    type IMLString =
+        | string
+        | {
+              default: string;
+              map: [string, string][];
+          };
+    export class MLString extends String {
+        private _map?: Map<string, string> = new Map<string, string>();
+        constructor();
+        constructor(str: string);
+        constructor(mlString: IMLString);
+        constructor(...arg: any[]) {
+            super(arg.length === 0 ? '' : typeof arg[0] === 'object' ? arg[0].default : arg[0]);
+            switch (arg.length) {
+                case 0:
+                    return;
+                case 1:
+                    if (typeof arg[0] === 'object') {
+                        this._map = new Map<string, string>(arg[0].map);
+                    }
+            }
+        }
+        toString(): string;
+        toString(lang: string): string;
+        toString(...arg: any[]): string | undefined {
+            switch (arg.length) {
+                case 0:
+                    return super.toString();
+                default:
+                    return this._map?.has(arg[0]) ? (this._map.get(arg[0]) as string) : super.toString();
+            }
+        }
+        get json(): IMLString {
+            return this._map === undefined
+                ? this.toString()
+                : {
+                      default: this.toString(),
+                      map: Array.from(this._map),
+                  };
+        }
+    }
     export type ObjectId = number;
-    export type MLString = string;
 }
 
 export enum DocumentErrorCode {
@@ -43,6 +83,8 @@ export class DocumentError extends Error {
 
 export interface IDocument {
     id?: Types.ObjectId;
+    locked?: boolean;
+    lockedByUser?: string;
     blocked?: boolean;
     created?: Date;
     changed?: Date;
@@ -52,13 +94,15 @@ export interface IDocument {
 }
 
 export const DocumentBaseSchema: ITableFieldSchema[] = [
-    { name: `id`, type: 'bigint(20)', required: true, autoIncrement: true },
-    { name: `blocked`, type: 'tinyint(1)', required: true, default: '0' },
-    { name: `wfStatus`, type: 'INT(11)' },
-    { name: `createdByUser`, type: 'varchar(128)' },
-    { name: `changedByUser`, type: 'varchar(128)' },
-    { name: `created`, type: 'timestamp', required: true, default: 'current_timestamp()' },
-    { name: `changed`, type: 'timestamp', required: true, default: 'current_timestamp()', onUpdate: 'current_timestamp()' },
+    { name: `id`, type: 'bigint(20)', required: true, autoIncrement: true, comment: 'Unique identificator of document or child record' },
+    { name: `locked`, type: 'tinyint(1)', required: true, default: '0', comment: 'Is Document locked for changes' },
+    { name: `lockedByUser`, type: 'varchar(128)', comment: 'User name who locked Document the last' },
+    { name: `blocked`, type: 'tinyint(1)', required: true, default: '0', comment: 'Is Document blocked' },
+    { name: `wfStatus`, type: 'INT(11)', comment: 'Workflow status of Document' },
+    { name: `createdByUser`, type: 'varchar(128)', comment: 'User login who created the Document' },
+    { name: `changedByUser`, type: 'varchar(128)', comment: 'User login who changed the Document the last' },
+    { name: `created`, type: 'timestamp', required: true, default: 'current_timestamp()', comment: 'Time when the document created' },
+    { name: `changed`, type: 'timestamp', required: true, default: 'current_timestamp()', onUpdate: 'current_timestamp()', comment: 'Time when the document changed last time' },
 ];
 
 export interface ITableFieldSchema {
@@ -68,7 +112,7 @@ export interface ITableFieldSchema {
     autoIncrement?: boolean;
     default?: string;
     onUpdate?: string;
-    check?: string;
+    comment?: string;
 }
 
 export interface ITableIndexSchema {
@@ -312,7 +356,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     }
 
     protected buildSQL(field: ITableFieldSchema): string {
-        return `\`${field.name}\` ${field.type === 'json' ? 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin' : field.type} ${field.required ? 'NOT NULL' : field.default !== undefined ? `DEFAULT ${field.default}` : 'DEFAULT NULL'} ${field.autoIncrement ? 'AUTO_INCREMENT' : ''} ${field.default !== undefined && field.required ? `DEFAULT ${field.default}` : ''} ${field.onUpdate !== undefined ? `ON UPDATE ${field.onUpdate}` : ''}`;
+        return `\`${field.name}\` ${field.type === 'json' ? 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin' : field.type} ${field.required ? 'NOT NULL' : field.default !== undefined ? `DEFAULT ${field.default}` : 'DEFAULT NULL'} ${field.autoIncrement ? 'AUTO_INCREMENT' : ''} ${field.default !== undefined && field.required ? `DEFAULT ${field.default}` : ''} ${field.type === 'json' ? `CHECK (json_valid(\`${field.name}\`))` : ''} ${field.onUpdate !== undefined ? `ON UPDATE ${field.onUpdate}` : ''} ${field.comment !== undefined ? `COMMENT '${field.comment}'` : ''}`;
     }
 
     protected async createMainTable() {

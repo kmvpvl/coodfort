@@ -212,7 +212,13 @@ describe('Meals editing', () => {
             .set('coodfort-password', 'password_of_new_employee')
             .send({
                 eateryAuthorId: firstEateryId,
-                name: 'Американо',
+                name: {
+                    default: 'Американо',
+                    map: [
+                        ['en', 'Americano'],
+                        ['it', 'Americano it'],
+                    ],
+                },
                 description: 'Кофе американо (бразилия)',
                 volumeOptions: ['200 мл', '350 мл'],
             });

@@ -1,0 +1,90 @@
+.webapp-container-notoken-none {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.web-app-logo {
+    margin: 0.5em;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+.web-app-logo > div {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-size: xxx-large;
+}
+.web-app-logo > div > img {
+    min-height: 20%;
+    max-height: 8em;
+    max-width: 80%;
+}
+
+.webapp-container-notoken-choosen {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    display: grid;
+    width: 100%;
+    height: 100%;
+}
+
+.webapp-choose-button {
+    margin: auto;
+    padding: 0.75em;
+    display: flex;
+    flex-flow: column;
+    gap: 1em;
+}
+
+.webapp-enter-info {
+    margin: auto;
+    padding: 0.75em;
+    display: flex;
+    flex-flow: column;
+    gap: 1em;
+}
+
+.webapp-choose-button > span:first-child {
+    margin: auto;
+    border: 1px solid var(--text-color);
+    border-radius: 1.5em;
+    padding: 0.75em;
+    text-align: center;
+    font-size: large;
+    cursor: pointer;
+}
+
+@media (orientation:landscape) {
+    .webapp-container-notoken-none {
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-rows: auto 1fr;
+    }
+    .web-app-logo {
+        grid-column: 1 / 4;
+    }
+    .webapp-enter-info {
+        grid-column: 1 / 4;
+
+    }
+    .webapp-container-notoken-choosen {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+}
+
+@media (orientation:portrait) {
+    .webapp-container-notoken-none {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr 1fr 1fr;
+    }
+    .webapp-container-notoken-choosen {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto auto;
+    }
+}
