@@ -1,8 +1,12 @@
 import { Context } from 'openapi-backend';
 import { AuthUser } from '../model/security';
 import { Request, Response } from 'express';
-import { Eatery, EateryRoleCode, IEatery } from '../model/eatery';
-import { DocumentError, DocumentErrorCode, Types } from '../model/protodocument';
+import { Eatery } from '../model/eatery';
+import { IEatery } from '../types/eaterytypes';
+import { EateryRoleCode } from '../types/eaterytypes';
+import { DocumentError } from '../model/protodocument';
+import { DocumentErrorCode } from '../types/prototypes';
+import { Types } from '../types/prototypes';
 
 function eateryDataFromBody(req: Request): IEatery {
     if (req.body.name === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Parameter 'name' is mandatory`);

@@ -1,8 +1,11 @@
 import { Context } from 'openapi-backend';
 import { AuthUser } from '../model/security';
 import { Request, Response } from 'express';
-import { DocumentError, DocumentErrorCode, Types } from '../model/protodocument';
-import { IMeal, Meal } from '../model/meal';
+import { DocumentError } from '../model/protodocument';
+import { DocumentErrorCode } from '../types/prototypes';
+import { Types } from '../types/prototypes';
+import { Meal } from '../model/meal';
+import { IMeal } from '../types/eaterytypes';
 
 function mealDataFromBody(req: Request): IMeal {
     if (req.body.name === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Parameter 'name' is mandatory`);
@@ -10,7 +13,7 @@ function mealDataFromBody(req: Request): IMeal {
         eateryAuthorId: req.body.eateryAuthorId,
         name: req.body.name,
         description: req.body.description,
-        volumeOptions: req.body.volumeOptions,
+        photos: [],
     };
     return mealData;
 }

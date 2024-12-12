@@ -1,5 +1,6 @@
 import React from "react";
-import { mlStrings } from "../model/mlstring";
+import { Types } from "@betypes/prototypes";
+import MLString, { mlStrings } from "../model/mlstring";
 
 export enum ProtoErrorCode {
 	serverNotAvailable,
@@ -15,12 +16,19 @@ export class ProtoError extends Error {
 		return { code: this._code, message: this.message };
 	}
 }
+export enum ServerStatusCode {
+	connecting,
+	notAvailable,
+	connected,
+}
 
 export interface IProtoProps {
 	lang?: string;
 }
 
-export interface IProtoState {}
+export interface IProtoState {
+	serverStatus?: ServerStatusCode;
+}
 export default class Proto<
 	IProps extends IProtoProps,
 	IState extends IProtoState,
@@ -33,6 +41,11 @@ export default class Proto<
 		if (lang_param !== undefined && lang_param.length > 0)
 			lang = lang_param[0].split("=")[1];
 		return lang;
+	}
+
+	protected toString(mlString: Types.IMLString, lang?: string): string {
+		const mls = new MLString(mlString);
+		return mls.toString(lang === undefined ? this.getLanguage() : lang);
 	}
 
 	protected ML(str?: string, lang?: string): string {
@@ -58,6 +71,10 @@ export default class Proto<
 		successcb?: (res: any) => void,
 		failcb?: (err: ProtoError) => void
 	) {
+		const nStatus: IState = this.state;
+		nStatus.serverStatus = ServerStatusCode.connecting;
+		this.setState(nStatus);
+
 		const h: Headers = new Headers([
 			["Access-Control-Allow-Origin", "*"],
 			["ngrok-skip-browser-warning", "any"],
@@ -79,17 +96,25 @@ export default class Proto<
 				return res.json();
 			})
 			.then(v => {
+				const nStatus: IState = this.state;
+				nStatus.serverStatus = ServerStatusCode.connected;
+				this.setState(nStatus);
+
 				if (successcb) successcb(v);
 			})
 			.catch(v => {
 				if (v instanceof Error) {
-					if (failcb)
+					const nStatus: IState = this.state;
+					nStatus.serverStatus = ServerStatusCode.notAvailable;
+					this.setState(nStatus);
+					if (failcb) {
 						failcb(
 							new ProtoError(
 								ProtoErrorCode.serverNotAvailable,
 								v.message
 							)
 						);
+					}
 				} else {
 					v.json()
 						.then((j: any) => {
@@ -97,6 +122,9 @@ export default class Proto<
 								ProtoErrorCode.httpError,
 								`url='${v.url}'; status='${v.status}'; text='${v.statusText}'; server_desc='${JSON.stringify(j)}'`
 							);
+							const nStatus: IState = this.state;
+							nStatus.serverStatus = ServerStatusCode.connected;
+							this.setState(nStatus);
 							if (failcb) failcb(err);
 						})
 						.catch((err: any) => {

@@ -1,69 +1,14 @@
 import { createHmac } from 'crypto';
-import { IDocument, Types, DocumentError, DocumentErrorCode, Document, IDocumentDataSchema, IDocumentWFSchema, WorkflowStatusCode } from './protodocument';
-import { IMeal } from './meal';
-
-export interface ITimeSlot {}
-
-export interface IPhoto {
-    url: string;
-    caption?: Types.MLString;
-    tags?: Types.MLString[];
-}
-
-export interface IRating {
-    ratingValue: number;
-    ratingCount: number;
-}
-
-export interface IAward {
-    awardName: Types.MLString;
-    logo?: {
-        url?: string;
-        html?: Types.MLString;
-    };
-    url: string;
-}
+import { DocumentError, Document, IDocumentDataSchema, IDocumentWFSchema } from './protodocument';
+import { WorkflowStatusCode } from '../types/prototypes';
+import { DocumentErrorCode } from '../types/prototypes';
+import { Types } from '../types/prototypes';
+import { IMeal } from '../types/eaterytypes';
+import { EateryRoleCode, IEatery, IEmployee } from '../types/eaterytypes';
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
 
 interface IEateryWFSchema extends IDocumentWFSchema {}
-
-export enum EateryRoleCode {
-    'supervisor' = 'supervisor',
-    'administrator' = 'administrator',
-    'MDM' = 'MDM',
-}
-
-export interface ITable extends IDocument {
-    name: Types.MLString;
-    guestCountMax?: number;
-    guestCountComfort?: number;
-    timeSlots?: ITimeSlot[];
-}
-
-export interface IEatery extends IDocument {
-    name: Types.MLString;
-    employees: {
-        employeeId: Types.ObjectId;
-        roles: EateryRoleCode;
-        objects?: {
-            type: string;
-            id: Types.ObjectId;
-        }[];
-    }[];
-    tables: ITable[];
-    deliveryPartnerIds: Types.ObjectId[];
-    entertainmentIds: Types.ObjectId[];
-    rating?: IRating;
-    urls?: { url: string; caption: Types.MLString }[];
-    photos?: IPhoto[];
-    descriptions?: { url?: string; html: Types.MLString }[];
-    tags?: Types.MLString[];
-    awards?: IAward[];
-    cuisines?: Types.MLString[];
-    averageBills?: { cuisine: Types.MLString; withAlcohol: number; withoutAlcohol: number }[];
-    menuId?: Types.ObjectId;
-}
 
 export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema> {
     get dataSchema(): IEateryDataSchema {
@@ -143,17 +88,6 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
  */
 interface IEmployeeSchema extends IDocumentDataSchema {}
 
-interface IEmployee extends IDocument {
-    login: number | string /**Telegram ID or login or phone */;
-    hash: string /** */;
-    name?: string;
-    rating?: IRating;
-    awards?: IAward[];
-    photos?: IPhoto[];
-    bios?: Types.MLString[];
-    tags?: Types.MLString[];
-}
-
 export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSchema> {
     get dataSchema(): IEmployeeSchema {
         return {
@@ -210,25 +144,3 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
         };
     }
 }
-
-interface IBooking extends IDocument {
-    eateryId: Types.ObjectId;
-    mnemNumber: string;
-    mainGuestId: Types.ObjectId;
-    whoPaysGuestId: Types.ObjectId[];
-    guestIds: Types.ObjectId[];
-    tableIds: Types.ObjectId[];
-    timeSlot: ITimeSlot;
-}
-
-interface IGuest extends IDocument {}
-
-interface IOrder extends IDocument {}
-
-interface IEntertainment extends IDocument {}
-
-interface IDeliveryPartner extends IDocument {}
-
-interface IInvoice extends IDocument {}
-
-interface IPayment extends IDocument {}

@@ -1,0 +1,106 @@
+.menu-item-container {
+    display: grid;
+    /* Photo, description, price of all options*/
+    grid-template-rows: 1fr auto auto;
+    width: 10em;
+    height: 12em;
+    position: relative;
+    overflow: hidden;
+    --border: 1px dotted var(--text-color);
+    border-radius: 5px;
+    padding: 2px;
+}
+
+.maximized {
+    width: 20em;
+    height: 18em;
+}
+
+.menu-item-photos-container {
+    width: 100%;
+    height: 100%;
+    padding: 5px;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    text-align: center;
+    overflow: hidden;
+}
+
+.menu-item-photo-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    overflow: hidden;
+}
+
+.menu-item-meal-description {
+    font-size: x-small;
+    text-align: center;
+}
+.menu-item-photo-container > img {
+    max-height: 100%;
+    max-width: 100%;
+    border-radius: 5px;
+    margin: auto;
+    --object-fit: contain;
+}
+.menu-item-photos-scroll {
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    gap: 0.5em;
+}
+
+.menu-item-photos-scroll > span {
+    cursor: pointer;
+}
+
+.menu-item-meal-options {
+    display: flex;
+    font-size: small;
+    justify-content: space-around;
+}
+
+.menu-item-meal-option {
+    border-radius: 5px;
+    border: 1px dotted var(--text-color);
+    padding: 5px;
+    text-align: center;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    grid-template-columns: auto 1fr;
+    cursor: pointer;
+    gap: 2px;
+    opacity: 0.3;
+}
+
+.menu-item-meal-option:hover, .selected {
+    opacity: 1;
+}
+
+.menu-item-meal-option-volume {
+    font-weight: bold;
+}
+.menu-item-meal-option-price {
+    font-size: x-small;
+}
+
+.menu-item-meal-toolbar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    flex-flow: column;
+    background-color: var(--background-color);
+    padding: 1px;
+    --border: 1px solid var(--text-color);
+    border-radius: 5px;
+    opacity: 0.2;
+    gap: 2px;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.menu-item-meal-toolbar:hover {
+    opacity: 1;
+}

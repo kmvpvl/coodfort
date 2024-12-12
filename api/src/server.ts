@@ -12,6 +12,7 @@ import { AuthUser } from './model/security';
 import { newEmployee } from './api/employee';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
 import { newMeal } from './api/meal';
+import cors from 'cors';
 
 configDotenv();
 mConsoleInit();
@@ -77,6 +78,7 @@ api.registerSecurityHandler('COODFortPassword', (c: Context, req: Request, res: 
 
 export const app = express();
 app.use(express.json());
+app.use(cors());
 
 // use as express middleware
 app.use(async (req: Request, res: Response) => {

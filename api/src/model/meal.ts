@@ -1,48 +1,6 @@
-import { IAward, IPhoto, IRating } from './eatery';
-import { Document, IDocument, IDocumentDataSchema, IDocumentWFSchema, Types, WorkflowStatusCode } from './protodocument';
-
-export interface IMeal extends IDocument {
-    name: string;
-    eateryAuthorId?: Types.ObjectId;
-    description: Types.MLString;
-    volumeOptions: Types.MLString[];
-    includeOptions?: Types.MLString[];
-    excludeOptions?: Types.MLString[];
-    rating?: IRating;
-    awards?: IAward[];
-    photos?: IPhoto[];
-    tags?: Types.MLString[];
-}
-
-export interface IMenuItem {
-    separatorHtml: Types.MLString;
-    chapters: IMenuChapter[];
-    headerHtml: Types.MLString;
-    footerHtml: Types.MLString;
-    notesHtml: Types.MLString;
-    mealId?: Types.ObjectId;
-    meal?: IMeal;
-    restrictions: Types.MLString[];
-}
-
-export interface IMenuChapter {
-    name: Types.MLString;
-    description: Types.MLString;
-    items: IMenuItem[];
-    headerHtml: Types.MLString;
-    footerHtml: Types.MLString;
-    notesHtml: Types.MLString;
-    restrictions: Types.MLString[];
-}
-
-export interface IMenu extends IDocument {
-    eateryAuthorId: Types.ObjectId;
-    headerHtml: Types.MLString;
-    footerHtml: Types.MLString;
-    notesHtml: Types.MLString;
-    restrictions: Types.MLString[];
-    chapters: IMenuChapter[];
-}
+import { IMeal, IMenu } from '../types/eaterytypes';
+import { Document, IDocumentDataSchema, IDocumentWFSchema } from './protodocument';
+import { WorkflowStatusCode } from '../types/prototypes';
 
 interface IMealDataSchema extends IDocumentDataSchema {}
 
