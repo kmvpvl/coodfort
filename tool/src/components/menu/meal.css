@@ -1,4 +1,4 @@
-.menu-item-container {
+.meal-container {
     display: grid;
     /* Photo, description, price of all options*/
     grid-template-rows: 1fr auto auto;
@@ -16,7 +16,7 @@
     height: 18em;
 }
 
-.menu-item-photos-container {
+.meal-photos-container {
     width: 100%;
     height: 100%;
     padding: 5px;
@@ -26,42 +26,42 @@
     overflow: hidden;
 }
 
-.menu-item-photo-container {
+.meal-photo-container {
     width: 100%;
     height: 100%;
     display: flex;
     overflow: hidden;
 }
 
-.menu-item-meal-description {
+.meal-meal-description {
     font-size: x-small;
     text-align: center;
 }
-.menu-item-photo-container > img {
+.meal-photo-container > img {
     max-height: 100%;
     max-width: 100%;
     border-radius: 5px;
     margin: auto;
     --object-fit: contain;
 }
-.menu-item-photos-scroll {
+.meal-photos-scroll {
     display: flex;
     flex-flow: row;
     justify-content: center;
     gap: 0.5em;
 }
 
-.menu-item-photos-scroll > span {
+.meal-photos-scroll > span {
     cursor: pointer;
 }
 
-.menu-item-meal-options {
+.meal-meal-options {
     display: flex;
     font-size: small;
     justify-content: space-around;
 }
 
-.menu-item-meal-option {
+.meal-meal-option {
     border-radius: 5px;
     border: 1px dotted var(--text-color);
     padding: 5px;
@@ -74,18 +74,18 @@
     opacity: 0.3;
 }
 
-.menu-item-meal-option:hover, .selected {
+.meal-meal-option:hover, .selected {
     opacity: 1;
 }
 
-.menu-item-meal-option-volume {
+.meal-meal-option-volume {
     font-weight: bold;
 }
-.menu-item-meal-option-price {
+.meal-meal-option-price {
     font-size: x-small;
 }
 
-.menu-item-meal-toolbar {
+.meal-meal-toolbar {
     position: absolute;
     right: 0;
     top: 0;
@@ -101,11 +101,11 @@
     cursor: pointer;
 }
 
-.menu-item-meal-toolbar:hover {
+.meal-meal-toolbar:hover {
     opacity: 1;
 }
 
-.menu-item-admin-container {
+.meal-admin-container {
     width: 100%;
     max-height: 100%;
     display: grid;
@@ -114,7 +114,7 @@
     gap: 0.5em;
 }
 
-.menu-item-admin-requisites-container {
+.meal-admin-requisites-container {
     width: 100%;
     height: 100%;
     display: flex;
@@ -122,12 +122,12 @@
     gap:0.5em;
 }
 
-.menu-item-admin-photos-edit-container {
+.meal-admin-photos-edit-container {
     width: 100%;
     display: flex;
 }
 
-.menu-item-admin-photos-list-container {
+.meal-admin-photos-list-container {
     display: flex;
     flex-flow: row;
     flex-wrap: wrap;
@@ -138,27 +138,27 @@
     gap: 0.5em;
 }
 
-.menu-item-admin-photo-container {
+.meal-admin-photo-container {
     width: 8em;
     --height: 100%;
     display: block;
 }
 
-.menu-item-admin-photo-container > img {
+.meal-admin-photo-container > img {
     max-height: 100%;
     max-width: 100%;
     border-radius: 5px;
     margin: auto;
 }
 
-.menu-item-admin-options-list-container {
+.meal-admin-options-list-container {
     height: 100%;
     max-height: 15em;
     display: flex;
     justify-content: space-between;
 }
 
-.menu-item-admin-options-list {
+.meal-admin-options-list {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5em;
@@ -167,19 +167,19 @@
     overflow: auto;
 }
 
-.menu-item-admin-options-list > span {
+.meal-admin-options-list > span {
     display: grid;
     grid-template-columns: 6em auto;
     grid-template-rows: auto auto;
     gap: 0.5em;
 }
 
-.menu-item-admin-options-list > span > :first-child {
+.meal-admin-options-list > span > :first-child {
     --max-width: 9em;
     grid-column: 1 / 3;
 }
 
-.menu-item-admin-options-list > span > input {
+.meal-admin-options-list > span > input {
     width: 100%;
 
 }

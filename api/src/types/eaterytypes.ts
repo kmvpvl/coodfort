@@ -93,6 +93,7 @@ export interface IMeal extends IDocument {
     eateryAuthorId?: Types.ObjectId;
     description: Types.IMLString;
     photos: IPhoto[];
+    options: IMealVolumeOption[];
     tags?: Types.MLString[];
 }
 
@@ -101,7 +102,6 @@ export interface IMenuItem extends IMeal {
     footerHtml?: Types.IMLString;
     notesHtml?: Types.IMLString;
     mealId?: Types.ObjectId;
-    options: IMealVolumeOption[];
     restrictions?: Types.IMLString[];
     rating?: IRating;
     awards?: IAward[];
