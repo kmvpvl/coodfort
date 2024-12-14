@@ -1,20 +1,9 @@
-export type ErrorCode =
-	| "notauth"
-	| "rolerequired"
-	| "servernotresponding"
-	| "badrequest"
-	| "unknown"
-	| "notfound";
+export type ErrorCode = "notauth" | "rolerequired" | "servernotresponding" | "badrequest" | "unknown" | "notfound";
 export class PlutchikError extends Error {
 	code: ErrorCode;
 	command: string;
 	rawData: any;
-	constructor(
-		code: ErrorCode,
-		message: string,
-		rawData: any,
-		command: string
-	) {
+	constructor(code: ErrorCode, message: string, rawData: any, command: string) {
 		super(message);
 		this.code = code;
 		this.rawData = rawData;
@@ -40,14 +29,7 @@ export interface IServerInfo {
 if (process.env.NODE_ENV === "development") {
 	console.log(JSON.stringify(process.env));
 }
-export function serverFetch(
-	command: string,
-	method: string,
-	headers?: HeadersInit,
-	body?: BodyInit,
-	successcb?: (res: any) => void,
-	failcb?: (err: PlutchikError) => void
-) {
+export function serverFetch(command: string, method: string, headers?: HeadersInit, body?: BodyInit, successcb?: (res: any) => void, failcb?: (err: PlutchikError) => void) {
 	const h: Headers = new Headers([
 		["Access-Control-Allow-Origin", "*"],
 		["ngrok-skip-browser-warning", "any"],
@@ -73,15 +55,7 @@ export function serverFetch(
 		})
 		.catch(v => {
 			if (v instanceof Error) {
-				if (failcb)
-					failcb(
-						new PlutchikError(
-							"servernotresponding",
-							v.message,
-							v,
-							command
-						)
-					);
+				if (failcb) failcb(new PlutchikError("servernotresponding", v.message, v, command));
 			} else {
 				v.json()
 					.then((j: any) => {
@@ -103,12 +77,7 @@ export function serverFetch(
 							default:
 								errcode = "unknown";
 						}
-						const err = new PlutchikError(
-							errcode,
-							`url='${v.url}'; status='${v.status}'; text='${v.statusText}'; server_desc='${JSON.stringify(j)}'`,
-							j,
-							command
-						);
+						const err = new PlutchikError(errcode, `url='${v.url}'; status='${v.status}'; text='${v.statusText}'; server_desc='${JSON.stringify(j)}'`, j, command);
 						if (failcb) failcb(err);
 					})
 					.catch((err: any) => {
@@ -118,13 +87,7 @@ export function serverFetch(
 		});
 }
 
-export function serverCommand(
-	command: string,
-	si: IServerInfo,
-	body?: BodyInit,
-	successcb?: (res: any) => void,
-	failcb?: (err: PlutchikError) => void
-) {
+export function serverCommand(command: string, si: IServerInfo, body?: BodyInit, successcb?: (res: any) => void, failcb?: (err: PlutchikError) => void) {
 	serverFetch(
 		command,
 		"POST",
@@ -191,8 +154,7 @@ export class EmotionalVector implements IEmotionalVector {
 	anger: number = 0;
 	anticipation: number = 0;
 	constructor(ev?: IEmotionalVector) {
-		for (const i in Emotion)
-			(this as any)[i] = ev === undefined ? 0 : (ev as any)[i];
+		for (const i in Emotion) (this as any)[i] = ev === undefined ? 0 : (ev as any)[i];
 	}
 	mult(a: number) {
 		const v = Object.entries(this as IEmotionalVector);

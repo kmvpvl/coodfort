@@ -1,10 +1,6 @@
 import { ReactNode } from "react";
 import "./WebApp.css";
-import Proto, {
-	IProtoProps,
-	IProtoState,
-	ServerStatusCode,
-} from "./components/proto";
+import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/proto";
 
 import { IMenuItem } from "@betypes/eaterytypes";
 
@@ -53,11 +49,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 	renderServerStatus(): ReactNode {
 		return (
 			<span className="webapp-server-status">
-				{this.state.serverStatus !== undefined
-					? ServerStatusCode[this.state.serverStatus]
-					: "unknown"}{" "}
-				{process.env.REACT_APP_SERVER_BASE_URL}{" "}
-				{this.state.serverVersion}
+				{this.state.serverStatus !== undefined ? ServerStatusCode[this.state.serverStatus] : "unknown"} {process.env.REACT_APP_SERVER_BASE_URL} {this.state.serverVersion}
 			</span>
 		);
 	}
@@ -74,68 +66,32 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 							}}>
 							I'm a new Eployee
 						</span>
-						<span className="tip">
-							{this.ML(
-								`If you're have no account in CoodFort or you want create new account as an employee`
-							)}
-						</span>
+						<span className="tip">{this.ML(`If you're have no account in CoodFort or you want create new account as an employee`)}</span>
 					</span>
 				) : (
 					<span className="webapp-enter-info">
 						<h2>{this.ML(`New Employee`)}</h2>
 						<div>
 							<span>
-								<input
-									placeholder={this.ML(
-										"Enter your login"
-									)}></input>
-								<span className="tip">
-									{this.ML(
-										"Employer can see your login name, can find you by it and can invite you"
-									)}
-								</span>
+								<input placeholder={this.ML("Enter your login")}></input>
+								<span className="tip">{this.ML("Employer can see your login name, can find you by it and can invite you")}</span>
 							</span>
 							<span>
-								<input
-									placeholder={this.ML(
-										"Enter your password"
-									)}></input>
-								<span className="tip">
-									{this.ML(
-										"Nobody must see you password. Keep it secret"
-									)}
-								</span>
+								<input placeholder={this.ML("Enter your password")}></input>
+								<span className="tip">{this.ML("Nobody must see you password. Keep it secret")}</span>
 							</span>
 						</div>
 						<div>
 							<span>
-								<input
-									placeholder={this.ML(
-										"Enter your name (alias)"
-									)}></input>
-								<span className="tip">
-									{this.ML(
-										"All employer and guests can see your name"
-									)}
-								</span>
+								<input placeholder={this.ML("Enter your name (alias)")}></input>
+								<span className="tip">{this.ML("All employer and guests can see your name")}</span>
 							</span>
 							<span>
-								<input
-									placeholder={this.ML(
-										"Enter your e-mail"
-									)}></input>
-								<span className="tip">
-									{this.ML(
-										"This e-mail allows you recover your account"
-									)}
-								</span>
+								<input placeholder={this.ML("Enter your e-mail")}></input>
+								<span className="tip">{this.ML("This e-mail allows you recover your account")}</span>
 							</span>
 						</div>
-						<span className="tip">
-							{this.ML(
-								"We strongly reccomend to you fill information to recover access to your Eatery. Use Telegram or e-mail to be sure that nobody can compromize your data"
-							)}
-						</span>
+						<span className="tip">{this.ML("We strongly reccomend to you fill information to recover access to your Eatery. Use Telegram or e-mail to be sure that nobody can compromize your data")}</span>
 					</span>
 				)}
 			</>
@@ -153,29 +109,14 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 							}}>
 							I want to register new Eatery
 						</span>
-						<span className="tip">
-							{this.ML(
-								`If you're a manager or owner of the new Eatery and want to register one`
-							)}
-						</span>
+						<span className="tip">{this.ML(`If you're a manager or owner of the new Eatery and want to register one`)}</span>
 					</span>
 				) : (
 					<span className="webapp-enter-info">
 						<h2>{this.ML(`New Eatery`)}</h2>
-						<span className="tip">
-							{this.ML(
-								"To create new Eatery you have to fill master data of Eatery: Names, address, tables, its meals and drinks"
-							)}
-						</span>
-						<input
-							placeholder={this.ML(
-								"Enter new Eatery name"
-							)}></input>
-						<span className="tip">
-							{this.ML(
-								"We strongly reccomend to you fill information to recover access to your Eatery. Use Telegram or e-mail to be sure that nobody can compromize your data"
-							)}
-						</span>
+						<span className="tip">{this.ML("To create new Eatery you have to fill master data of Eatery: Names, address, tables, its meals and drinks")}</span>
+						<input placeholder={this.ML("Enter new Eatery name")}></input>
+						<span className="tip">{this.ML("We strongly reccomend to you fill information to recover access to your Eatery. Use Telegram or e-mail to be sure that nobody can compromize your data")}</span>
 					</span>
 				)}
 			</>
@@ -193,39 +134,21 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 							}}>
 							I have token
 						</span>
-						<span className="tip">
-							{this.ML(
-								`You've registered earlier and had token. Insert token or recover your token here`
-							)}
-						</span>
+						<span className="tip">{this.ML(`You've registered earlier and had token. Insert token or recover your token here`)}</span>
 					</span>
 				) : (
 					<span className="webapp-enter-info">
 						<h2>{this.ML(`Sign in`)}</h2>
-						<span className="tip">
-							{this.ML(
-								`The result of your registration was token which we sent to your e-mail or/and Telegram. Check out you token or recover it by Telegram or e-mail`
-							)}
-						</span>
-						<input
-							placeholder={this.ML(
-								"Insert your token here"
-							)}></input>
-						<span className="tip">
-							{this.ML(`To recover your token use Telegram`)}
-						</span>
+						<span className="tip">{this.ML(`The result of your registration was token which we sent to your e-mail or/and Telegram. Check out you token or recover it by Telegram or e-mail`)}</span>
+						<input placeholder={this.ML("Insert your token here")}></input>
+						<span className="tip">{this.ML(`To recover your token use Telegram`)}</span>
 					</span>
 				)}
 			</>
 		);
 
 		return (
-			<div
-				className={
-					this.state.exhibit === ExhibitViewCode.none
-						? "webapp-container-notoken-none"
-						: "webapp-container-notoken-choosen"
-				}>
+			<div className={this.state.exhibit === ExhibitViewCode.none ? "webapp-container-notoken-none" : "webapp-container-notoken-choosen"}>
 				<div
 					onClick={event => {
 						const nState = this.state;
@@ -238,8 +161,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 					</div>
 					<div>CoodFort</div>
 				</div>
-				{this.state.exhibit === ExhibitViewCode.none ||
-				this.state.exhibit === ExhibitViewCode.enterToken ? (
+				{this.state.exhibit === ExhibitViewCode.none || this.state.exhibit === ExhibitViewCode.enterToken ? (
 					<>
 						{havet}
 						{emp}
@@ -268,12 +190,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 			name: "Americano",
 			description: {
 				default: "Coffee Americano (Brasilian arabica, middle roast)",
-				values: [
-					[
-						"ru",
-						"Кофе Американо (Арабика из Бразилии, средняя обжарка)",
-					],
-				],
+				values: [["ru", "Кофе Американо (Арабика из Бразилии, средняя обжарка)"]],
 			},
 			photos: [
 				{
@@ -313,10 +230,6 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 			],
 		};
 
-		return this.state.loggedInToken !== undefined ? (
-			this.renderNoToken()
-		) : (
-			<MenuItem item={meal} />
-		);
+		return this.state.loggedInToken !== undefined ? this.renderNoToken() : <MenuItem item={meal} admin={true} />;
 	}
 }

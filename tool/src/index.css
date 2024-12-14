@@ -39,3 +39,35 @@ body {
   padding-bottom: 0.5em;
 }
 
+.caption, .toolbar {
+  position: absolute;
+  border: 1px dotted var(--text-color);
+  background-color: var(--background-color);
+  top: -0.5em;
+  font-size: small;
+  font-weight: bold;
+  padding-left: 1em;
+  padding-right: 1em;
+  border-radius: 0.5em;
+}
+
+.caption {
+  left: 0.5em;
+  font-size: small;
+}
+
+.toolbar {
+  right:0.5em;
+}
+
+.toolbar > span {
+  cursor: pointer;
+}
+
+.has-caption {
+  padding: 0.5em;
+  padding-top: 1em;
+  border: 1px dotted var(--text-color);
+  border-radius: 0.5em;
+  position: relative;
+}

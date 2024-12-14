@@ -1,35 +1,28 @@
-.mlstring-container {
-    padding: 0.75em 2px 0.5em 2px;
-    margin-top: 0.5em;
-    border: 1px dotted var(--text-color);
+.mlstring-editor-container {
+    width: 100%;
     display: grid;
-    grid-template-rows: auto auto auto;
-    position: relative;
-    border-radius: 5px;
+    gap: 0.5em;
+    --font-size: 50%;
 }
 
-.mlstring-caption {
-    border-radius: 5px;
-    display: inline;
-    font-size: smaller;
-    --font-weight: bold;
-    position: absolute;
-    top:-0.5em;
-    left:0.5em;
-    width: fit-content;
-    background-color: var(--background-color);
-    border: 1px dotted var(--text-color);
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+.mlstring-editor-default  {
+    width: 100%;
+    overflow: hidden;
 }
 
-.mlstring-default {
-    font-style: italic;
-    display: grid;
-    grid-template-columns: auto 1fr;
+.mlstring-editor-default > input, .mlstring-editor-value > input {
+
+    width: 100%;
 }
 
-.mlstring-values {
+.mlstring-editor-value {
     display: grid;
     grid-template-columns: auto auto 1fr;
+    gap: 0.5em;
+    width: 100%;
+    overflow: hidden;
+}
+
+.mlstring-editor-value-toolbar {
+    cursor: pointer;
 }

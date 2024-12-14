@@ -6,21 +6,12 @@ export default class MLString extends String {
 	constructor(def: Types.IMLString | string) {
 		super(typeof def !== "string" ? def.default : def);
 		this.values = new Map();
-		this.values =
-			typeof def !== "string"
-				? new Map<string, string>(def.values)
-				: new Map<string, string>();
+		this.values = typeof def !== "string" ? new Map<string, string>(def.values) : new Map<string, string>();
 	}
 	public toString(lang?: string): string {
 		if (!lang) lang = MLString.getLang();
 		if (!this.values.has(lang)) lang = lang.split("-")[0];
-		return (
-			lang
-				? this.values.has(lang)
-					? this.values.get(lang)
-					: super.toString()
-				: super.toString()
-		) as string;
+		return (lang ? (this.values.has(lang) ? this.values.get(lang) : super.toString()) : super.toString()) as string;
 	}
 	public toJSON() {
 		return {
@@ -35,8 +26,7 @@ export default class MLString extends String {
 		const params: string[] = window.location.search.substring(1).split("&");
 		let lang = window.navigator.language.split("-")[0];
 		const lang_param = params.filter(v => v.split("=")[0] === "lang");
-		if (lang_param !== undefined && lang_param.length > 0)
-			lang = lang_param[0].split("=")[1];
+		if (lang_param !== undefined && lang_param.length > 0) lang = lang_param[0].split("=")[1];
 		return lang;
 	}
 }
@@ -103,50 +93,23 @@ export const mlStrings = new Map([
 	[
 		`There is not more content items to assess. Ask your HR manager or psychologist to add ones`,
 		new Map([
-			[
-				`de`,
-				`Es gibt keine weiteren Inhalte zu bewerten. Bitten Sie Ihren Personalleiter oder Psychologen, weitere hinzuzufügen.`,
-			],
-			[
-				`fr`,
-				`Il n'y a plus d'éléments de contenu à évaluer. Demandez à votre responsable RH ou à votre psychologue d'en ajouter.`,
-			],
-			[
-				`es`,
-				`No hay más elementos de contenido para evaluar. Pídale a su gerente de recursos humanos o psicólogo que agregue algunos.`,
-			],
-			[
-				`uk`,
-				`Немає більше елементів вмісту для оцінки. Попросіть свого менеджера з персоналу або психолога додати їх`,
-			],
-			[
-				`ru`,
-				`Больше нет элементов контента для оценки. Попросите своего менеджера по персоналу или психолога добавить их`,
-			],
-			[
-				`it`,
-				`Non ci sono altri elementi di contenuto da valutare. Chiedi al tuo responsabile delle risorse umane o allo psicologo di aggiungerne`,
-			],
+			[`de`, `Es gibt keine weiteren Inhalte zu bewerten. Bitten Sie Ihren Personalleiter oder Psychologen, weitere hinzuzufügen.`],
+			[`fr`, `Il n'y a plus d'éléments de contenu à évaluer. Demandez à votre responsable RH ou à votre psychologue d'en ajouter.`],
+			[`es`, `No hay más elementos de contenido para evaluar. Pídale a su gerente de recursos humanos o psicólogo que agregue algunos.`],
+			[`uk`, `Немає більше елементів вмісту для оцінки. Попросіть свого менеджера з персоналу або психолога додати їх`],
+			[`ru`, `Больше нет элементов контента для оценки. Попросите своего менеджера по персоналу или психолога добавить их`],
+			[`it`, `Non ci sono altri elementi di contenuto da valutare. Chiedi al tuo responsabile delle risorse umane o allo psicologo di aggiungerne`],
 		]),
 	],
 	[
 		`Press button to request new content items`,
 		new Map([
-			[
-				`de`,
-				`Klicken Sie auf die Schaltfläche, um neue Inhaltselemente anzufordern`,
-			],
-			[
-				`fr`,
-				`Appuyez sur le bouton pour demander de nouveaux éléments de contenu`,
-			],
+			[`de`, `Klicken Sie auf die Schaltfläche, um neue Inhaltselemente anzufordern`],
+			[`fr`, `Appuyez sur le bouton pour demander de nouveaux éléments de contenu`],
 			[`es`, `Pulse el botón para solicitar nuevos contenidos`],
 			[`uk`, `Натисніть кнопку, щоб запитати нові елементи вмісту`],
 			[`ru`, `Нажмите кнопку, чтобы запросить новые элементы контента`],
-			[
-				`it`,
-				`Premi il pulsante per richiedere nuovi elementi di contenuto`,
-			],
+			[`it`, `Premi il pulsante per richiedere nuovi elementi di contenuto`],
 		]),
 	],
 	[
@@ -281,21 +244,12 @@ export const mlStrings = new Map([
 	[
 		`Invite your friends to check out their emotional azimuth`,
 		new Map([
-			[
-				`de`,
-				`Laden Sie Ihre Freunde ein, ihren emotionalen Azimut zu überprüfen`,
-			],
+			[`de`, `Laden Sie Ihre Freunde ein, ihren emotionalen Azimut zu überprüfen`],
 			[`fr`, `Invitez vos amis à découvrir leur azimut émotionnel`],
 			[`es`, `Invita a tus amigos a comprobar su acimut emocional.`],
 			[`uk`, `Запросіть друзів перевірити їхній емоційний азимут`],
-			[
-				`ru`,
-				`Пригласите своих друзей проверить их эмоциональный азимут.`,
-			],
-			[
-				`it`,
-				`Invita i tuoi amici a dare un'occhiata al loro azimut emotivo`,
-			],
+			[`ru`, `Пригласите своих друзей проверить их эмоциональный азимут.`],
+			[`it`, `Invita i tuoi amici a dare un'occhiata al loro azimut emotivo`],
 		]),
 	],
 	[
@@ -367,30 +321,12 @@ export const mlStrings = new Map([
 	[
 		`The emotions listed below are the most prevalent in you compared to people who assessed the same content. The emotions are listed in descending order of intensity.`,
 		new Map([
-			[
-				`de`,
-				`Die unten aufgeführten Emotionen sind bei Ihnen im Vergleich zu Personen, die dieselben Inhalte bewertet haben, am stärksten ausgeprägt. Die Emotionen sind in absteigender Reihenfolge der Intensität aufgeführt.`,
-			],
-			[
-				`fr`,
-				`Les émotions énumérées ci-dessous sont celles qui prévalent le plus chez vous par rapport aux personnes ayant évalué le même contenu. Les émotions sont classées par ordre décroissant d'intensité.`,
-			],
-			[
-				`es`,
-				`Las emociones que se enumeran a continuación son las más frecuentes en usted en comparación con las personas que evaluaron el mismo contenido. Las emociones se enumeran en orden descendente de intensidad.`,
-			],
-			[
-				`uk`,
-				`Перелічені нижче емоції є найбільш поширеними у вас порівняно з людьми, які оцінювали той самий вміст. Емоції перераховані в порядку зменшення інтенсивності.`,
-			],
-			[
-				`ru`,
-				`Перечисленные ниже эмоции являются наиболее распространенными у вас по сравнению с людьми, оценивавшими тот же контент. Эмоции перечислены в порядке убывания интенсивности.`,
-			],
-			[
-				`it`,
-				`Le emozioni elencate di seguito sono le più diffuse in te rispetto alle persone che hanno valutato lo stesso contenuto. Le emozioni sono elencate in ordine decrescente di intensità.`,
-			],
+			[`de`, `Die unten aufgeführten Emotionen sind bei Ihnen im Vergleich zu Personen, die dieselben Inhalte bewertet haben, am stärksten ausgeprägt. Die Emotionen sind in absteigender Reihenfolge der Intensität aufgeführt.`],
+			[`fr`, `Les émotions énumérées ci-dessous sont celles qui prévalent le plus chez vous par rapport aux personnes ayant évalué le même contenu. Les émotions sont classées par ordre décroissant d'intensité.`],
+			[`es`, `Las emociones que se enumeran a continuación son las más frecuentes en usted en comparación con las personas que evaluaron el mismo contenido. Las emociones se enumeran en orden descendente de intensidad.`],
+			[`uk`, `Перелічені нижче емоції є найбільш поширеними у вас порівняно з людьми, які оцінювали той самий вміст. Емоції перераховані в порядку зменшення інтенсивності.`],
+			[`ru`, `Перечисленные ниже эмоции являются наиболее распространенными у вас по сравнению с людьми, оценивавшими тот же контент. Эмоции перечислены в порядке убывания интенсивности.`],
+			[`it`, `Le emozioni elencate di seguito sono le più diffuse in te rispetto alle persone che hanno valutato lo stesso contenuto. Le emozioni sono elencate in ordine decrescente di intensità.`],
 		]),
 	],
 	[
