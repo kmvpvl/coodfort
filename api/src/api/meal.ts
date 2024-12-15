@@ -13,7 +13,8 @@ function mealDataFromBody(req: Request): IMeal {
         eateryAuthorId: req.body.eateryAuthorId,
         name: req.body.name,
         description: req.body.description,
-        photos: [],
+        options: req.body.options,
+        photos: req.body.photos,
     };
     return mealData;
 }
