@@ -31,20 +31,6 @@ paths:
       responses:
         '200': 
           description: OK
-  /tgconfig:
-    get:
-      operationId: tgconfig
-      security: []
-      responses:
-        '200': 
-          description: OK
-  /telegram:
-    post:
-      operationId: telegram
-      security: []
-      responses:
-        '200':
-          description: OK
   /eatery/new:
     post:
       operationId: newEatery
@@ -73,6 +59,12 @@ paths:
     post:
       operationId: newEmployee
       security: []      
+      responses:
+        '200':
+          description: OK
+  /employee/view:
+    post:
+      operationId: viewEmployee
       responses:
         '200':
           description: OK

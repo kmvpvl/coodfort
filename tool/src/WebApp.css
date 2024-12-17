@@ -59,10 +59,8 @@
     gap: 0.5em;
 }
 
-.webapp-enter-info > div {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1em;
+.--webapp-enter-info > div {
+    display: flex;
 }
 
 .webapp-enter-info > div > span {

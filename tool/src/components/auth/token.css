@@ -1,0 +1,13 @@
+.token-container {
+    width: 100%;
+    text-align: center;
+}
+
+.token-container > input {
+    width: 80%;
+}
+
+.token-server-error {
+    color: red;
+    font-size: x-small;
+}

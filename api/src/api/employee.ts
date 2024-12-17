@@ -29,3 +29,16 @@ export async function newEmployee(c: Context, req: Request, res: Response, user:
         return res.status(400).json({ ok: false, error: e });
     }
 }
+
+export async function viewEmployee(c: Context, req: Request, res: Response, user: AuthUser) {
+    const id = req.body.id;
+    if (id === undefined) return res.status(200).json({ ok: true, employee: user.employee?.data });
+    try {
+        const empl = new Employee(id);
+        await empl.load();
+        return res.status(200).json({ ok: true, employee: empl.data });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: (e as DocumentError).json });
+        return res.status(400).json({ ok: false, error: e });
+    }
+}

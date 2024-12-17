@@ -8,13 +8,52 @@ import fs from 'fs';
 import { randomUUID } from 'crypto';
 import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
-import { AuthUser } from './model/security';
-import { newEmployee } from './api/employee';
+import { AuthUser, startCommand } from './model/security';
+import { newEmployee, viewEmployee } from './api/employee';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
 import { newMeal } from './api/meal';
 import cors from 'cors';
+import { Telegraf } from 'telegraf';
 
 configDotenv();
+const TGTOKEN = process.env.tgtoken;
+const TGWEBHOOK = process.env.tgwebhook;
+if (TGTOKEN === undefined) throw new Error('TGTOKEN undefined');
+if (TGWEBHOOK === undefined) throw new Error('TGWEBHOOK undefined');
+
+let tgBot: Telegraf;
+try {
+    tgBot = new Telegraf(TGTOKEN);
+    process.once('SIGINT', () => tgBot.stop('SIGINT'));
+    process.once('SIGTERM', () => tgBot.stop('SIGTERM'));
+
+    tgBot.command('start', startCommand);
+    tgBot.catch(async (err, ctx) => {
+        console.log(err, ctx);
+    });
+
+    // Start webhook via launch method (preferred)
+    tgBot.launch({
+        webhook: {
+            // Public domain for webhook; e.g.: example.com
+            domain: TGWEBHOOK,
+
+            // Port to listen on; e.g.: 8080
+            //port: "80",
+
+            // Optional path to listen for.
+            // `bot.secretPathComponent()` will be used by default
+            //path: webhookPath,
+
+            // Optional secret to be sent back in a header for security.
+            // e.g.: `crypto.randomBytes(64).toString("hex")`
+            //secretToken: randomAlphaNumericString,
+        },
+    });
+} catch (e) {
+    console.log('TG bot not started', e);
+}
+
 mConsoleInit();
 
 const PORT = process.env.PORT || 8000;
@@ -32,19 +71,20 @@ api.register({
             return res.status(400).json(e);
         }
     },
-    tgconfig: async (c: Context, req: Request, res: Response) => {
-        return res.status(200).json({ ok: true });
-    },
-    telegram: async (c: Context, req: Request, res: Response, user: AuthUser) => res.status(200).json({ ok: true }),
     newEatery: newEatery,
     updateEatery: updateEatery,
     viewEatery: viewEatery,
     publishEatery: publishEatery,
     newEmployee: newEmployee,
+    viewEmployee: viewEmployee,
     newMeal: newMeal,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {
+        if (req.path.indexOf('/telegraf') === 0) {
+            tgBot.handleUpdate(req.body);
+            return res.status(200).json('ok');
+        }
         const p = path.join(__dirname, '..', 'public', req.path);
         if (fs.existsSync(p)) {
             return res.sendFile(p);

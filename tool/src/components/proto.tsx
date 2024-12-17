@@ -1,6 +1,7 @@
 import React from "react";
 import { Types } from "@betypes/prototypes";
 import MLString, { mlStrings } from "../model/mlstring";
+import Toaster from "./toast";
 
 export enum ProtoErrorCode {
 	serverNotAvailable,
@@ -24,6 +25,7 @@ export enum ServerStatusCode {
 
 export interface IProtoProps {
 	lang?: string;
+	toaster?: React.RefObject<Toaster | null>;
 }
 
 export interface IProtoState {
