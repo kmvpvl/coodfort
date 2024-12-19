@@ -2,13 +2,10 @@ import React, { ReactNode } from "react";
 import "./WebApp.css";
 import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/proto";
 
-import { IMenuItem } from "@betypes/eaterytypes";
+import { IEmployee } from "@betypes/eaterytypes";
 
-import Meal from "./components/menu/meal";
-import Eatery from "./components/eatery/eatery";
-import TGCodeGenerator from "./components/auth/tgcodegenerator";
-import Token from "./components/auth/token";
-import Toaster, { ToastType } from "./components/toast";
+import Toaster from "./components/toast";
+import Employee from "./components/employee/employee";
 
 export interface IWebAppProps extends IProtoProps {
 	mode: string;
@@ -22,7 +19,6 @@ enum ExhibitViewCode {
 }
 
 export interface IWebAppState extends IProtoState {
-	loggedInToken?: string;
 	exhibit: ExhibitViewCode;
 	serverVersion?: string;
 }
@@ -34,9 +30,9 @@ declare global {
 }
 
 export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
-	toasterRef = React.createRef<Toaster>();
+	protected toasterRef = React.createRef<Toaster>();
 	state: IWebAppState = {
-		exhibit: ExhibitViewCode.none,
+		exhibit: ExhibitViewCode.enterToken,
 	};
 	protected intervalPing?: NodeJS.Timeout;
 	ping() {
@@ -50,6 +46,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 	componentDidMount(): void {
 		this.ping();
 		this.intervalPing = setInterval(this.ping.bind(this), 30000);
+		if (this.token !== undefined) this.login(this.token);
 	}
 	renderServerStatus(): ReactNode {
 		return (
@@ -145,9 +142,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 					<span className="webapp-enter-info">
 						<h2>{this.ML(`Sign in`)}</h2>
 						<span className="tip">{this.ML(`The result of your registration was token which we sent to your e-mail or/and Telegram. Check out you token or recover it by Telegram or e-mail`)}</span>
-						<Token toaster={this.toasterRef} onSingIn={employee=> {
-							this.toasterRef.current?.addToast({type: ToastType.info, message: JSON.stringify(employee, undefined, 2)});
-						}}/>
+						<input/>
 						<span className="tip">{this.ML(`To recover your token use Telegram`)}</span>
 					</span>
 				)}
@@ -188,13 +183,20 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 					</>
 				)}
 				{this.renderServerStatus()}
-				<Toaster placesCount={3} ref={this.toasterRef}/>
+				<Toaster placesCount={3} ref={this.toasterRef} />
 			</div>
 		);
 	}
 	render(): ReactNode {
 		//window.Telegram.WebApp.expand();
 
-		return this.state.loggedInToken === undefined ? this.renderNoToken() : <TGCodeGenerator></TGCodeGenerator>;
+		return this.state.employee === undefined ? (
+			this.renderNoToken()
+		) : (
+			<>
+				<Employee employee={this.state.employee} toaster={this.toasterRef} />
+				{this.renderServerStatus()}
+			</>
+		);
 	}
 }

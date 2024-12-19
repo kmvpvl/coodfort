@@ -33,7 +33,7 @@ try {
     });
 
     // Start webhook via launch method (preferred)
-    tgBot.launch({
+    /*tgBot.launch({
         webhook: {
             // Public domain for webhook; e.g.: example.com
             domain: TGWEBHOOK,
@@ -49,7 +49,7 @@ try {
             // e.g.: `crypto.randomBytes(64).toString("hex")`
             //secretToken: randomAlphaNumericString,
         },
-    });
+    });*/
 } catch (e) {
     console.log('TG bot not started', e);
 }

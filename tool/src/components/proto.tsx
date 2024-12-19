@@ -2,6 +2,7 @@ import React from "react";
 import { Types } from "@betypes/prototypes";
 import MLString, { mlStrings } from "../model/mlstring";
 import Toaster from "./toast";
+import { IEmployee } from "@betypes/eaterytypes";
 
 export enum ProtoErrorCode {
 	serverNotAvailable,
@@ -26,12 +27,66 @@ export enum ServerStatusCode {
 export interface IProtoProps {
 	lang?: string;
 	toaster?: React.RefObject<Toaster | null>;
+	onSingIn?: (employee: IEmployee) => void;
+	onSignOut?: () => void;
+	onSignError?: (err: ProtoError)=> void;
 }
 
 export interface IProtoState {
 	serverStatus?: ServerStatusCode;
+	signedIn?: boolean;
+	employee?: IEmployee;
 }
 export default class Proto<IProps extends IProtoProps, IState extends IProtoState> extends React.Component<IProps, IState> {
+	protected get token(): string | undefined {
+		const ls = localStorage.getItem("coodforttoken");
+		return ls?ls as string:undefined;
+	}
+	protected getTokenPair(token?: string | null): [string | undefined, string | undefined] {
+		if ((token === undefined || token === null) && this.token !== undefined) token = this.token;
+		if (token) {
+			const token_parts = token.split(":");
+			const password = token_parts.pop();
+			if (password !== undefined) {
+				const login = token_parts.join(":");
+				return [login, password];
+			}
+		}
+		return ["",""];
+	}
+
+	login(token: string) {
+		const [login, password] = this.getTokenPair(token);
+		if (password !== undefined && login !== undefined) {
+			this.serverFetch(
+				"employee/view",
+				"POST",
+				new Headers([
+					["content-type", "application/json"],
+					["coodfort-login", login],
+					["coodfort-password", password],
+				]),
+				undefined,
+				res => {
+					console.log(res);
+					if (res.ok) {
+						const nState: IState = this.state;
+						nState.employee = res.employee;
+						nState.signedIn = true;
+						this.setState(nState);
+						localStorage.setItem("coodforttoken", token);
+						if (this.props.onSingIn) this.props.onSingIn(res.employee);
+
+					}
+				},
+				err => {
+					console.log(err);
+					if (this.props.onSignError !== undefined) this.props.onSignError(err);
+				}
+			);
+		}
+	}
+
 	protected getLanguage(): string {
 		if (this.props.lang !== undefined) return this.props.lang;
 		const params: string[] = window.location.search.substring(1).split("&");
@@ -118,10 +173,11 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 			});
 	}
 
-	/*protected serverCommand (command: string, si: IServerInfo, body?: BodyInit, successcb?: (res: any)=>void, failcb?: (err: PlutchikError)=>void){
-        serverFetch(command, 'POST', {
-            "plutchik-tguid": si.tguserid?si.tguserid.toString():'',
-            "plutchik-sessiontoken": si.sessiontoken?si.sessiontoken:''
+	protected serverCommand (command: string, body?: BodyInit, successcb?: (res: any)=>void, failcb?: (err: ProtoError)=>void){
+		const [login, password] = this.getTokenPair();
+        this.serverFetch(command, 'POST', {
+            "coodfort-login": login !== undefined?login:"",
+            "coodfort-password": password !== undefined?password:""
         }, body, successcb, failcb);
-    }*/
+    }
 }
