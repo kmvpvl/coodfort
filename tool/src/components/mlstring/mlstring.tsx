@@ -20,7 +20,7 @@ export default class MLStringEditor extends React.Component<IMLStringEditorProps
 		return this.state.value;
 	}
 	render(): React.ReactNode {
-		const langs = (process.env.REACT_APP_LANGS !== undefined ? process.env.REACT_APP_LANGS : "en,fr,de,es,it,ru").split(",");
+		const langs = (process.env.LANGUAGES !== undefined ? process.env.LANGUAGES : "en,fr,de,es,it,ru").split(",");
 		return (
 			<div className="mlstring-editor-container has-caption">
 				<div className="caption">{this.props.caption}</div>

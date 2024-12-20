@@ -38,23 +38,21 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		nState.focus = newFocus;
 		this.setState(nState);
 	}
-    newEatery() {
-        const newEatery:IEatery = {
-            name: "New Eatery",
-            tables: [],
-            deliveryPartnerIds:[],
-            employees:[],
-            entertainmentIds: []
-        }
-        this.serverCommand("eatery/new", JSON.stringify(newEatery), res=>{
-            if (res.ok) {
-                if (this.props.eateriesChanged !== undefined) this.props.eateriesChanged(res.eatery.id);
-            }
-        })
-    }
-    updateEateriesList() {
-        
-    }
+	newEatery() {
+		const newEatery: IEatery = {
+			name: "New Eatery",
+			tables: [],
+			deliveryPartnerIds: [],
+			employees: [],
+			entertainmentIds: [],
+		};
+		this.serverCommand("eatery/new", JSON.stringify(newEatery), res => {
+			if (res.ok) {
+				if (this.props.eateriesChanged !== undefined) this.props.eateriesChanged(res.eatery.id);
+			}
+		});
+	}
+	updateEateriesList() {}
 	renderEATERIESFocus(): ReactNode {
 		return (
 			<div className="eateries-container has-caption">

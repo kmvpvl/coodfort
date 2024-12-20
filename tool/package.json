@@ -1,18 +1,19 @@
 {
   "name": "coodfort_tool",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "private": true,
+  "type": "module",
   "dependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite serve",
     "commit_prepare": "npm version patch && npm run prettier",
     "prettier": "npx prettier -w **/*.{ts*,html}",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "react-scripts test"
   },
   "browserslist": {
     "production": [
@@ -30,8 +31,9 @@
     "@types/node": "^22.10.1",
     "@types/react": "^19.0.1",
     "@types/react-dom": "^19.0.1",
+    "@vitejs/plugin-react": "^4.3.4",
     "prettier": "^3.4.2",
-    "react-scripts": "^5.0.1",
+    "vite": "^5.4.11",
     "web-vitals": "^4.2.4"
   }
 }

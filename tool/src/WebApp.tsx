@@ -51,7 +51,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 	renderServerStatus(): ReactNode {
 		return (
 			<span className="webapp-server-status">
-				{this.state.serverStatus !== undefined ? ServerStatusCode[this.state.serverStatus] : "unknown"} {process.env.REACT_APP_SERVER_BASE_URL} {this.state.serverVersion}
+				{this.state.serverStatus !== undefined ? ServerStatusCode[this.state.serverStatus] : "unknown"} {process.env.SERVER_BASE_URL} {this.state.serverVersion}
 			</span>
 		);
 	}
@@ -142,7 +142,15 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 					<span className="webapp-enter-info">
 						<h2>{this.ML(`Sign in`)}</h2>
 						<span className="tip">{this.ML(`The result of your registration was token which we sent to your e-mail or/and Telegram. Check out you token or recover it by Telegram or e-mail`)}</span>
-						<input/>
+						<input
+							type="password"
+							placeholder={this.ML("Insert your token here")}
+							onChange={event => {
+								const token = event.currentTarget.value;
+								if (token !== undefined) {
+									this.login(token);
+								}
+							}}></input>
 						<span className="tip">{this.ML(`To recover your token use Telegram`)}</span>
 					</span>
 				)}

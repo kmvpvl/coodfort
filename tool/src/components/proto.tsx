@@ -29,7 +29,7 @@ export interface IProtoProps {
 	toaster?: React.RefObject<Toaster | null>;
 	onSingIn?: (employee: IEmployee) => void;
 	onSignOut?: () => void;
-	onSignError?: (err: ProtoError)=> void;
+	onSignError?: (err: ProtoError) => void;
 }
 
 export interface IProtoState {
@@ -40,7 +40,7 @@ export interface IProtoState {
 export default class Proto<IProps extends IProtoProps, IState extends IProtoState> extends React.Component<IProps, IState> {
 	protected get token(): string | undefined {
 		const ls = localStorage.getItem("coodforttoken");
-		return ls?ls as string:undefined;
+		return ls ? (ls as string) : undefined;
 	}
 	protected getTokenPair(token?: string | null): [string | undefined, string | undefined] {
 		if ((token === undefined || token === null) && this.token !== undefined) token = this.token;
@@ -52,7 +52,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 				return [login, password];
 			}
 		}
-		return ["",""];
+		return ["", ""];
 	}
 
 	login(token: string) {
@@ -76,7 +76,6 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 						this.setState(nState);
 						localStorage.setItem("coodforttoken", token);
 						if (this.props.onSingIn) this.props.onSingIn(res.employee);
-
 					}
 				},
 				err => {
@@ -133,7 +132,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 				h.append(h1, h2);
 			}
 		}
-		fetch(`${process.env.REACT_APP_SERVER_BASE_URL}/${command}`, {
+		fetch(`${process.env.SERVER_BASE_URL}/${command}`, {
 			method: method,
 			headers: h,
 			body: body,
@@ -173,11 +172,18 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 			});
 	}
 
-	protected serverCommand (command: string, body?: BodyInit, successcb?: (res: any)=>void, failcb?: (err: ProtoError)=>void){
+	protected serverCommand(command: string, body?: BodyInit, successcb?: (res: any) => void, failcb?: (err: ProtoError) => void) {
 		const [login, password] = this.getTokenPair();
-        this.serverFetch(command, 'POST', {
-            "coodfort-login": login !== undefined?login:"",
-            "coodfort-password": password !== undefined?password:""
-        }, body, successcb, failcb);
-    }
+		this.serverFetch(
+			command,
+			"POST",
+			{
+				"coodfort-login": login !== undefined ? login : "",
+				"coodfort-password": password !== undefined ? password : "",
+			},
+			body,
+			successcb,
+			failcb
+		);
+	}
 }
