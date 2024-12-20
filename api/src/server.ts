@@ -9,7 +9,7 @@ import { randomUUID } from 'crypto';
 import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
 import { AuthUser, startCommand } from './model/security';
-import { newEmployee, viewEmployee } from './api/employee';
+import { employeeEateriesList, newEmployee, viewEmployee } from './api/employee';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
 import { newMeal } from './api/meal';
 import cors from 'cors';
@@ -33,7 +33,7 @@ try {
     });
 
     // Start webhook via launch method (preferred)
-    /*tgBot.launch({
+    tgBot.launch({
         webhook: {
             // Public domain for webhook; e.g.: example.com
             domain: TGWEBHOOK,
@@ -49,7 +49,7 @@ try {
             // e.g.: `crypto.randomBytes(64).toString("hex")`
             //secretToken: randomAlphaNumericString,
         },
-    });*/
+    });
 } catch (e) {
     console.log('TG bot not started', e);
 }
@@ -78,6 +78,7 @@ api.register({
     newEmployee: newEmployee,
     viewEmployee: viewEmployee,
     newMeal: newMeal,
+    employeeEateriesList: employeeEateriesList,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {

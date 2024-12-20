@@ -322,6 +322,18 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         mconsole.sqlinfo(`Foreign key for related table ${tableSchema.tableName}' of schema '${this.dataSchema.tableName}' has created successfully`);
     }
 
+    protected jsonTranslate(obj: any, schema: IDocumentDataSchema): DataType {
+        schema.fields.forEach(field => {
+            if (field.type === 'json') (obj as any)[field.name] = JSON.parse((obj as any)[field.name]);
+            if ((obj as any)[field.name] === null) (obj as any)[field.name] = undefined;
+        });
+        DocumentBaseSchema.forEach(field => {
+            if (field.type === 'json') (obj as any)[field.name] = JSON.parse((obj as any)[field.name]);
+            if ((obj as any)[field.name] === null) (obj as any)[field.name] = undefined;
+        });
+        return obj;
+    }
+
     protected async loadFromDB(): Promise<DataType> {
         await Document.createSQLConnection();
         let [rows, fields]: [DataType[], FieldPacket[]] = [[], []];
@@ -348,15 +360,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
             }
         }
         if (rows.length === 1) {
-            const parentObj = rows[0];
-            this.dataSchema.fields.forEach(field => {
-                if (field.type === 'json') (parentObj as any)[field.name] = JSON.parse((parentObj as any)[field.name]);
-                if ((parentObj as any)[field.name] === null) (parentObj as any)[field.name] = undefined;
-            });
-            DocumentBaseSchema.forEach(field => {
-                if (field.type === 'json') (parentObj as any)[field.name] = JSON.parse((parentObj as any)[field.name]);
-                if ((parentObj as any)[field.name] === null) (parentObj as any)[field.name] = undefined;
-            });
+            const parentObj = this.jsonTranslate(rows[0], this.dataSchema);
             if (this.dataSchema.related !== undefined) {
                 for (const relObj of this.dataSchema.related) {
                     let [rows, fields]: [any[], FieldPacket[]] = [[], []];
@@ -366,14 +370,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
 
                             (parentObj as any)[relObj.tableName] = rows;
                             for (const row of rows) {
-                                relObj.fields.forEach(field => {
-                                    if (field.type === 'json') (row as any)[field.name] = JSON.parse((row as any)[field.name]);
-                                    if ((row as any)[field.name] === null) (row as any)[field.name] = undefined;
-                                });
-                                DocumentBaseSchema.forEach(field => {
-                                    if (field.type === 'json') (row as any)[field.name] = JSON.parse((row as any)[field.name]);
-                                    if ((row as any)[field.name] === null) (row as any)[field.name] = undefined;
-                                });
+                                this.jsonTranslate(row, relObj);
                             }
                             break;
                         } catch (e: any) {

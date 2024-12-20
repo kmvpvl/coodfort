@@ -3,8 +3,9 @@ import { DocumentError, Document, IDocumentDataSchema, IDocumentWFSchema } from 
 import { WorkflowStatusCode } from '../types/prototypes';
 import { DocumentErrorCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
-import { IMeal } from '../types/eaterytypes';
 import { EateryRoleCode, IEatery, IEmployee } from '../types/eaterytypes';
+import { mconsole } from './console';
+import { RowDataPacket } from 'mysql2';
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
 
@@ -79,7 +80,7 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
     }
 
     checkRoles(roleToCheck: EateryRoleCode, employeeId: Types.ObjectId): boolean {
-        return this.data.employees.some(empl => empl.employeeId === employeeId && (empl.roles === roleToCheck || empl.roles === EateryRoleCode.administrator));
+        return this.data.employees.some(empl => empl.employeeId === employeeId && (empl.roles === roleToCheck || empl.roles === EateryRoleCode.owner));
     }
 }
 
@@ -87,6 +88,10 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
  *
  */
 interface IEmployeeSchema extends IDocumentDataSchema {}
+interface IEateryExt extends RowDataPacket {}
+interface IEateryExt extends IEatery {
+    roles: string;
+}
 
 export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSchema> {
     get dataSchema(): IEmployeeSchema {
@@ -121,7 +126,7 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
     async createEatery(eateryData: IEatery): Promise<Eatery> {
         eateryData.employees.push({
             employeeId: this.id,
-            roles: EateryRoleCode.administrator,
+            roles: EateryRoleCode.owner,
         });
         const eatery = new Eatery(eateryData);
 
@@ -135,6 +140,16 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
         await eatery.load();
         if (!eatery.checkRoles(EateryRoleCode.MDM, this.id)) await eatery.save(this.data.login.toString());
         return eatery;
+    }
+
+    async eateriesList(): Promise<IEateryExt[]> {
+        const sql =
+            'select `eateries`.*, `linkedEateries`.`roles` from (SELECT `eatery_employees`.`eatery_id` as `id`, `roles` FROM `eatery_employees` WHERE `eatery_employees`.`employeeId` = ?) as `linkedEateries` INNER join `eateries` on `linkedEateries`.`id` = `eateries`.`id`';
+        mconsole.sqlq(sql, [this.id]);
+        const [rows, fields] = await this.sqlConnection.query<IEateryExt[]>(sql, [this.id]);
+        rows.forEach(row => this.jsonTranslate(row, new Eatery().dataSchema));
+        mconsole.sqlinfo(rows, fields);
+        return rows;
     }
 
     get wfSchema(): IDocumentWFSchema {

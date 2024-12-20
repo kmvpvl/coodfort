@@ -23,7 +23,7 @@ export interface IAward {
 }
 export enum EateryRoleCode {
     'supervisor' = 'supervisor',
-    'administrator' = 'administrator',
+    'owner' = 'owner',
     'MDM' = 'MDM',
 }
 export interface ITable extends IDocument {

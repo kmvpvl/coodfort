@@ -36,6 +36,11 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 	selectFocus(newFocus: EmployeeFocus) {
 		const nState = this.state;
 		nState.focus = newFocus;
+		switch (nState.focus) {
+			case "eateries":
+				this.updateEateriesList();
+				break;
+		}
 		this.setState(nState);
 	}
 	newEatery() {
@@ -49,10 +54,30 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		this.serverCommand("eatery/new", JSON.stringify(newEatery), res => {
 			if (res.ok) {
 				if (this.props.eateriesChanged !== undefined) this.props.eateriesChanged(res.eatery.id);
+				const nState = this.state;
+				nState.currentEateryId = res.eatery.id;
+				this.setState(nState);
+				this.updateEateriesList();
 			}
 		});
 	}
-	updateEateriesList() {}
+	updateEateriesList() {
+		this.serverCommand(
+			"employee/eateriesList",
+			undefined,
+			res => {
+				console.log(res);
+				if (res.ok) {
+					const nState = this.state;
+					nState.eateries = res.eateries;
+					this.setState(nState);
+				}
+			},
+			err => {
+				console.log(err);
+			}
+		);
+	}
 	renderEATERIESFocus(): ReactNode {
 		return (
 			<div className="eateries-container has-caption">
@@ -60,6 +85,12 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				<div className="toolbar">
 					<span onClick={this.newEatery.bind(this)}>+</span>
 				</div>
+				{this.state.eateries?.map((eatery, idx) => (
+					<div key={idx}>
+						{this.toString(eatery.name)}
+						{eatery.id === this.state.currentEateryId ? "=" : ""}
+					</div>
+				))}
 			</div>
 		);
 	}

@@ -42,3 +42,14 @@ export async function viewEmployee(c: Context, req: Request, res: Response, user
         return res.status(400).json({ ok: false, error: e });
     }
 }
+
+export async function employeeEateriesList(c: Context, req: Request, res: Response, user: AuthUser) {
+    if (user.employee === undefined) return res.status(401).json({ ok: false, error: {} });
+    try {
+        const empl = user.employee;
+        return res.status(200).json({ ok: true, eateries: await empl.eateriesList() });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: (e as DocumentError).json });
+        return res.status(400).json({ ok: false, error: e });
+    }
+}

@@ -219,6 +219,7 @@ Working with|Methods
 -|-
 Employee root object|[employee/new](#post-employeenew), employee/edit, employee/view
 Invitations from Eateries|employee/acceptInvitation, employee/rejectInvitation
+Working with Eateries as owner|[employee/eateriesList](#post-employeeeaterieslist)
 
 #### POST `employee/new`
 Creates new Employee object. This method is used for Employee registration by web application. If you want register new Employee by Telegram, use `/start` command.
@@ -260,6 +261,40 @@ Response body if error
 }
 ```
 
+#### POST `employee/eateriesList`
+Reveals list of all Eateries created by Employee.
+
+*Parameters*
+Mand|Parameter|Where|Type|Description
+-|-|-|-|-
+✅|coodfort-login|header|string|Login name of Employee
+✅|coodfort-password|header|string|Password of Employee
+
+*Returns*
+
+HTTP status|Condition|Response body
+-|-|-
+200|Array of IEatery structures| See below
+401|Unknown Employee|See below
+
+Response body if successful
+```javascript
+{
+    ok: true, 
+    employee: IEatery[]
+}
+```
+Response body if error
+```javascript
+{
+    ok: false,
+    error: {
+        code: code_number,
+        shortName: short_string_error,
+        message: error_description
+    } 
+}
+```
 
 ### Working with GUEST class
 Working with|Methods
