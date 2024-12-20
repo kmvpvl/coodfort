@@ -3,7 +3,7 @@ import { DocumentError, Document, IDocumentDataSchema, IDocumentWFSchema } from 
 import { WorkflowStatusCode } from '../types/prototypes';
 import { DocumentErrorCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
-import { EateryRoleCode, IEatery, IEmployee } from '../types/eaterytypes';
+import { EateryRoleCode, IEatery, IEateryBrief, IEmployee } from '../types/eaterytypes';
 import { mconsole } from './console';
 import { RowDataPacket } from 'mysql2';
 
@@ -88,10 +88,6 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
  *
  */
 interface IEmployeeSchema extends IDocumentDataSchema {}
-interface IEateryExt extends RowDataPacket {}
-interface IEateryExt extends IEatery {
-    roles: string;
-}
 
 export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSchema> {
     get dataSchema(): IEmployeeSchema {
@@ -142,11 +138,11 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
         return eatery;
     }
 
-    async eateriesList(): Promise<IEateryExt[]> {
+    async eateriesList(): Promise<IEateryBrief[]> {
         const sql =
             'select `eateries`.*, `linkedEateries`.`roles` from (SELECT `eatery_employees`.`eatery_id` as `id`, `roles` FROM `eatery_employees` WHERE `eatery_employees`.`employeeId` = ?) as `linkedEateries` INNER join `eateries` on `linkedEateries`.`id` = `eateries`.`id`';
         mconsole.sqlq(sql, [this.id]);
-        const [rows, fields] = await this.sqlConnection.query<IEateryExt[]>(sql, [this.id]);
+        const [rows, fields] = await this.sqlConnection.query<IEateryBrief[]>(sql, [this.id]);
         rows.forEach(row => this.jsonTranslate(row, new Eatery().dataSchema));
         mconsole.sqlinfo(rows, fields);
         return rows;

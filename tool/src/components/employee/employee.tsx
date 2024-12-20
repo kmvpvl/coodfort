@@ -1,8 +1,9 @@
 import { ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState } from "../proto";
 import "./employee.css";
-import { IEatery, IEmployee, IMeal } from "@betypes/eaterytypes";
+import { IEatery, IEateryBrief, IEmployee, IMeal } from "@betypes/eaterytypes";
 import { Types } from "@betypes/prototypes";
+import { EateryThumb } from "../eatery/eateryThumb";
 
 type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "orders";
 
@@ -16,7 +17,7 @@ export interface IEmployeeState extends IProtoState {
 	focus: EmployeeFocus;
 	currentEateryId?: Types.ObjectId;
 	currentMealId?: Types.ObjectId;
-	eateries?: IEatery[];
+	eateries?: IEateryBrief[];
 	meals?: IMeal[];
 }
 
@@ -85,12 +86,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				<div className="toolbar">
 					<span onClick={this.newEatery.bind(this)}>+</span>
 				</div>
-				{this.state.eateries?.map((eatery, idx) => (
-					<div key={idx}>
-						{this.toString(eatery.name)}
-						{eatery.id === this.state.currentEateryId ? "=" : ""}
-					</div>
-				))}
+				{this.state.eateries?.map((eatery, idx) => <EateryThumb key={idx} eateryBrief={eatery} />)}
 			</div>
 		);
 	}

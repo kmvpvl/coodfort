@@ -1,3 +1,4 @@
+import { RowDataPacket } from 'mysql2/promise';
 import { IDocument, Types } from './prototypes';
 
 export interface ITimeSlot {}
@@ -55,6 +56,11 @@ export interface IEatery extends IDocument {
     averageBills?: { cuisine: Types.IMLString; withAlcohol: number; withoutAlcohol: number }[];
     menuId?: Types.ObjectId;
 }
+export interface IEateryBrief extends RowDataPacket {}
+export interface IEateryBrief extends IEatery {
+    roles: string;
+}
+
 export interface IEmployee extends IDocument {
     login: number | string /**Telegram ID or login or phone */;
     hash: string /** */;

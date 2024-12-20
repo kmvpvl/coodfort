@@ -16,7 +16,7 @@ export interface IEateryState extends IProtoState {
 	focus?: EateryFocus;
 }
 
-export default class Eatery extends Proto<IEateryProps, IEateryState> {
+export class Eatery extends Proto<IEateryProps, IEateryState> {
 	state: IEateryState = {
 		editedEatery: this.props.eatery,
 		editMode: false,

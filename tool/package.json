@@ -1,6 +1,6 @@
 {
   "name": "coodfort_tool",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -12,8 +12,7 @@
     "build": "vite build",
     "serve": "vite serve",
     "commit_prepare": "npm version patch && npm run prettier",
-    "prettier": "npx prettier -w **/*.{ts*,html}",
-    "test": "react-scripts test"
+    "prettier": "npx prettier -w **/*.{ts*,html}"
   },
   "browserslist": {
     "production": [

@@ -33,23 +33,29 @@ try {
     });
 
     // Start webhook via launch method (preferred)
-    tgBot.launch({
-        webhook: {
-            // Public domain for webhook; e.g.: example.com
-            domain: TGWEBHOOK,
+    setTimeout(async () => {
+        try {
+            await tgBot.launch({
+                webhook: {
+                    // Public domain for webhook; e.g.: example.com
+                    domain: TGWEBHOOK,
 
-            // Port to listen on; e.g.: 8080
-            //port: "80",
+                    // Port to listen on; e.g.: 8080
+                    //port: "80",
 
-            // Optional path to listen for.
-            // `bot.secretPathComponent()` will be used by default
-            //path: webhookPath,
+                    // Optional path to listen for.
+                    // `bot.secretPathComponent()` will be used by default
+                    //path: webhookPath,
 
-            // Optional secret to be sent back in a header for security.
-            // e.g.: `crypto.randomBytes(64).toString("hex")`
-            //secretToken: randomAlphaNumericString,
-        },
-    });
+                    // Optional secret to be sent back in a header for security.
+                    // e.g.: `crypto.randomBytes(64).toString("hex")`
+                    //secretToken: randomAlphaNumericString,
+                },
+            });
+        } catch (e) {
+            console.log('TG bot not started', e);
+        }
+    }, 500);
 } catch (e) {
     console.log('TG bot not started', e);
 }
