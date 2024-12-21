@@ -53,3 +53,14 @@ export async function employeeEateriesList(c: Context, req: Request, res: Respon
         return res.status(400).json({ ok: false, error: e });
     }
 }
+
+export async function employeeMealsList(c: Context, req: Request, res: Response, user: AuthUser) {
+    if (user.employee === undefined) return res.status(401).json({ ok: false, error: {} });
+    try {
+        const empl = user.employee;
+        return res.status(200).json({ ok: true, meals: await empl.mealsList() });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: (e as DocumentError).json });
+        return res.status(400).json({ ok: false, error: e });
+    }
+}

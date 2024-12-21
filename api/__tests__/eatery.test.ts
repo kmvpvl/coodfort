@@ -194,7 +194,6 @@ describe('Checking Employee security', () => {
 describe('Meals editing', () => {
     test('Creating meal Salad', async () => {
         const meal1 = {
-            eateryAuthorId: firstEateryId,
             name: 'Americano',
             description: {
                 default: 'Coffee Americano (Brasilian arabica, middle roast)',

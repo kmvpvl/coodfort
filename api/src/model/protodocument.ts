@@ -281,7 +281,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     }
 
     protected buildSQL(field: ITableFieldSchema): string {
-        return `\`${field.name}\` ${field.type === 'json' ? 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin' : field.type} ${field.required ? 'NOT NULL' : field.default !== undefined ? `DEFAULT ${field.default}` : 'DEFAULT NULL'} ${field.autoIncrement ? 'AUTO_INCREMENT' : ''} ${field.default !== undefined && field.required ? `DEFAULT ${field.default}` : ''} ${field.type === 'json' ? `CHECK (json_valid(\`${field.name}\`))` : ''} ${field.onUpdate !== undefined ? `ON UPDATE ${field.onUpdate}` : ''} ${field.comment !== undefined ? `COMMENT '${field.comment}'` : ''}`;
+        return `\`${field.name}\` ${field.type === 'json' ? 'longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin' : field.type} ${field.required ? 'NOT NULL' : field.default !== undefined ? `DEFAULT ${field.default}` : 'DEFAULT NULL'} ${field.autoIncrement ? 'AUTO_INCREMENT' : ''} ${field.default !== undefined && field.required ? `DEFAULT ${field.default}` : ''} ${field.comment !== undefined ? `COMMENT '${field.comment}'` : ''} ${field.type === 'json' ? `CHECK (json_valid(\`${field.name}\`))` : ''} ${field.onUpdate !== undefined ? `ON UPDATE ${field.onUpdate}` : ''}`;
     }
 
     protected async createMainTable() {
@@ -332,6 +332,16 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
             if ((obj as any)[field.name] === null) (obj as any)[field.name] = undefined;
         });
         return obj;
+    }
+
+    public checkMandatory(obj: any, schema?: IDocumentDataSchema) {
+        if (schema === undefined) schema = this.dataSchema;
+        schema.fields.forEach(field => {
+            if (field.required && (obj as any)[field.name] === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `While checking of object '${this.constructor.name}' expected mandatory field value '${field.name}'`);
+        });
+        /*DocumentBaseSchema.forEach(field => {
+            if (field.required && (obj as any)[field.name] === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `While checking of object '${this.constructor.name}' expected mandatory field value '${field.name}'`);
+        });*/
     }
 
     protected async loadFromDB(): Promise<DataType> {

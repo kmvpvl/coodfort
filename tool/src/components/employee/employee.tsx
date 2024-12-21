@@ -4,6 +4,7 @@ import "./employee.css";
 import { IEatery, IEateryBrief, IEmployee, IMeal } from "@betypes/eaterytypes";
 import { Types } from "@betypes/prototypes";
 import { EateryThumb } from "../eatery/eateryThumb";
+import Meal from "../menu/meal";
 
 type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "orders";
 
@@ -41,6 +42,9 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 			case "eateries":
 				this.updateEateriesList();
 				break;
+			case "meals":
+				this.updateMealsList();
+				break;
 		}
 		this.setState(nState);
 	}
@@ -61,6 +65,40 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				this.updateEateriesList();
 			}
 		});
+	}
+	newMeal() {
+		const newMeal: IMeal = {
+			name: "New meal",
+			description: "",
+			photos: [],
+			options: [],
+		};
+		this.serverCommand("meal/new", JSON.stringify(newMeal), res => {
+			if (res.ok) {
+				if (this.props.mealsChanged !== undefined) this.props.mealsChanged(res.meal.id);
+				const nState = this.state;
+				nState.currentMealId = res.meal.id;
+				this.setState(nState);
+				this.updateMealsList();
+			}
+		});
+	}
+	updateMealsList() {
+		this.serverCommand(
+			"employee/mealsList",
+			undefined,
+			res => {
+				console.log(res);
+				if (res.ok) {
+					const nState = this.state;
+					nState.meals = res.meals;
+					this.setState(nState);
+				}
+			},
+			err => {
+				console.log(err);
+			}
+		);
 	}
 	updateEateriesList() {
 		this.serverCommand(
@@ -90,6 +128,17 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 			</div>
 		);
 	}
+	renderMEALSFocus(): ReactNode {
+		return (
+			<div className="meals-container has-caption">
+				<div className="caption">My meals</div>
+				<div className="toolbar">
+					<span onClick={this.newMeal.bind(this)}>+</span>
+				</div>
+				{this.state.meals?.map((meal, idx) => <Meal key={idx} meal={meal} admin={true} />)}
+			</div>
+		);
+	}
 	renderNONEFocus(): ReactNode {
 		return <div>Choose any tab</div>;
 	}
@@ -99,6 +148,9 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		switch (curFocus) {
 			case "eateries":
 				focusContent = this.renderEATERIESFocus();
+				break;
+			case "meals":
+				focusContent = this.renderMEALSFocus();
 				break;
 			case "none":
 			default:
@@ -115,7 +167,9 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 					<span className={`employee-focus-item${curFocus === "eateries" ? " selected" : ""}`} data-focus="eateries" onClick={this.onSelectFocus.bind(this)}>
 						Eateries
 					</span>
-					<span>Meals</span>
+					<span className={`employee-focus-item${curFocus === "meals" ? " selected" : ""}`} data-focus="meals" onClick={this.onSelectFocus.bind(this)}>
+						Meals
+					</span>
 					<span>Bookings</span>
 				</div>
 				{focusContent}

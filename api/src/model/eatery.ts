@@ -3,9 +3,10 @@ import { DocumentError, Document, IDocumentDataSchema, IDocumentWFSchema } from 
 import { WorkflowStatusCode } from '../types/prototypes';
 import { DocumentErrorCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
-import { EateryRoleCode, IEatery, IEateryBrief, IEmployee } from '../types/eaterytypes';
+import { EateryRoleCode, IEatery, IEateryBrief, IEmployee, IMeal, IMealRow } from '../types/eaterytypes';
 import { mconsole } from './console';
 import { RowDataPacket } from 'mysql2';
+import { Meal } from './meal';
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
 
@@ -143,7 +144,20 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
             'select `eateries`.*, `linkedEateries`.`roles` from (SELECT `eatery_employees`.`eatery_id` as `id`, `roles` FROM `eatery_employees` WHERE `eatery_employees`.`employeeId` = ?) as `linkedEateries` INNER join `eateries` on `linkedEateries`.`id` = `eateries`.`id`';
         mconsole.sqlq(sql, [this.id]);
         const [rows, fields] = await this.sqlConnection.query<IEateryBrief[]>(sql, [this.id]);
-        rows.forEach(row => this.jsonTranslate(row, new Eatery().dataSchema));
+        const schema = new Eatery().dataSchema;
+        rows.forEach(row => this.jsonTranslate(row, schema));
+        mconsole.sqlinfo(rows, fields);
+        return rows;
+    }
+
+    async mealsList(eateryId?: Types.ObjectId): Promise<IMealRow[]> {
+        const sql = `select \`meals\`.* from \`meals\` where \`employeeId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ?' : ''}`;
+        const params = [this.id];
+        if (eateryId !== undefined) params.push(eateryId);
+        mconsole.sqlq(sql, params);
+        const [rows, fields] = await this.sqlConnection.query<IMealRow[]>(sql, [this.id]);
+        const schema = new Meal().dataSchema;
+        rows.forEach(row => this.jsonTranslate(row, schema));
         mconsole.sqlinfo(rows, fields);
         return rows;
     }

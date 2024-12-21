@@ -16,8 +16,8 @@ Role is the complex object. Every permission is a structure.
 ```
 ### `Supervisor` role
 Supervisor role has all roles to all objects everywhere
-### `Admin` role
-Admin role has all permission in one or more Eateries. Every Eatery has at least one employee with Admin role. You can't delete last Admin role
+### `Owner` role
+Owner role has all permission in one or more Eateries. Every Eatery has at least one employee with Owner role. You can't delete last Owner role
 ### `MDM` role
 ## Security schemas
 ## Paths
@@ -219,7 +219,7 @@ Working with|Methods
 -|-
 Employee root object|[employee/new](#post-employeenew), employee/edit, employee/view
 Invitations from Eateries|employee/acceptInvitation, employee/rejectInvitation
-Working with Eateries as owner|[employee/eateriesList](#post-employeeeaterieslist)
+Working with Eateries as owner|[employee/eateriesList](#post-employeeeaterieslist), [employee/mealsList](#post-employeemealslist)
 
 #### POST `employee/new`
 Creates new Employee object. This method is used for Employee registration by web application. If you want register new Employee by Telegram, use `/start` command.
@@ -282,6 +282,41 @@ Response body if successful
 {
     ok: true, 
     employee: IEatery[]
+}
+```
+Response body if error
+```javascript
+{
+    ok: false,
+    error: {
+        code: code_number,
+        shortName: short_string_error,
+        message: error_description
+    } 
+}
+```
+
+#### POST `employee/mealsList`
+Reveals list of all Meals created by Employee.
+
+*Parameters*
+Mand|Parameter|Where|Type|Description
+-|-|-|-|-
+✅|coodfort-login|header|string|Login name of Employee
+✅|coodfort-password|header|string|Password of Employee
+
+*Returns*
+
+HTTP status|Condition|Response body
+-|-|-
+200|Array of IMeal structures| See below
+401|Unknown Employee|See below
+
+Response body if successful
+```javascript
+{
+    ok: true, 
+    employee: IMeal[]
 }
 ```
 Response body if error

@@ -74,6 +74,12 @@ paths:
       responses:
         '200':
           description: OK
+  /employee/mealsList:
+    post:
+      operationId: employeeMealsList
+      responses:
+        '200':
+          description: OK
   /meal/new:
     post:
       operationId: newMeal

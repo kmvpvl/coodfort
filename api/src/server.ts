@@ -9,7 +9,7 @@ import { randomUUID } from 'crypto';
 import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
 import { AuthUser, startCommand } from './model/security';
-import { employeeEateriesList, newEmployee, viewEmployee } from './api/employee';
+import { employeeEateriesList, employeeMealsList, newEmployee, viewEmployee } from './api/employee';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
 import { newMeal } from './api/meal';
 import cors from 'cors';
@@ -85,6 +85,7 @@ api.register({
     viewEmployee: viewEmployee,
     newMeal: newMeal,
     employeeEateriesList: employeeEateriesList,
+    employeeMealsList: employeeMealsList,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {

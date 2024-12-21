@@ -11,13 +11,13 @@ interface IMenuDataSchema extends IDocumentDataSchema {}
 interface IMenuWFSchema extends IDocumentWFSchema {}
 
 export class Menu extends Document<IMenu, IMenuDataSchema, IMenuWFSchema> {
-    get dataSchema(): IMealDataSchema {
+    get dataSchema(): IMenuDataSchema {
         return {
             idFieldName: 'id',
             tableName: 'menus',
             relatedTablesPrefix: 'menu_',
             fields: [
-                { name: `eateryAuthorId`, type: 'INT(20)', required: true },
+                { name: `employeeId`, type: 'INT(20)', required: true, comment: 'Author id' },
                 { name: `headerHtml`, type: 'varchar(128)', required: true },
                 { name: `description`, type: 'json' },
                 { name: `volumeOptions`, type: 'json' },
@@ -30,9 +30,9 @@ export class Menu extends Document<IMenu, IMenuDataSchema, IMenuWFSchema> {
         };
     }
 
-    get wfSchema(): IMealWFSchema {
+    get wfSchema(): IMenuWFSchema {
         return {
-            tableName: 'meals',
+            tableName: 'menus',
             initialState: WorkflowStatusCode.registered,
             transfers: [
                 {
@@ -52,14 +52,15 @@ export class Meal extends Document<IMeal, IMealDataSchema, IMealWFSchema> {
             tableName: 'meals',
             relatedTablesPrefix: 'meal_',
             fields: [
-                { name: `eateryAuthorId`, type: 'INT(20)', required: true },
-                { name: `name`, type: 'json', required: true },
-                { name: `description`, type: 'json' },
-                { name: `options`, type: 'json' },
-                { name: `photos`, type: 'json' },
-                { name: `tags`, type: 'json' },
+                { name: `employeeId`, type: 'INT(20)', required: true, comment: 'Author id' },
+                { name: `eateryId`, type: 'INT(20)', required: false, comment: 'Eatery id' },
+                { name: `name`, type: 'varchar(256)', required: true, comment: 'Short name of meal for author only' },
+                { name: `description`, type: 'json', comment: 'Long text described the meal' },
+                { name: `options`, type: 'json', comment: 'Variation of the meal' },
+                { name: `photos`, type: 'json', comment: 'DataURI of photos' },
+                { name: `tags`, type: 'json', comment: 'Array of tags' },
             ],
-            indexes: [{ fields: ['name', 'eateryAuthorId'], indexType: 'UNIQUE' }],
+            indexes: [{ fields: ['name', 'employeeId', 'eateryId'], indexType: 'UNIQUE' }],
         };
     }
 

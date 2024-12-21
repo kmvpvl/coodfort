@@ -48,7 +48,6 @@ export default class MLStringEditor extends React.Component<IMLStringEditorProps
 						defaultValue={typeof this.state.value === "string" ? (this.state.value as string) : this.state.value?.default}
 						onChange={event => {
 							const nState = this.state;
-							debugger;
 
 							if (typeof nState.value === "object") {
 								nState.value.default = event.currentTarget.value;

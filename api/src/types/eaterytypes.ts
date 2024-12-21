@@ -61,6 +61,9 @@ export interface IEateryBrief extends IEatery {
     roles: string;
 }
 
+export interface IMealRow extends RowDataPacket {}
+export interface IMealRow extends IMeal {}
+
 export interface IEmployee extends IDocument {
     login: number | string /**Telegram ID or login or phone */;
     hash: string /** */;
@@ -96,11 +99,12 @@ export interface IMealVolumeOption {
 
 export interface IMeal extends IDocument {
     name: string;
-    eateryAuthorId?: Types.ObjectId;
+    employeeId?: Types.ObjectId;
+    eateryId?: Types.ObjectId;
     description: Types.IMLString;
     photos: IPhoto[];
     options: IMealVolumeOption[];
-    tags?: Types.MLString[];
+    tags?: Types.IMLString[];
 }
 
 export interface IMenuItem extends IMeal {
