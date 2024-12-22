@@ -5,6 +5,7 @@ import { IEatery, IEateryBrief, IEmployee, IMeal } from "@betypes/eaterytypes";
 import { Types } from "@betypes/prototypes";
 import { EateryThumb } from "../eatery/eateryThumb";
 import Meal from "../menu/meal";
+import { Eatery } from "../eatery/eatery";
 
 type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "orders";
 
@@ -118,13 +119,27 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		);
 	}
 	renderEATERIESFocus(): ReactNode {
+		let currentEatery: IEatery |undefined;
+		if (this.state.currentEateryId !== undefined) {
+			const idx = this.state.eateries?.findIndex(eatery=>eatery.id === this.state.currentEateryId)
+			if (idx !== undefined && idx !== -1) currentEatery = this.state.eateries?.at(idx);
+		}
 		return (
 			<div className="eateries-container has-caption">
 				<div className="caption">My eateries</div>
 				<div className="toolbar">
 					<span onClick={this.newEatery.bind(this)}>+</span>
 				</div>
-				{this.state.eateries?.map((eatery, idx) => <EateryThumb key={idx} eateryBrief={eatery} />)}
+				<div>
+				{this.state.eateries?.map((eatery, idx) => <EateryThumb key={idx} eateryBrief={eatery} onSelect={(eatery=>{
+					const nState = this.state;
+					nState.currentEateryId = eatery.id;
+					this.setState(nState);
+				})}/>)}
+				</div>
+				<div>
+					{currentEatery !== undefined?<Eatery eatery={currentEatery}/>:<></>}
+				</div>
 			</div>
 		);
 	}
@@ -135,7 +150,9 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				<div className="toolbar">
 					<span onClick={this.newMeal.bind(this)}>+</span>
 				</div>
+				<div>
 				{this.state.meals?.map((meal, idx) => <Meal key={idx} meal={meal} admin={true} />)}
+				</div>
 			</div>
 		);
 	}

@@ -10,7 +10,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "serve": "vite serve",
+    "serve": "vite preview",
     "commit_prepare": "npm version patch && npm run prettier",
     "prettier": "npx prettier -w **/*.{ts*,html}"
   },
