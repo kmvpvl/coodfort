@@ -41,8 +41,9 @@
     max-height: 100%;
     max-width: 100%;
     border-radius: 5px;
-    margin: auto;
-    --object-fit: contain;
+    margin-left: auto;
+    margin-right: auto;
+    object-fit: contain;
 }
 .meal-photos-scroll {
     display: flex;
