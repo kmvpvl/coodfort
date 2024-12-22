@@ -1,25 +1,28 @@
-version: '3.9'
-
 services:
-
   db:
-    image: postgres
+    image: mysql:latest
     restart: always
-    # set shared memory limit when using docker-compose
-    shm_size: 128mb
-    # or set shared memory limit when deploy via swarm stack
-    #volumes:
-    #  - type: tmpfs
-    #    target: /dev/shm
-    #    tmpfs:
-    #      size: 134217728 # 128*2^20 bytes = 128Mb
     environment:
-      POSTGRES_PASSWORD: admin
-      #POSTGRES_USER: admin
+      MYSQL_ROOT_PASSWORD: 
+      MYSQL_DATABASE: 
+      MYSQL_USER: 
+      MYSQL_PASSWORD: 
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+    volumes:
+      - mysqldata:/var/lib/mysql
     ports:
-      - 5432:5432
-  adminer:
-    image: adminer
+      - "3306:3306"
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
     restart: always
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: 
     ports:
-      - 8080:8080
+      - "8080:80"
+volumes:
+  mysqldata:
+    name: mysqldata
