@@ -11,7 +11,7 @@ import { DocumentError } from './model/protodocument';
 import { AuthUser, startCommand } from './model/security';
 import { employeeEateriesList, employeeMealsList, newEmployee, viewEmployee } from './api/employee';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
-import { newMeal } from './api/meal';
+import { updateMeal } from './api/meal';
 import cors from 'cors';
 import { Telegraf } from 'telegraf';
 
@@ -83,7 +83,8 @@ api.register({
     publishEatery: publishEatery,
     newEmployee: newEmployee,
     viewEmployee: viewEmployee,
-    newMeal: newMeal,
+    newMeal: updateMeal,
+    updateMeal: updateMeal,
     employeeEateriesList: employeeEateriesList,
     employeeMealsList: employeeMealsList,
 

@@ -49,6 +49,7 @@ export enum DocumentErrorCode {
     sql_not_found,
     parameter_expected,
     wf_suspense,
+    redundant_value,
 }
 export enum WorkflowStatusCode {
     draft,

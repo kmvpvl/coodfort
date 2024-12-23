@@ -8,6 +8,7 @@ import MLStringEditor from "../mlstring/mlstring";
 export interface IMealProps extends IProtoProps {
 	meal: IMeal;
 	admin?: boolean;
+	onSave?: (newValue: IMeal) => void;
 }
 
 export interface IMealState extends IProtoState {
@@ -19,11 +20,27 @@ export interface IMealState extends IProtoState {
 }
 
 export default class Meal extends Proto<IMealProps, IMealState> {
-	private hiddenFileInputRef = React.createRef<HTMLInputElement>();
 	state: IMealState = {
 		editedMeal: this.props.meal,
 		currentPhotoIndex: this.props.meal.photos.length > 0 ? 0 : undefined,
 	};
+
+	protected save() {
+		if (this.state.editedMeal.id !== undefined) {
+			this.serverCommand(
+				"meal/update",
+				JSON.stringify(this.state.editedMeal),
+				res => {
+					console.log(res);
+					if (!res.ok) return;
+					if (this.props.onSave !== undefined) this.props.onSave(res.meal);
+				},
+				err => {
+					console.log(err);
+				}
+			);
+		}
+	}
 
 	protected editModeLoadImages(files: FileList) {
 		for (let i = 0; i < files.length; i++) {
@@ -67,10 +84,21 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						}}>
 						❏
 					</span>
+					<span onClick={this.save.bind(this)}>
+						<i className="fa fa-save" />
+					</span>
 				</div>
 				<div className="meal-admin-requisites-container has-caption">
 					<span className="caption">Requisites</span>
-					<input type="text" ref={this.hiddenFileInputRef} id="name" placeholder="enter name" defaultValue={this.state.editedMeal?.name}></input>
+					<MLStringEditor
+						defaultValue={this.state.editedMeal?.name}
+						caption="Name"
+						onChange={newVal => {
+							const nState = this.state;
+							nState.editedMeal.name = newVal;
+							this.setState(nState);
+						}}
+					/>
 					<MLStringEditor
 						defaultValue={this.state.editedMeal?.description}
 						caption="Description"
@@ -160,7 +188,18 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 										this.setState(nState);
 									}}
 								/>
-								<input type="number" placeholder="Amount" defaultValue={option.amount}></input>
+								<input
+									type="number"
+									placeholder="Amount"
+									defaultValue={option.amount}
+									onChange={event => {
+										const nv = parseFloat(event.currentTarget.value);
+										if (!isNaN(nv)) {
+											const nState = this.state;
+											nState.editedMeal.options[idx].amount = nv;
+											this.setState(nState);
+										}
+									}}></input>
 								<MLStringEditor
 									defaultValue={option.currency}
 									caption="Currency"
@@ -216,6 +255,9 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 							</span>
 						))}
 					</div>
+				</div>
+				<div className="meal-meal-name">
+					<span>{this.toString(this.props.meal.name)}</span>
 				</div>
 				<div className="meal-meal-description">
 					<span>{this.toString(this.props.meal.description)}</span>

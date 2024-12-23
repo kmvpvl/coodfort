@@ -87,6 +87,13 @@ paths:
       responses:
         '200':
           description: OK
+  /meal/update:
+    post:
+      operationId: updateMeal
+      security: []      
+      responses:
+        '200':
+          description: OK
 
 security:
   - COODFortTGUserId: []

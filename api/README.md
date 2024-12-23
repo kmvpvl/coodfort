@@ -330,6 +330,44 @@ Response body if error
     } 
 }
 ```
+### Working with MEAL class
+Working with|Methods
+-|-
+Creating, updating meals|[meal/new](#post-mealnew), meal/update, meal/block
+
+#### POST `meal/new`
+Creates new meal and returns IMeal structure
+*Parameters*
+Mand|Parameter|Where|Type|Description
+-|-|-|-|-
+✅|coodfort-login|header|string|Login name of Employee
+✅|coodfort-password|header|string|Password of Employee
+
+*Returns*
+
+HTTP status|Condition|Response body
+-|-|-
+200|Array of IEatery structures| See below
+401|Unknown Employee|See below
+
+Response body if successful
+```javascript
+{
+    ok: true, 
+    employee: IEatery[]
+}
+```
+Response body if error
+```javascript
+{
+    ok: false,
+    error: {
+        code: code_number,
+        shortName: short_string_error,
+        message: error_description
+    } 
+}
+```
 
 ### Working with GUEST class
 Working with|Methods

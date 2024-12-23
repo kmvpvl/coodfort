@@ -98,7 +98,7 @@ export interface IMealVolumeOption {
 }
 
 export interface IMeal extends IDocument {
-    name: string;
+    name: Types.IMLString;
     employeeId?: Types.ObjectId;
     eateryId?: Types.ObjectId;
     description: Types.IMLString;

@@ -54,13 +54,13 @@ export class Meal extends Document<IMeal, IMealDataSchema, IMealWFSchema> {
             fields: [
                 { name: `employeeId`, type: 'INT(20)', required: true, comment: 'Author id' },
                 { name: `eateryId`, type: 'INT(20)', required: false, comment: 'Eatery id' },
-                { name: `name`, type: 'varchar(256)', required: true, comment: 'Short name of meal for author only' },
+                { name: `name`, type: 'json', required: true, comment: 'Short name of meal' },
                 { name: `description`, type: 'json', comment: 'Long text described the meal' },
                 { name: `options`, type: 'json', comment: 'Variation of the meal' },
                 { name: `photos`, type: 'json', comment: 'DataURI of photos' },
                 { name: `tags`, type: 'json', comment: 'Array of tags' },
             ],
-            indexes: [{ fields: ['name', 'employeeId', 'eateryId'], indexType: 'UNIQUE' }],
+            indexes: [{ fields: ['id', 'employeeId', 'eateryId'], indexType: 'UNIQUE' }],
         };
     }
 
