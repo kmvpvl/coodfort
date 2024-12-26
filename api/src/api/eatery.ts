@@ -17,8 +17,8 @@ function eateryDataFromBody(req: Request): IEatery {
         deliveryPartnerIds: [],
         entertainmentIds: [],
 
-        descriptions: req.body.descriptions,
-        urls: req.body.urls,
+        description: req.body.description,
+        url: req.body.url,
         cuisines: req.body.cuisines,
         averageBills: req.body.averageBills,
         photos: req.body.photos,

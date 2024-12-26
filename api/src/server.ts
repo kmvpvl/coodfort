@@ -121,7 +121,7 @@ api.registerSecurityHandler('COODFortLogin', (c: Context, req: Request, res: Res
 });
 api.registerSecurityHandler('COODFortPassword', (c: Context, req: Request, res: Response, user: AuthUser) => {
     const password = req.headers['coodfort-password'] as string;
-    mconsole.auth(`COODFortPassword security check. coodfort-password = ${password === undefined ? '-' : password}`);
+    mconsole.auth(`COODFortPassword security check. coodfort-password = ${password === undefined ? '-' : '*******'}`);
     return user.employee?.checkSecretKey(password);
 });
 
@@ -134,12 +134,14 @@ app.use(async (req: Request, res: Response) => {
     const requestUUID = randomUUID();
     const requestStart = new Date();
     console.log(
-        `🚀 ${requestStart.toISOString()} - [${requestUUID}] - ${req.method} ${colours.fg.yellow}${req.path}\n${colours.fg.blue}headers: ${Object.keys(req.headersDistinct)
-            .filter(v => v.startsWith('misiscoin-'))
+        `🚀 ${requestStart.toISOString()} - [${requestUUID}] - ${req.method} ${colours.fg.yellow}${req.path}${Object.keys(req.headersDistinct).filter(v => v.startsWith('coodfort-')).length > 0 ? `\n${colours.fg.blue}headers: ` : ''}${Object.keys(
+            req.headersDistinct
+        )
+            .filter(v => v.startsWith('coodfort-') && v !== 'coodfort-password')
             .map(v => `${v} = '${req.headersDistinct[v]}'`)
-            .join(', ')}\nbody: ${Object.keys(req.body)
+            .join(', ')}${Object.keys(req.body).length > 0 ? '\nbody: ' : ''}${Object.keys(req.body)
             .map(v => `${v} = '${req.body[v]}'`)
-            .join(', ')}\nquery: ${Object.keys(req.query)
+            .join(', ')}${Object.keys(req.query).length > 0 ? '\nquery: ' : ''}${Object.keys(req.query)
             .map(v => `${v} = '${req.query[v]}'`)
             .join(', ')}${colours.reset}`
     );

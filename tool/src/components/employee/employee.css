@@ -1,3 +1,11 @@
 .selected {
     font-weight: bold;
 }
+
+.meals-container {
+    display: grid;
+}
+
+.meals-list {
+    display: flex;
+}

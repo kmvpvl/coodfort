@@ -62,6 +62,9 @@ body {
 
 .toolbar > span {
   cursor: pointer;
+  font-size: 110%;
+  text-align: center;
+  padding-left: 0.5em;
 }
 
 .has-caption {
@@ -70,4 +73,5 @@ body {
   border: 1px dotted var(--text-color);
   border-radius: 0.5em;
   position: relative;
+  margin-top: 0.5em;
 }

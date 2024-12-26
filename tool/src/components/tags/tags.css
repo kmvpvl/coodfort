@@ -1,0 +1,27 @@
+.tags-container {
+    display: flex;
+    gap: 0.5em;
+    --overflow: auto;
+    flex-wrap: wrap;
+}
+.tags-container > span {
+    min-width: 2em;
+    width: max-content;
+    border: 1px solid;
+    --padding-left: 5px;
+    border-radius: 0.25em;
+    position: relative;
+    text-align: center;
+}
+
+.tags-container > span > span {
+    position: relative;
+    top: -0.5em;
+    min-width: 1em;
+    min-height: 1em;
+    cursor: pointer;
+    border: 1px solid;
+    --border-radius: 50%;
+    font-size: 75%;
+    background-color: var(--background-color);
+}

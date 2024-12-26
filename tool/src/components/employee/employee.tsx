@@ -19,7 +19,8 @@ export interface IEmployeeState extends IProtoState {
 	focus: EmployeeFocus;
 	currentEateryId?: Types.ObjectId;
 	currentMealId?: Types.ObjectId;
-	eateries?: IEateryBrief[];
+	eateriesBrief?: IEateryBrief[];
+	currentEatery?: IEatery;
 	meals?: IMeal[];
 }
 
@@ -49,6 +50,25 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		}
 		this.setState(nState);
 	}
+
+	loadEatery() {
+		this.serverCommand(
+			"eatery/view",
+			JSON.stringify({ id: this.state.currentEateryId }),
+			res => {
+				console.log(res);
+				if (res.ok) {
+					const nState = this.state;
+					nState.currentEatery = res.eatery;
+					this.setState(nState);
+				}
+			},
+			err => {
+				console.log(err);
+			}
+		);
+	}
+
 	newEatery() {
 		const newEatery: IEatery = {
 			name: "New Eatery",
@@ -109,7 +129,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				console.log(res);
 				if (res.ok) {
 					const nState = this.state;
-					nState.eateries = res.eateries;
+					nState.eateriesBrief = res.eateries;
 					this.setState(nState);
 				}
 			},
@@ -119,11 +139,6 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		);
 	}
 	renderEATERIESFocus(): ReactNode {
-		let currentEatery: IEatery | undefined;
-		if (this.state.currentEateryId !== undefined) {
-			const idx = this.state.eateries?.findIndex(eatery => eatery.id === this.state.currentEateryId);
-			if (idx !== undefined && idx !== -1) currentEatery = this.state.eateries?.at(idx);
-		}
 		return (
 			<div className="eateries-container has-caption">
 				<div className="caption">My eateries</div>
@@ -131,19 +146,21 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 					<span onClick={this.newEatery.bind(this)}>+</span>
 				</div>
 				<div>
-					{this.state.eateries?.map((eatery, idx) => (
+					{this.state.eateriesBrief?.map((eatery, idx) => (
 						<EateryThumb
 							key={idx}
 							eateryBrief={eatery}
 							onSelect={eatery => {
 								const nState = this.state;
 								nState.currentEateryId = eatery.id;
+								nState.currentEatery = undefined;
 								this.setState(nState);
+								this.loadEatery();
 							}}
 						/>
 					))}
 				</div>
-				<div>{currentEatery !== undefined ? <Eatery eatery={currentEatery} /> : <></>}</div>
+				<div>{this.state.currentEatery !== undefined ? <Eatery eatery={this.state.currentEatery} admin={true} /> : <></>}</div>
 			</div>
 		);
 	}
@@ -154,7 +171,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				<div className="toolbar">
 					<span onClick={this.newMeal.bind(this)}>+</span>
 				</div>
-				<div>{this.state.meals?.map((meal, idx) => <Meal key={idx} meal={meal} admin={true} />)}</div>
+				<div className="meals-list">{this.state.meals?.map((meal, idx) => <Meal key={idx} meal={meal} admin={true} />)}</div>
 			</div>
 		);
 	}

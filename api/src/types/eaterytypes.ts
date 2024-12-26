@@ -46,12 +46,10 @@ export interface IEatery extends IDocument {
     tables: ITable[];
     deliveryPartnerIds: Types.ObjectId[];
     entertainmentIds: Types.ObjectId[];
-    rating?: IRating;
-    urls?: { url: string; caption: Types.IMLString }[];
+    url?: { url: string; caption: Types.IMLString };
     photos?: IPhoto[];
-    descriptions?: { url?: string; html: Types.IMLString }[];
+    description?: Types.IMLString;
     tags?: Types.IMLString[];
-    awards?: IAward[];
     cuisines?: Types.IMLString[];
     averageBills?: { cuisine: Types.IMLString; withAlcohol: number; withoutAlcohol: number }[];
     menuId?: Types.ObjectId;

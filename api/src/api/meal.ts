@@ -3,7 +3,6 @@ import { AuthUser } from '../model/security';
 import { Request, Response } from 'express';
 import { DocumentError } from '../model/protodocument';
 import { Meal } from '../model/meal';
-import { DocumentErrorCode } from '../types/prototypes';
 
 export async function updateMeal(c: Context, req: Request, res: Response, user: AuthUser) {
     try {
@@ -11,6 +10,9 @@ export async function updateMeal(c: Context, req: Request, res: Response, user: 
         if (req.body.id === undefined) {
             req.body.employeeId = user.employee?.id;
         } else {
+            const tempMeal = new Meal(req.body.id);
+            await tempMeal.load();
+            if (tempMeal.data.employeeId !== user.employee?.id) return res.status(403).json({ ok: false, error: `` });
         }
         meal.checkMandatory(req.body);
         await meal.load(req.body);

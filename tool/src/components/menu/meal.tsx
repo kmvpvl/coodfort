@@ -4,6 +4,7 @@ import Proto, { IProtoProps, IProtoState } from "../proto";
 
 import { IMeal } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
+import Photos from "../photos/photos";
 
 export interface IMealProps extends IProtoProps {
 	meal: IMeal;
@@ -12,7 +13,6 @@ export interface IMealProps extends IProtoProps {
 }
 
 export interface IMealState extends IProtoState {
-	currentPhotoIndex?: number;
 	currentOptionSelected?: number;
 	maximized?: boolean;
 	editMode?: boolean;
@@ -22,7 +22,6 @@ export interface IMealState extends IProtoState {
 export default class Meal extends Proto<IMealProps, IMealState> {
 	state: IMealState = {
 		editedMeal: this.props.meal,
-		currentPhotoIndex: this.props.meal.photos.length > 0 ? 0 : undefined,
 	};
 
 	protected save() {
@@ -39,29 +38,6 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 					console.log(err);
 				}
 			);
-		}
-	}
-
-	protected editModeLoadImages(files: FileList) {
-		for (let i = 0; i < files.length; i++) {
-			const file = files[i];
-
-			if (!file.type.startsWith("image/")) {
-				continue;
-			}
-			const reader = new FileReader();
-			reader.onload = () => {
-				const src = reader.result;
-				if (src) {
-					const nState = this.state;
-					nState.editedMeal?.photos.push({
-						url: src.toString(),
-						caption: "",
-					});
-					this.setState(nState);
-				}
-			};
-			reader.readAsDataURL(file);
 		}
 	}
 
@@ -82,7 +58,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						onClick={event => {
 							navigator.clipboard.writeText(JSON.stringify(this.state.editedMeal, undefined, 4));
 						}}>
-						❏
+						⚯
 					</span>
 					<span onClick={this.save.bind(this)}>
 						<i className="fa fa-save" />
@@ -111,52 +87,15 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						}}
 					/>
 				</div>
-				<div className="meal-admin-photos-edit-container has-caption">
-					<span className="caption">Photos</span>
-					<div className="toolbar">
-						<label>
-							+
-							<input
-								type="file"
-								id="inputImages"
-								hidden
-								multiple
-								accept="image/*"
-								onChange={event => {
-									const files = event.currentTarget.files;
-									if (files) this.editModeLoadImages(files);
-									event.currentTarget.value = "";
-								}}></input>
-						</label>{" "}
-						or{" "}
-						<span
-							onDragEnter={event => {
-								event.stopPropagation();
-								event.preventDefault();
-							}}
-							onDragOver={event => {
-								event.stopPropagation();
-								event.preventDefault();
-							}}
-							onDrop={event => {
-								event.stopPropagation();
-								event.preventDefault();
-
-								const dt = event.dataTransfer;
-								const files = dt.files;
-								this.editModeLoadImages(files);
-							}}>
-							drop files here
-						</span>
-					</div>
-					<div className="meal-admin-photos-list-container">
-						{this.state.editedMeal?.photos.map((photo, idx) => (
-							<span className="meal-admin-photo-container" key={idx}>
-								<img src={photo.url} />
-							</span>
-						))}
-					</div>
-				</div>
+				<Photos
+					editMode={true}
+					defaultValue={this.state.editedMeal.photos}
+					onChange={newPhotos => {
+						const nState = this.state;
+						nState.editedMeal.photos = newPhotos;
+						this.setState(nState);
+					}}
+				/>
 				<div className="meal-admin-options-list-container has-caption">
 					<span className="caption">Options</span>
 					<div className="toolbar">
@@ -223,39 +162,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 		if (this.state.editMode) return this.renderEditMode();
 		return (
 			<span className={`meal-container${this.state.maximized ? " maximized" : ""}`}>
-				<div className="meal-photos-container">
-					<div
-						className="meal-photo-container"
-						onClick={event => {
-							if (this.props.meal.photos.length > 0 && this.state.currentPhotoIndex !== undefined) {
-								const nState = this.state;
-								nState.currentPhotoIndex = nState.currentPhotoIndex === this.props.meal.photos.length - 1 ? 0 : this.state.currentPhotoIndex + 1;
-								this.setState(nState);
-							}
-						}}>
-						{this.state.currentPhotoIndex !== undefined ? <img src={this.props.meal.photos[this.state.currentPhotoIndex].url}></img> : <></>}
-					</div>
-					<div className="meal-photos-scroll">
-						{this.props.meal.photos.map((photo, idx) => (
-							<span
-								data-index={idx}
-								key={idx}
-								onMouseOver={event => {
-									const key = event.currentTarget.attributes.getNamedItem("data-index")?.value;
-									if (key !== undefined) {
-										const i = parseInt(key);
-										if (i !== this.state.currentPhotoIndex) {
-											const nState = this.state;
-											nState.currentPhotoIndex = i;
-											this.setState(nState);
-										}
-									}
-								}}>
-								{idx === this.state.currentPhotoIndex ? `☉` : "⚬"}
-							</span>
-						))}
-					</div>
-				</div>
+				<Photos defaultValue={this.props.meal.photos} />
 				<div className="meal-meal-name">
 					<span>{this.toString(this.props.meal.name)}</span>
 				</div>
