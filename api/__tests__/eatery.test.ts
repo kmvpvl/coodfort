@@ -99,6 +99,18 @@ describe('employee -> eatery', () => {
             });
         expect(newEatery.statusCode).toBe(400);
     });
+
+    /**
+     * SUCCESS
+     * Creating new Eatery Korchma by owner
+     */
+
+    test('Creating new Eatery Korchma', async () => {
+        const corchma = require('./corchma.json');
+        const newEatery = await request(app).post('/eatery/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(corchma);
+        expect(newEatery.statusCode).toBe(200);
+    });
+
     /**
      * SUCCESS
      * Creating new Eatery by owner
@@ -199,6 +211,11 @@ describe('Meals editing', () => {
     });
     test('Creating meal Salad', async () => {
         const meal1 = require('./salad.json');
+        const newMeal1 = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
+        expect(newMeal1.statusCode).toBe(200);
+    });
+    test('Creating meal Chakhokhbilli', async () => {
+        const meal1 = require('./chakhokhbili.json');
         const newMeal1 = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
         expect(newMeal1.statusCode).toBe(200);
     });

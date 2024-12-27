@@ -2,13 +2,12 @@ import React, { ReactNode } from "react";
 import "./WebApp.css";
 import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/proto";
 
-import { IEmployee } from "@betypes/eaterytypes";
-
 import Toaster from "./components/toast";
 import Employee from "./components/employee/employee";
 
 export interface IWebAppProps extends IProtoProps {
 	mode: string;
+	pingFrequency?: number;
 }
 
 enum ExhibitViewCode {
@@ -45,7 +44,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 	}
 	componentDidMount(): void {
 		this.ping();
-		this.intervalPing = setInterval(this.ping.bind(this), 30000);
+		if (this.intervalPing === undefined) this.intervalPing = setInterval(this.ping.bind(this), this.props.pingFrequency === undefined ? (process.env.MODE === "production" ? 30000 : 120000) : this.props.pingFrequency);
 		if (this.token !== undefined) this.login(this.token);
 	}
 	renderServerStatus(): ReactNode {

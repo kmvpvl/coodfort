@@ -6,6 +6,7 @@ export interface IMLStringEditorProps {
 	defaultValue: Types.IMLString;
 	caption?: string;
 	onChange?: (newMLString: Types.IMLString) => void;
+	className?: string;
 }
 
 export interface IMLStringEditorState {
@@ -22,7 +23,7 @@ export default class MLStringEditor extends React.Component<IMLStringEditorProps
 	render(): React.ReactNode {
 		const langs = (process.env.LANGUAGES !== undefined ? process.env.LANGUAGES : "en,fr,de,es,it,ru").split(",");
 		return (
-			<div className="mlstring-editor-container has-caption">
+			<div className={`mlstring-editor-container has-caption ${this.props.className}`}>
 				<div className="caption">{this.props.caption}</div>
 				<div className="toolbar">
 					<span

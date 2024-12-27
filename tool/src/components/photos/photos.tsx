@@ -7,6 +7,7 @@ export interface IPhotosProps {
 	defaultValue: IPhoto[];
 	onChange?: (newValue: IPhoto[]) => void;
 	editMode?: boolean;
+	className?: string;
 }
 
 export interface IPhotosState {
@@ -48,7 +49,7 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 
 	renderEditMode(): ReactNode {
 		return (
-			<div className="photos-admin-edit-container has-caption">
+			<div className={`photos-admin-edit-container has-caption ${this.props.className}`}>
 				<span className="caption">Photos</span>
 				<div className="toolbar">
 					<label>

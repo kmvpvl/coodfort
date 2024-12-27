@@ -1,0 +1,9 @@
+.eatery-admin-data {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.eatery-admin-photos, .eatery-admin-description {
+    grid-column: span 2;
+}
+

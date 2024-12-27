@@ -48,10 +48,6 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 			<div className="eatery-admin-container has-caption">
 				<div className="caption">{this.toString(this.props.eatery.name)}</div>
 				<div className="toolbar">
-					<span>Profile</span>
-					<span>Tables</span>
-					<span>Menu</span>
-					<span>Entertainments</span>
 					<span onClick={this.save.bind(this)}>
 						<i className="fa fa-save" />
 					</span>
@@ -61,37 +57,15 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 						}}>
 						⚯
 					</span>
+					<span>❖</span>
 				</div>
-				<div>
+				<div className="eatery-admin-data">
 					<MLStringEditor
 						caption="Name"
 						defaultValue={this.state.editedEatery.name}
 						onChange={newVal => {
 							const nState = this.state;
 							nState.editedEatery.name = newVal;
-							this.setState(nState);
-						}}
-					/>
-					<MLStringEditor
-						caption="Description"
-						defaultValue={this.state.editedEatery.description !== undefined ? this.state.editedEatery.description : ""}
-						onChange={newVal => {
-							const nState = this.state;
-							nState.editedEatery.description = newVal;
-							this.setState(nState);
-						}}
-					/>
-					<MLStringEditor caption="URL caption" defaultValue={this.state.editedEatery.url !== undefined ? this.state.editedEatery.url.caption : ""} />
-					<div className="has-caption">
-						<div className="caption">URL</div>
-						<input type="text" />
-					</div>
-					<Photos
-						editMode={true}
-						defaultValue={this.state.editedEatery.photos !== undefined ? this.state.editedEatery.photos : []}
-						onChange={newPhotos => {
-							const nState = this.state;
-							nState.editedEatery.photos = newPhotos;
 							this.setState(nState);
 						}}
 					/>
@@ -104,6 +78,31 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 							this.setState(nState);
 						}}
 					/>
+					<MLStringEditor
+						className="eatery-admin-description"
+						caption="Description"
+						defaultValue={this.state.editedEatery.description !== undefined ? this.state.editedEatery.description : ""}
+						onChange={newVal => {
+							const nState = this.state;
+							nState.editedEatery.description = newVal;
+							this.setState(nState);
+						}}
+					/>
+					<Photos
+						className="eatery-admin-photos"
+						editMode={true}
+						defaultValue={this.state.editedEatery.photos !== undefined ? this.state.editedEatery.photos : []}
+						onChange={newPhotos => {
+							const nState = this.state;
+							nState.editedEatery.photos = newPhotos;
+							this.setState(nState);
+						}}
+					/>
+					<MLStringEditor caption="URL caption" defaultValue={this.state.editedEatery.url !== undefined ? this.state.editedEatery.url.caption : ""} />
+					<div className="has-caption">
+						<div className="caption">URL</div>
+						<input type="text" />
+					</div>
 				</div>
 			</div>
 		);
