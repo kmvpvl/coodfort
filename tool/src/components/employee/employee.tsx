@@ -1,9 +1,7 @@
 import { ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState } from "../proto";
 import "./employee.css";
-import { IEatery, IEateryBrief, IEmployee, IMeal } from "@betypes/eaterytypes";
-import { Types } from "@betypes/prototypes";
-import { EateryThumb } from "../eatery/eateryThumb";
+import { IEateryBrief, IEmployee, IMeal } from "@betypes/eaterytypes";
 import Meal from "../menu/meal";
 import { Eatery } from "../eatery/eatery";
 
@@ -11,22 +9,19 @@ type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "o
 
 export interface IEmployeeProps extends IProtoProps {
 	employee: IEmployee;
-	eateriesChanged?: (selectedEateryId?: Types.ObjectId) => void;
-	mealsChanged?: (selectedMealId?: Types.ObjectId) => void;
 }
 
 export interface IEmployeeState extends IProtoState {
 	focus: EmployeeFocus;
-	currentEateryId?: Types.ObjectId;
-	currentMealId?: Types.ObjectId;
-	eateriesBrief?: IEateryBrief[];
-	currentEatery?: IEatery;
-	meals?: IMeal[];
+	eateriesBrief: Array<IEateryBrief | undefined>;
+	meals: Array<IMeal | undefined>;
 }
 
 export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 	state: IEmployeeState = {
 		focus: this.getCurrentFocus(),
+		meals: [],
+		eateriesBrief: [],
 	};
 	getCurrentFocus(): EmployeeFocus {
 		const ls: any = localStorage.getItem("coodfort_employee_focus");
@@ -51,59 +46,6 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		this.setState(nState);
 	}
 
-	loadEatery() {
-		this.serverCommand(
-			"eatery/view",
-			JSON.stringify({ id: this.state.currentEateryId }),
-			res => {
-				console.log(res);
-				if (res.ok) {
-					const nState = this.state;
-					nState.currentEatery = res.eatery;
-					this.setState(nState);
-				}
-			},
-			err => {
-				console.log(err);
-			}
-		);
-	}
-
-	newEatery() {
-		const newEatery: IEatery = {
-			name: "New Eatery",
-			tables: [],
-			deliveryPartnerIds: [],
-			employees: [],
-			entertainmentIds: [],
-		};
-		this.serverCommand("eatery/new", JSON.stringify(newEatery), res => {
-			if (res.ok) {
-				if (this.props.eateriesChanged !== undefined) this.props.eateriesChanged(res.eatery.id);
-				const nState = this.state;
-				nState.currentEateryId = res.eatery.id;
-				this.setState(nState);
-				this.updateEateriesList();
-			}
-		});
-	}
-	newMeal() {
-		const newMeal: IMeal = {
-			name: "New meal",
-			description: "Mew meal",
-			photos: [],
-			options: [],
-		};
-		this.serverCommand("meal/new", JSON.stringify(newMeal), res => {
-			if (res.ok) {
-				if (this.props.mealsChanged !== undefined) this.props.mealsChanged(res.meal.id);
-				const nState = this.state;
-				nState.currentMealId = res.meal.id;
-				this.setState(nState);
-				this.updateMealsList();
-			}
-		});
-	}
 	updateMealsList() {
 		this.serverCommand(
 			"employee/mealsList",
@@ -140,38 +82,43 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 	}
 	renderEATERIESFocus(): ReactNode {
 		return (
-			<div className="eateries-container has-caption">
-				<div className="caption">My eateries</div>
-				<div className="toolbar">
-					<span onClick={this.newEatery.bind(this)}>+</span>
+			<div className="employee-eateries-container">
+				<div className="employee-eateries-toolbar">
+					<span
+						onClick={event => {
+							const nState = this.state;
+							nState.eateriesBrief.push(undefined);
+							this.setState(nState);
+						}}>
+						+ Add new Eatery
+					</span>
 				</div>
-				<div>
-					{this.state.eateriesBrief?.map((eatery, idx) => (
-						<EateryThumb
-							key={idx}
-							eateryBrief={eatery}
-							onSelect={eatery => {
-								const nState = this.state;
-								nState.currentEateryId = eatery.id;
-								nState.currentEatery = undefined;
-								this.setState(nState);
-								this.loadEatery();
-							}}
-						/>
+				<div className="employee-eateries-list">
+					{this.state.eateriesBrief.map((eatery, idx) => (
+						<Eatery key={idx} defaultValue={eatery} admin={true} />
 					))}
 				</div>
-				<div>{this.state.currentEatery !== undefined ? <Eatery eatery={this.state.currentEatery} admin={true} /> : <></>}</div>
 			</div>
 		);
 	}
 	renderMEALSFocus(): ReactNode {
 		return (
-			<div className="meals-container has-caption">
-				<div className="caption">My meals</div>
-				<div className="toolbar">
-					<span onClick={this.newMeal.bind(this)}>+</span>
+			<div className="employee-meals-container">
+				<div className="employee-meals-toolbar">
+					<span
+						onClick={event => {
+							const nState = this.state;
+							nState.meals.push(undefined);
+							this.setState(nState);
+						}}>
+						+
+					</span>
 				</div>
-				<div className="meals-list">{this.state.meals?.map((meal, idx) => <Meal key={idx} meal={meal} admin={true} />)}</div>
+				<div className="employee-meals-list">
+					{this.state.meals.map((meal, idx) => (
+						<Meal key={idx} defaultValue={meal} admin={true} />
+					))}
+				</div>
 			</div>
 		);
 	}

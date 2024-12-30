@@ -1,9 +1,28 @@
 .eatery-admin-data {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    gap: 5px;
 }
 
 .eatery-admin-photos, .eatery-admin-description {
     grid-column: span 2;
 }
 
+.eatery-container {
+    display: grid;
+    /* Photo, description, price of all options*/
+    grid-template-rows: 1fr auto auto auto;
+    width: 10em;
+    height: 13em;
+    position: relative;
+    overflow: hidden;
+    --border: 1px dotted var(--text-color);
+    border-radius: 5px;
+    padding: 2px;
+}
+.eatery-name {
+    text-overflow: ellipsis;
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+}

@@ -8,7 +8,7 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
     define: {
       "process.env.SERVER_BASE_URL": JSON.stringify(env.SERVER_BASE_URL),
       "process.env.LANGUAGES": JSON.stringify(env.LANGUAGES),
-      "process.env.MODE": JSON.stringify(mode)
+      "process.env.MODE": JSON.stringify(mode),
     },
     plugins: [react()],
   };

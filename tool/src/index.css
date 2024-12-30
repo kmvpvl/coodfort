@@ -52,19 +52,20 @@ body {
 }
 
 .caption {
-  left: 0.5em;
+  left: 1em;
   font-size: small;
 }
 
 .toolbar {
-  right:0.5em;
+  right:1em;
 }
 
 .toolbar > span {
   cursor: pointer;
-  font-size: 110%;
+  --font-size: 110%;
   text-align: center;
   padding-left: 0.5em;
+  padding-right: 0.5em;
 }
 
 .has-caption {
@@ -75,3 +76,28 @@ body {
   position: relative;
   margin-top: 0.5em;
 }
+
+.context-toolbar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-flow: column;
+  background-color: var(--background-color);
+  padding: 1px;
+  border: 1px solid var(--text-color);
+  border-radius: 5px;
+  opacity: 0.5;
+  gap: 2px;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.context-toolbar:hover {
+  opacity: 1;
+}
+
+.has-context-toolbar {
+  position: relative;
+}
+

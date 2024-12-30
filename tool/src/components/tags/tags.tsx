@@ -4,7 +4,7 @@ import React from "react";
 import { Types } from "@betypes/prototypes";
 
 export interface ITagsProps {
-	defaultValue: Types.IMLString[];
+	defaultValue?: Types.IMLString[];
 	editMode: boolean;
 	onChange?: (newTags: Types.IMLString[]) => void;
 }
@@ -15,7 +15,7 @@ export interface ITagsState {
 
 export default class Tags extends React.Component<ITagsProps, ITagsState> {
 	state: ITagsState = {
-		value: this.props.defaultValue,
+		value: this.props.defaultValue ? this.props.defaultValue : [],
 	};
 	get value(): Types.IMLString[] {
 		return this.state.value;

@@ -1,44 +1,54 @@
 import "./meal.css";
-import React, { ReactNode, RefObject } from "react";
+import { ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState } from "../proto";
 
 import { IMeal } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
 import Photos from "../photos/photos";
+import Tags from "../tags/tags";
 
 export interface IMealProps extends IProtoProps {
-	meal: IMeal;
+	defaultValue?: IMeal;
 	admin?: boolean;
 	onSave?: (newValue: IMeal) => void;
+	onChange?: (newValue: IMeal) => void;
 }
 
 export interface IMealState extends IProtoState {
 	currentOptionSelected?: number;
 	maximized?: boolean;
 	editMode?: boolean;
-	editedMeal: IMeal;
+	value: IMeal;
 }
 
 export default class Meal extends Proto<IMealProps, IMealState> {
 	state: IMealState = {
-		editedMeal: this.props.meal,
+		value: this.props.defaultValue ? this.props.defaultValue : this.new(),
 	};
 
+	new(): IMeal {
+		const newMeal: IMeal = {
+			name: "New meal",
+			description: "Mew meal description. Add photo!",
+			photos: [],
+			options: [],
+		};
+		return newMeal;
+	}
+
 	protected save() {
-		if (this.state.editedMeal.id !== undefined) {
-			this.serverCommand(
-				"meal/update",
-				JSON.stringify(this.state.editedMeal),
-				res => {
-					console.log(res);
-					if (!res.ok) return;
-					if (this.props.onSave !== undefined) this.props.onSave(res.meal);
-				},
-				err => {
-					console.log(err);
-				}
-			);
-		}
+		this.serverCommand(
+			"meal/update",
+			JSON.stringify(this.state.value),
+			res => {
+				console.log(res);
+				if (!res.ok) return;
+				if (this.props.onSave !== undefined) this.props.onSave(res.meal);
+			},
+			err => {
+				console.log(err);
+			}
+		);
 	}
 
 	renderEditMode(): ReactNode {
@@ -46,6 +56,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 			<div className="meal-admin-container has-caption">
 				<div className="caption">Meal</div>
 				<div className="toolbar">
+					<span>⤬</span>
 					<span
 						onClick={event => {
 							const nState = this.state;
@@ -56,7 +67,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 					</span>
 					<span
 						onClick={event => {
-							navigator.clipboard.writeText(JSON.stringify(this.state.editedMeal, undefined, 4));
+							navigator.clipboard.writeText(JSON.stringify(this.state.value, undefined, 4));
 						}}>
 						⚯
 					</span>
@@ -67,32 +78,40 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 				<div className="meal-admin-requisites-container has-caption">
 					<span className="caption">Requisites</span>
 					<MLStringEditor
-						defaultValue={this.state.editedMeal?.name}
+						defaultValue={this.state.value?.name}
 						caption="Name"
 						onChange={newVal => {
 							const nState = this.state;
-							nState.editedMeal.name = newVal;
+							nState.value.name = newVal;
+							this.setState(nState);
+						}}
+					/>
+					<Tags
+						defaultValue={this.state.value.tags}
+						editMode={true}
+						onChange={newTags => {
+							const nState = this.state;
+							nState.value.tags = newTags;
 							this.setState(nState);
 						}}
 					/>
 					<MLStringEditor
-						defaultValue={this.state.editedMeal?.description}
+						className="meal-admin-requisites-description"
+						defaultValue={this.state.value?.description}
 						caption="Description"
 						onChange={newValue => {
 							const nState = this.state;
-							if (nState.editedMeal === undefined) return;
-
-							nState.editedMeal.description = newValue;
+							nState.value.description = newValue;
 							this.setState(nState);
 						}}
 					/>
 				</div>
 				<Photos
 					editMode={true}
-					defaultValue={this.state.editedMeal.photos}
+					defaultValue={this.state.value.photos}
 					onChange={newPhotos => {
 						const nState = this.state;
-						nState.editedMeal.photos = newPhotos;
+						nState.value.photos = newPhotos;
 						this.setState(nState);
 					}}
 				/>
@@ -102,7 +121,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						<span
 							onClick={event => {
 								const nState = this.state;
-								nState.editedMeal?.options.push({
+								nState.value?.options.push({
 									volume: "",
 									amount: 0,
 									currency: "",
@@ -114,16 +133,16 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						<span>?</span>
 					</div>
 					<div className="meal-admin-options-list">
-						{this.state.editedMeal?.options.map((option, idx) => (
+						{this.state.value?.options.map((option, idx) => (
 							<span className="has-caption" key={idx}>
 								<MLStringEditor
 									defaultValue={option.volume}
 									caption="Volume"
 									onChange={newValue => {
 										const nState = this.state;
-										if (nState.editedMeal === undefined) return;
+										if (nState.value === undefined) return;
 
-										nState.editedMeal.options[idx].volume = newValue;
+										nState.value.options[idx].volume = newValue;
 										this.setState(nState);
 									}}
 								/>
@@ -135,7 +154,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 										const nv = parseFloat(event.currentTarget.value);
 										if (!isNaN(nv)) {
 											const nState = this.state;
-											nState.editedMeal.options[idx].amount = nv;
+											nState.value.options[idx].amount = nv;
 											this.setState(nState);
 										}
 									}}></input>
@@ -144,9 +163,9 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 									caption="Currency"
 									onChange={newValue => {
 										const nState = this.state;
-										if (nState.editedMeal === undefined) return;
+										if (nState.value === undefined) return;
 
-										nState.editedMeal.options[idx].currency = newValue;
+										nState.value.options[idx].currency = newValue;
 										this.setState(nState);
 									}}
 								/>
@@ -162,15 +181,15 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 		if (this.state.editMode) return this.renderEditMode();
 		return (
 			<span className={`meal-container${this.state.maximized ? " maximized" : ""}`}>
-				<Photos defaultValue={this.props.meal.photos} />
+				<Photos defaultValue={this.props.defaultValue?.photos} />
 				<div className="meal-meal-name">
-					<span>{this.toString(this.props.meal.name)}</span>
+					<span>{this.toString(this.state.value.name)}</span>
 				</div>
 				<div className="meal-meal-description">
-					<span>{this.toString(this.props.meal.description)}</span>
+					<span>{this.toString(this.state.value.description)}</span>
 				</div>
 				<div className="meal-meal-options">
-					{this.props.meal.options.map((option, idx) => (
+					{this.state.value.options.map((option, idx) => (
 						<span
 							className={`meal-meal-option${this.state.currentOptionSelected === idx ? " selected" : ""}`}
 							key={idx}
@@ -191,16 +210,15 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						</span>
 					))}
 				</div>
-				<div className="meal-meal-toolbar">
+				<div className="context-toolbar">
 					{this.props.admin ? (
 						<span
 							onClick={event => {
 								const nState = this.state;
 								nState.editMode = !this.state.editMode;
-								if (nState.editedMeal === undefined) nState.editedMeal = this.props.meal;
 								this.setState(nState);
 							}}>
-							❖
+							✎
 						</span>
 					) : (
 						<></>
@@ -211,7 +229,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 							nState.maximized = !this.state.maximized;
 							this.setState(nState);
 						}}>
-						{this.state.maximized ? "⚊" : "❒"}
+						{this.state.maximized ? "⚊" : "⤢"}
 					</span>
 				</div>
 			</span>

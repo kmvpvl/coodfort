@@ -39,7 +39,7 @@ export async function newEatery(c: Context, req: Request, res: Response, user: A
 
 export async function updateEatery(c: Context, req: Request, res: Response, user: AuthUser) {
     try {
-        if (req.body.id === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Parameter 'id' is mandatory`);
+        if (req.body.id === undefined) return newEatery(c, req, res, user);
         const ed = eateryDataFromBody(req);
         ed.id = req.body.id as Types.ObjectId;
         const eatery = new Eatery(ed.id);

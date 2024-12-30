@@ -219,6 +219,11 @@ describe('Meals editing', () => {
         const newMeal1 = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
         expect(newMeal1.statusCode).toBe(200);
     });
+    test('Creating meal Kholodets', async () => {
+        const meal1 = require('./kholodets.json');
+        const newMeal1 = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
+        expect(newMeal1.statusCode).toBe(200);
+    });
     const m: IMenu = {
         headerHtml: "Here's the header of menu. The CoodFORT eatery presents:",
         footerHtml: 'The footer of entire menu. Copyright 2025',
