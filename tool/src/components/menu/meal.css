@@ -14,11 +14,18 @@
 .meal-container.maximized {
     width: 20em;
     height: 18em;
+    font-size: 120%;
 }
 
 .meal-meal-description {
-    font-size: x-small;
+    font-size: 80%;
     text-align: center;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .meal-meal-name{
     text-align: center;
@@ -26,7 +33,7 @@
 
 .meal-meal-options {
     display: flex;
-    font-size: small;
+    font-size: 80%;
     justify-content: space-around;
 }
 
@@ -51,7 +58,7 @@
     font-weight: bold;
 }
 .meal-meal-option-price {
-    font-size: x-small;
+    font-size: 75%;
 }
 
 .meal-admin-container {

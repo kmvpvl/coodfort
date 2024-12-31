@@ -101,3 +101,34 @@ body {
   position: relative;
 }
 
+.tab-list-tab-selected {
+  font-weight: bold;
+  border-bottom: 0px;
+}
+
+.tabs-list {
+  --border-left: 1px solid;
+}
+
+.tabs-list + div {
+  border-left: 1px solid;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+}
+
+.tabs-list > span:first-child {
+  border-left: 1px solid;
+}
+.tabs-list > span {
+  border-top: 1px solid;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-right: 1px solid;
+  cursor: pointer;
+}
+
+.tabs-list > span:not(.tab-list-tab-selected){
+  border-bottom: 1px solid;
+}

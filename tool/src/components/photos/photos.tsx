@@ -16,6 +16,7 @@ export interface IPhotosState {
 }
 
 export default class Photos extends React.Component<IPhotosProps, IPhotosState> {
+	private touchesCoords?: { clientX: number; clientY: number };
 	state: IPhotosState = {
 		value: this.props.defaultValue !== undefined ? this.props.defaultValue : [],
 		currentPhotoIndex: this.props.defaultValue !== undefined && this.props.defaultValue.length > 0 ? 0 : undefined,
@@ -45,6 +46,20 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 			};
 			reader.readAsDataURL(file);
 		}
+	}
+
+	nextPhoto() {
+		if (this.state.value.length === 0 || (this.state.currentPhotoIndex !== undefined && this.state.currentPhotoIndex + 1 >= this.state.value.length)) return;
+		const nState = this.state;
+		nState.currentPhotoIndex = nState.currentPhotoIndex !== undefined ? nState.currentPhotoIndex + 1 : 0;
+		this.setState(nState);
+	}
+
+	prevPhoto() {
+		if (this.state.value.length === 0 || this.state.currentPhotoIndex === 0) return;
+		const nState = this.state;
+		nState.currentPhotoIndex = nState.currentPhotoIndex !== undefined ? nState.currentPhotoIndex - 1 : 0;
+		this.setState(nState);
 	}
 
 	renderEditMode(): ReactNode {
@@ -122,6 +137,25 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 									const nState = this.state;
 									nState.currentPhotoIndex = nState.currentPhotoIndex === this.state.value.length - 1 ? 0 : this.state.currentPhotoIndex + 1;
 									this.setState(nState);
+								}
+							}}
+							onTouchStart={event => {
+								event.stopPropagation();
+								if (event.touches.length === 1) {
+									this.touchesCoords = event.touches[0];
+								}
+							}}
+							onTouchMove={event => {
+								event.stopPropagation();
+								if (event.touches.length === 1 && this.touchesCoords !== undefined) {
+									if (event.touches[0].clientX > this.touchesCoords.clientX + 20) {
+										this.touchesCoords = event.touches[0];
+										this.nextPhoto();
+									}
+									if (event.touches[0].clientX < this.touchesCoords.clientX - 20) {
+										this.touchesCoords = event.touches[0];
+										this.prevPhoto();
+									}
 								}
 							}}>
 							{this.state.currentPhotoIndex !== undefined ? <img src={this.state.value[this.state.currentPhotoIndex].url}></img> : <img src={emptyDish} />}

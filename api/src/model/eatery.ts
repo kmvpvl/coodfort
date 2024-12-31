@@ -3,9 +3,8 @@ import { DocumentError, Document, IDocumentDataSchema, IDocumentWFSchema } from 
 import { WorkflowStatusCode } from '../types/prototypes';
 import { DocumentErrorCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
-import { EateryRoleCode, IEatery, IEateryBrief, IEmployee, IMeal, IMealRow } from '../types/eaterytypes';
+import { EateryRoleCode, IEatery, IEateryBrief, IEmployee, IMealRow } from '../types/eaterytypes';
 import { mconsole } from './console';
-import { RowDataPacket } from 'mysql2';
 import { Meal } from './meal';
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
@@ -32,10 +31,7 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
                 {
                     tableName: 'tables',
                     idFieldName: 'id',
-                    fields: [
-                        { name: `name`, type: 'json', required: true },
-                        { name: `rating`, type: 'json' },
-                    ],
+                    fields: [{ name: `name`, type: 'json', required: true }],
                 },
                 {
                     tableName: 'employees',

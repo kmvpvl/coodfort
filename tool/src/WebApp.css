@@ -110,7 +110,7 @@
 .webapp-server-status {
     position: absolute;
     right: 0;
-    bottom: 0;
+    top: 0;
     font-size: xx-small;
     cursor: pointer;
 }

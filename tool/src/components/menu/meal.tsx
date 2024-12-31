@@ -185,9 +185,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 				<div className="meal-meal-name">
 					<span>{this.toString(this.state.value.name)}</span>
 				</div>
-				<div className="meal-meal-description">
-					<span>{this.toString(this.state.value.description)}</span>
-				</div>
+				<div className="meal-meal-description">{this.toString(this.state.value.description)}</div>
 				<div className="meal-meal-options">
 					{this.state.value.options.map((option, idx) => (
 						<span
@@ -231,6 +229,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						}}>
 						{this.state.maximized ? "⚊" : "⤢"}
 					</span>
+					<span>☷</span>
 				</div>
 			</span>
 		);

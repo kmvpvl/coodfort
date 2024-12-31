@@ -4,6 +4,7 @@ import "./employee.css";
 import { IEateryBrief, IEmployee, IMeal } from "@betypes/eaterytypes";
 import Meal from "../menu/meal";
 import { Eatery } from "../eatery/eatery";
+import QRCode from "react-qr-code";
 
 type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "orders";
 
@@ -142,18 +143,19 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		return (
 			<div className="employee-container">
 				<div>{this.props.employee.name}</div>
-				<div>
-					<span className={`employee-focus-item${curFocus === "orders" ? " selected" : ""}`} data-focus="orders" onClick={this.onSelectFocus.bind(this)}>
+				<div className="tabs-list" style={{ display: "grid", gridTemplateColumns: "auto auto auto auto auto 1fr" }}>
+					<span className={`employee-focus-item${curFocus === "orders" ? " tab-list-tab-selected" : ""}`} data-focus="orders" onClick={this.onSelectFocus.bind(this)}>
 						Orders
 					</span>
 					<span>Profile</span>
-					<span className={`employee-focus-item${curFocus === "eateries" ? " selected" : ""}`} data-focus="eateries" onClick={this.onSelectFocus.bind(this)}>
+					<span className={`employee-focus-item${curFocus === "eateries" ? " tab-list-tab-selected" : ""}`} data-focus="eateries" onClick={this.onSelectFocus.bind(this)}>
 						Eateries
 					</span>
-					<span className={`employee-focus-item${curFocus === "meals" ? " selected" : ""}`} data-focus="meals" onClick={this.onSelectFocus.bind(this)}>
+					<span className={`employee-focus-item${curFocus === "meals" ? " tab-list-tab-selected" : ""}`} data-focus="meals" onClick={this.onSelectFocus.bind(this)}>
 						Meals
 					</span>
 					<span>Bookings</span>
+					<span></span>
 				</div>
 				{focusContent}
 			</div>

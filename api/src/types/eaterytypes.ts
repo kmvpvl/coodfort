@@ -1,7 +1,14 @@
 import { RowDataPacket } from 'mysql2/promise';
 import { IDocument, Types } from './prototypes';
 
-export interface ITimeSlot {}
+export interface ITimeSlot {
+    start: Date;
+    duration: number;
+    repeat?: string;
+    until?: Date;
+    includes?: ITimeSlot[];
+    excludes?: ITimeSlot[];
+}
 
 export interface IPhoto {
     url: string;
@@ -17,8 +24,8 @@ export interface IRating {
 export interface IAward {
     awardName: Types.IMLString;
     logo?: {
-        url?: string;
-        html?: Types.IMLString;
+        url: string;
+        caption: Types.IMLString;
     };
     url: string;
 }
