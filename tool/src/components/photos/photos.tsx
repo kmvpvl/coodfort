@@ -48,17 +48,20 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 		}
 	}
 
-	nextPhoto() {
-		if (this.state.value.length === 0 || (this.state.currentPhotoIndex !== undefined && this.state.currentPhotoIndex + 1 >= this.state.value.length)) return;
+	nextPhoto(cycle: boolean = true) {
+		if (this.state.value.length === 0) return;
+		if (this.state.currentPhotoIndex !== undefined && this.state.currentPhotoIndex + 1 >= this.state.value.length && !cycle) return;
 		const nState = this.state;
 		nState.currentPhotoIndex = nState.currentPhotoIndex !== undefined ? nState.currentPhotoIndex + 1 : 0;
+		if (nState.currentPhotoIndex + 1 > nState.value.length) nState.currentPhotoIndex = 0;
 		this.setState(nState);
 	}
 
-	prevPhoto() {
-		if (this.state.value.length === 0 || this.state.currentPhotoIndex === 0) return;
+	prevPhoto(cycle: boolean = true) {
+		if (this.state.value.length === 0 || (this.state.currentPhotoIndex === 0 && !cycle)) return;
 		const nState = this.state;
 		nState.currentPhotoIndex = nState.currentPhotoIndex !== undefined ? nState.currentPhotoIndex - 1 : 0;
+		if (nState.currentPhotoIndex < 0) nState.currentPhotoIndex = nState.value.length - 1;
 		this.setState(nState);
 	}
 
@@ -133,11 +136,7 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 						<div
 							className="photo-container"
 							onClick={event => {
-								if (this.state.value.length > 0 && this.state.currentPhotoIndex !== undefined) {
-									const nState = this.state;
-									nState.currentPhotoIndex = nState.currentPhotoIndex === this.state.value.length - 1 ? 0 : this.state.currentPhotoIndex + 1;
-									this.setState(nState);
-								}
+								this.nextPhoto();
 							}}
 							onTouchStart={event => {
 								event.stopPropagation();

@@ -30,7 +30,7 @@
 .photos-container {
     width: 100%;
     --height: 100%;
-    padding: 5px;
+    --padding: 5px;
     display: grid;
     grid-template-rows: 1fr auto;
     text-align: center;
