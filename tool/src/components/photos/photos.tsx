@@ -87,25 +87,54 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 					or{" "}
 					<span
 						onDragEnter={event => {
-							event.stopPropagation();
+							//event.stopPropagation();
 							event.preventDefault();
+							event.dataTransfer.dropEffect = "copy";
+							console.log('Enter');
 						}}
 						onDragOver={event => {
-							event.stopPropagation();
+							console.log('Over');
+							//event.stopPropagation();
 							event.preventDefault();
+							event.dataTransfer.dropEffect = "copy";
 						}}
 						onDrop={event => {
-							event.stopPropagation();
-							event.preventDefault();
+							console.log('Drop');
+							//debugger
+							//event.stopPropagation();
 
 							const dt = event.dataTransfer;
 							const files = dt.files;
 							this.editModeLoadImages(files);
+							event.preventDefault();
 						}}>
 						drop files here
 					</span>
 				</div>
-				<div className="photos-admin-list-container">
+				<div className="photos-admin-list-container"
+					onDragEnter={event => {
+						//event.stopPropagation();
+						event.preventDefault();
+						event.dataTransfer.dropEffect = "copy";
+						console.log('Enter');
+					}}
+					onDragOver={event => {
+						console.log('Over');
+						//event.stopPropagation();
+						event.preventDefault();
+						event.dataTransfer.dropEffect = "copy";
+					}}
+					onDrop={event => {
+						console.log('Drop');
+						//debugger
+						//event.stopPropagation();
+
+						const dt = event.dataTransfer;
+						const files = dt.files;
+						this.editModeLoadImages(files);
+						event.preventDefault();
+					}}
+				>
 					{this.state.value.map((photo, idx) => (
 						<span className="photo-admin-container has-context-toolbar" key={idx}>
 							<span className="context-toolbar">

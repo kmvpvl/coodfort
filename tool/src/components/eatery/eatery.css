@@ -26,3 +26,14 @@
     overflow: hidden;
     white-space: nowrap;
 }
+
+.eatery-description {
+    font-size: 80%;
+    text-align: center;
+    display: -webkit-box;
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

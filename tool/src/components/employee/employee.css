@@ -18,6 +18,9 @@
 
 .employee-meals-toolbar, .employee-eateries-toolbar {
     padding: 5px;
+    display: flex;
+    gap: 5px;
+    border-bottom: 1px solid;
 }
 .employee-meals-toolbar span, .employee-eateries-toolbar span{
     --font-size: 120%;

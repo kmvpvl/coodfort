@@ -4,7 +4,6 @@ import "./employee.css";
 import { IEateryBrief, IEmployee, IMeal } from "@betypes/eaterytypes";
 import Meal from "../menu/meal";
 import { Eatery } from "../eatery/eatery";
-import QRCode from "react-qr-code";
 
 type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "orders";
 
@@ -91,7 +90,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 							nState.eateriesBrief.push(undefined);
 							this.setState(nState);
 						}}>
-						+ Add new Eatery
+						+
 					</span>
 				</div>
 				<div className="employee-eateries-list">
@@ -114,6 +113,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 						}}>
 						+
 					</span>
+					<span>⤢</span>
 				</div>
 				<div className="employee-meals-list">
 					{this.state.meals.map((meal, idx) => (

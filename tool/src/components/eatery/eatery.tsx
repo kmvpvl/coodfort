@@ -166,7 +166,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 				</div>
 				<Photos defaultValue={this.state.value.photos} />
 				<div className="eatery-name"> {this.toString(this.state.value.name)}</div>
-				<span>{this.toString(this.state.value.description)}</span>
+				<span className="eatery-description">{this.toString(this.state.value.description)}</span>
 			</div>
 		);
 	}
