@@ -5,6 +5,7 @@ import { IEatery } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
 import Tags from "../tags/tags";
 import Photos from "../photos/photos";
+import Menu from "../menu/menu";
 
 type EateryFocus = "none" | "profile" | "tables" | "menu" | "entertainments";
 
@@ -76,8 +77,10 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 
 	renderEditMode(): ReactNode {
 		return (
-			<div className="eatery-admin-container has-caption">
-				<div className="caption">{this.toString(this.state.value.name)}</div>
+			<div className="eatery-admin-container has-caption" onKeyUp={event => {
+				console.log(event);
+			}}>
+				<div className="caption">EATERY: {this.toString(this.state.value.name)}</div>
 				<div className="toolbar">
 					<span onClick={this.save.bind(this)}>
 						<i className="fa fa-save" />
@@ -141,6 +144,29 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 						<div className="caption">URL</div>
 						<input type="text" />
 					</div>
+					<div className="has-caption eatery-admin-tables-container">
+						<div className="caption">Tables</div> 
+						<div className="toolbar"><span>+</span></div>
+						{this.state.value.tables?.map((table, idx)=>
+						<div className="has-caption eatery-admin-table-container" key={idx}>
+							<div className="caption">TABLE: {this.toString(table.name)}</div>
+							<MLStringEditor 
+								defaultValue={table.name}
+								caption="Name"
+							/>
+							<Tags editMode={true}/>
+							<Photos editMode={true} className="eatery-admin-table-photos"/>
+							<div className="has-caption">
+								<div className="caption">Min guests</div>
+								<input type="number"/>
+							</div>
+							<div className="has-caption">
+								<div className="caption">Max guests</div>
+								<input type="number"/>
+							</div>
+						</div>)}
+					</div>
+					<Menu admin={true} />
 				</div>
 			</div>
 		);

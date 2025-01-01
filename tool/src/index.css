@@ -41,16 +41,17 @@ body {
 
 .caption, .toolbar {
   position: absolute;
-  border: 1px dotted var(--text-color);
-  background-color: var(--background-color);
   top: -0.5em;
   font-size: small;
   font-weight: bold;
-  padding-left: 1em;
-  padding-right: 1em;
   border-radius: 0.5em;
 }
-
+.caption {
+  border: 1px dotted var(--text-color);
+  background-color: var(--background-color);
+  padding-left: 1em;
+  padding-right: 1em;
+}
 .caption {
   left: 1em;
   font-size: small;
@@ -58,19 +59,28 @@ body {
 
 .toolbar {
   right:1em;
+  display: flex;
+  gap: 0.25em;
 }
 
-.toolbar > span {
+.toolbar > span, .toolbar > label {
   cursor: pointer;
   --font-size: 110%;
   text-align: center;
   padding-left: 0.5em;
   padding-right: 0.5em;
+  border: 1px dotted var(--text-color);
+  background-color: var(--background-color);
+}
+
+.toolbar > span:hover, .toolbar > label:hover {
+  background-color: var(--text-color);
+  color: var(--background-color);
 }
 
 .has-caption {
-  padding: 0.5em;
-  padding-top: 1em;
+  padding: 0.25em;
+  padding-top: 0.75em;
   border: 1px dotted var(--text-color);
   border-radius: 0.5em;
   position: relative;
@@ -79,8 +89,8 @@ body {
 
 .context-toolbar {
   position: absolute;
-  right: 0;
-  top: 0;
+  right: 2px;
+  top: 2px;
   display: flex;
   flex-flow: column;
   padding: 1px;
@@ -99,6 +109,8 @@ body {
 
 .context-toolbar > span:hover {
   opacity: 1;
+  background-color: var(--text-color);
+  color: var(--background-color);
 }
 
 .has-context-toolbar {
@@ -127,8 +139,7 @@ body {
   border-top: 1px solid;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  padding-left: 5px;
-  padding-right: 5px;
+  padding: 5px;
   border-right: 1px solid;
   cursor: pointer;
 }

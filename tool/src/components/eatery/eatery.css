@@ -7,6 +7,27 @@
 .eatery-admin-photos, .eatery-admin-description {
     grid-column: span 2;
 }
+.eatery-admin-container {
+    max-width: 100%;
+}
+
+.eatery-admin-tables-container {
+    display: flex;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 5px;
+    grid-column: span 2;
+}
+
+.eatery-admin-table-container {
+    width: fit-content;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.eatery-admin-table-photos {
+    grid-column: span 2;
+}
 
 .eatery-container {
     display: grid;

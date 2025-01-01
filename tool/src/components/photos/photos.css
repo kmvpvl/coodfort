@@ -10,8 +10,9 @@
     overflow: auto;
     height: 100%;
     max-height: 15em;
-    justify-content: space-around;
+    justify-content:left;
     gap: 0.5em;
+    width: 100%;
 }
 
 .photo-admin-container {

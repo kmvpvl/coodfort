@@ -95,8 +95,8 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		return lang;
 	}
 
-	protected toString(mlString?: Types.IMLString, lang?: string): string | undefined {
-		if (mlString === undefined) return;
+	protected toString(mlString?: Types.IMLString, lang?: string): string {
+		if (mlString === undefined) return '';
 		const mls = new MLString(mlString);
 		return mls.toString(lang === undefined ? this.getLanguage() : lang);
 	}

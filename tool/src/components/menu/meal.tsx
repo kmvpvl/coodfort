@@ -19,6 +19,7 @@ export interface IMealState extends IProtoState {
 	maximized?: boolean;
 	editMode?: boolean;
 	value: IMeal;
+	changed?: boolean;
 }
 
 export default class Meal extends Proto<IMealProps, IMealState> {
@@ -44,6 +45,9 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 				console.log(res);
 				if (!res.ok) return;
 				if (this.props.onSave !== undefined) this.props.onSave(res.meal);
+				const nState = this.state;
+				nState.changed = false;
+				this.setState(nState);
 			},
 			err => {
 				console.log(err);
@@ -54,7 +58,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 	renderEditMode(): ReactNode {
 		return (
 			<div className="meal-admin-container has-caption">
-				<div className="caption">Meal</div>
+				<div className="caption">MEAL: {this.toString(this.state.value.name)}</div>
 				<div className="toolbar">
 					<span>⤬</span>
 					<span
@@ -72,7 +76,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						⚯
 					</span>
 					<span onClick={this.save.bind(this)}>
-						<i className="fa fa-save" />
+						<i className="fa fa-save" style={this.state.changed?{color:"red"}:{}}/>
 					</span>
 				</div>
 				<div className="meal-admin-requisites-container has-caption">
@@ -82,6 +86,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						caption="Name"
 						onChange={newVal => {
 							const nState = this.state;
+							nState.changed = true;
 							nState.value.name = newVal;
 							this.setState(nState);
 						}}
@@ -91,6 +96,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						editMode={true}
 						onChange={newTags => {
 							const nState = this.state;
+							nState.changed = true;
 							nState.value.tags = newTags;
 							this.setState(nState);
 						}}
@@ -102,6 +108,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						onChange={newValue => {
 							const nState = this.state;
 							nState.value.description = newValue;
+							nState.changed = true;
 							this.setState(nState);
 						}}
 					/>
@@ -112,6 +119,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 					onChange={newPhotos => {
 						const nState = this.state;
 						nState.value.photos = newPhotos;
+						nState.changed = true;
 						this.setState(nState);
 					}}
 				/>
@@ -141,7 +149,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 									onChange={newValue => {
 										const nState = this.state;
 										if (nState.value === undefined) return;
-
+										nState.changed = true;
 										nState.value.options[idx].volume = newValue;
 										this.setState(nState);
 									}}
@@ -154,6 +162,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 										const nv = parseFloat(event.currentTarget.value);
 										if (!isNaN(nv)) {
 											const nState = this.state;
+											nState.changed = true;
 											nState.value.options[idx].amount = nv;
 											this.setState(nState);
 										}
@@ -164,7 +173,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 									onChange={newValue => {
 										const nState = this.state;
 										if (nState.value === undefined) return;
-
+										nState.changed = true;
 										nState.value.options[idx].currency = newValue;
 										this.setState(nState);
 									}}
