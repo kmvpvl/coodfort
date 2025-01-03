@@ -167,7 +167,14 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 					<div className="has-caption eatery-admin-tables-container">
 						<div className="caption">Tables</div>
 						<div className="toolbar">
-							<span>+</span>
+							<span
+								onClick={event => {
+									const nState = this.state;
+									nState.value.tables.push({ name: "New table", tags: [] });
+									this.setState(nState);
+								}}>
+								+
+							</span>
 						</div>
 						{this.state.value.tables?.map((table, idx) => (
 							<div className="has-caption eatery-admin-table-container" key={idx}>

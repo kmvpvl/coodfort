@@ -1,9 +1,10 @@
 import { ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState } from "../proto";
 import "./employee.css";
-import { IEateryBrief, IEmployee, IMeal } from "@betypes/eaterytypes";
+import { IEateryBrief, IEmployee, IMeal, IMenu } from "@betypes/eaterytypes";
 import Meal from "../menu/meal";
 import { Eatery } from "../eatery/eatery";
+import Menu from "../menu/menu";
 
 type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "orders";
 
@@ -15,6 +16,7 @@ export interface IEmployeeState extends IProtoState {
 	focus: EmployeeFocus;
 	eateriesBrief: Array<IEateryBrief | undefined>;
 	meals: Array<IMeal | undefined>;
+	menus: Array<IMenu | undefined>;
 }
 
 export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
@@ -22,6 +24,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		focus: this.getCurrentFocus(),
 		meals: [],
 		eateriesBrief: [],
+		menus: [],
 	};
 	getCurrentFocus(): EmployeeFocus {
 		const ls: any = localStorage.getItem("coodfort_employee_focus");
@@ -103,22 +106,44 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 	}
 	renderMEALSFocus(): ReactNode {
 		return (
-			<div className="employee-meals-container">
-				<div className="employee-meals-toolbar">
-					<span
-						onClick={event => {
-							const nState = this.state;
-							nState.meals.push(undefined);
-							this.setState(nState);
-						}}>
-						+
-					</span>
-					<span>⤢</span>
+			<div className="employee-manus-and-meals-container">
+				<div className="employee-meals-container has-caption">
+					<div className="caption">Meals</div>
+					<div className="toolbar">
+						<span
+							onClick={event => {
+								const nState = this.state;
+								nState.meals.push(undefined);
+								this.setState(nState);
+							}}>
+							+
+						</span>
+						<span>⤢</span>
+					</div>
+					<div className="employee-meals-list">
+						{this.state.meals.map((meal, idx) => (
+							<Meal key={idx} defaultValue={meal} admin={true} />
+						))}
+					</div>
 				</div>
-				<div className="employee-meals-list">
-					{this.state.meals.map((meal, idx) => (
-						<Meal key={idx} defaultValue={meal} admin={true} />
-					))}
+				<div className="employee-menus-container has-caption">
+					<div className="caption">Menus</div>
+					<div className="toolbar">
+						<span
+							onClick={event => {
+								const nState = this.state;
+								nState.menus.push(undefined);
+								this.setState(nState);
+							}}>
+							+
+						</span>
+						<span>⤢</span>
+					</div>
+					<div className="employee-menus-list">
+						{this.state.menus.map((menu, idx) => (
+							<Menu key={idx} defaultValue={menu} admin={true} editMode={true} />
+						))}
+					</div>
 				</div>
 			</div>
 		);

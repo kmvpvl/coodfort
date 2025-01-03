@@ -18,15 +18,13 @@ export class Menu extends Document<IMenu, IMenuDataSchema, IMenuWFSchema> {
             relatedTablesPrefix: 'menu_',
             fields: [
                 { name: `employeeId`, type: 'INT(20)', required: true, comment: 'Author id' },
-                { name: `headerHtml`, type: 'varchar(128)', required: true },
-                { name: `description`, type: 'json' },
-                { name: `volumeOptions`, type: 'json' },
-                { name: `rating`, type: 'json' },
-                { name: `awards`, type: 'json' },
-                { name: `photos`, type: 'json' },
-                { name: `tags`, type: 'json' },
+                { name: `name`, type: 'varchar(256)', required: true },
+                { name: `headerHtml`, type: 'json', required: true },
+                { name: `footerHtml`, type: 'json', required: true },
+                { name: `chapters`, type: 'json', required: true },
+                { name: `restrictions`, type: 'json' },
             ],
-            indexes: [{ fields: ['name', 'eateryAuthorId'], indexType: 'UNIQUE' }],
+            indexes: [{ fields: ['id', 'employeeId'], indexType: 'UNIQUE' }],
         };
     }
 

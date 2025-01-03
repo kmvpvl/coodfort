@@ -133,7 +133,8 @@ export interface IMenuChapter {
 }
 
 export interface IMenu extends IDocument {
-    eateryAuthorId?: Types.ObjectId;
+    employeeId?: Types.ObjectId;
+    name: string;
     headerHtml: Types.IMLString;
     footerHtml: Types.IMLString;
     restrictions?: Types.IMLString[];

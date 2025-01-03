@@ -21,6 +21,7 @@ Owner role has all permission in one or more Eateries. Every Eatery has at least
 ### `MDM` role
 ## Security schemas
 ## Paths
+[Employee](#working-with-employee-class) | [Eatery](#working-with-eatery-class) | [Meal](#working-with-meal-class) | [Menu](#working-with-menu-class) | [Guest](#working-with-guest-class)
 Name|Description
 -|-
 [eatery/edit](#post-eateryedit)|Changes existing eatery object
@@ -330,6 +331,48 @@ Response body if error
     } 
 }
 ```
+
+### Working with MENU class
+Working with|Methods
+-|-
+Creating, updating menus|[menu/update](#post-menuupdate)
+
+#### POST `menu/update`
+Creates new menu or updates one. Returns the IMenu structure if successful or error structure
+
+*Parameters*
+Mand|Parameter|Where|Type|Description
+-|-|-|-|-
+✅|coodfort-login|header|string|Login name of Employee
+✅|coodfort-password|header|string|Password of Employee
+
+*Returns*
+
+HTTP status|Condition|Response body
+-|-|-
+200|success|IMenu structure See below
+401|Unknown Employee|See below
+
+Response body if successful
+```javascript
+{
+    ok: true, 
+    menu: IMenu
+}
+```
+Response body if error
+```javascript
+{
+    ok: false,
+    error: {
+        code: code_number,
+        shortName: short_string_error,
+        message: error_description
+    } 
+}
+```
+
+
 ### Working with MEAL class
 Working with|Methods
 -|-
@@ -347,14 +390,14 @@ Mand|Parameter|Where|Type|Description
 
 HTTP status|Condition|Response body
 -|-|-
-200|Array of IEatery structures| See below
+200|success|IMeal structure See below
 401|Unknown Employee|See below
 
 Response body if successful
 ```javascript
 {
     ok: true, 
-    employee: IEatery[]
+    meal: IMeal
 }
 ```
 Response body if error

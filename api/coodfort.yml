@@ -94,6 +94,13 @@ paths:
       responses:
         '200':
           description: OK
+  /menu/update:
+    post:
+      operationId: updateMenu
+      security: []      
+      responses:
+        '200':
+          description: OK
 
 security:
   - COODFortTGUserId: []

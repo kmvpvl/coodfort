@@ -225,6 +225,7 @@ describe('Meals editing', () => {
         expect(newMeal1.statusCode).toBe(200);
     });
     const m: IMenu = {
+        name: '',
         headerHtml: "Here's the header of menu. The CoodFORT eatery presents:",
         footerHtml: 'The footer of entire menu. Copyright 2025',
         chapters: [

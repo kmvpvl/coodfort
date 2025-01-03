@@ -1,17 +1,16 @@
 .menu-admin-container {
-    width: fit-content;
-    grid-column: span 2;
+    width: 100%;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 5px;
 }
 
 .menu-admin-chapters-container {
-    grid-column: span 2;
+    --grid-column: span 2;
 }
 
 .menu-admin-header {
-    grid-column: span 2;
+    --grid-column: span 2;
 }
 
 .menu-container {

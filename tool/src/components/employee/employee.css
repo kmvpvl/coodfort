@@ -7,13 +7,25 @@
     overflow: hidden;
 }
 
-.employee-meals-container, .employee-eateries-container {
+.employee-manus-and-meals-container {
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: 1fr 1fr;
+    padding: 5px;
+    overflow: hidden;
+    height: 100%;
+    width: 100%;
+}
+
+.employee-meals-container, .employee-eateries-container, .employee-menus-container {
+    display: grid;
     width: 100%;
     max-width: 100%;
     max-height: 100%;
     overflow: hidden;
+}
+
+.employee-eateries-container {
+    grid-template-rows: auto 1fr;
 }
 
 .employee-meals-toolbar, .employee-eateries-toolbar {
@@ -30,7 +42,7 @@
     padding-left: 0.5em;
     padding-right: 0.5em;
 }
-.employee-meals-list, .employee-eateries-list {
+.employee-meals-list, .employee-eateries-list, .employee-menus-list {
     display: flex;
     flex-wrap: wrap;
     overflow: auto;
