@@ -3,7 +3,7 @@ import React from "react";
 import { Types } from "@betypes/prototypes";
 
 export interface IMLStringEditorProps {
-	defaultValue: Types.IMLString;
+	defaultValue?: Types.IMLString;
 	caption?: string;
 	onChange?: (newMLString: Types.IMLString) => void;
 	className?: string;
@@ -15,7 +15,7 @@ export interface IMLStringEditorState {
 
 export default class MLStringEditor extends React.Component<IMLStringEditorProps, IMLStringEditorState> {
 	state: IMLStringEditorState = {
-		value: this.props.defaultValue,
+		value: this.props.defaultValue !== undefined ? this.props.defaultValue : "",
 	};
 	get value(): Types.IMLString {
 		return this.state.value;

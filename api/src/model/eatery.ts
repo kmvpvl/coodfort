@@ -31,7 +31,13 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
                 {
                     tableName: 'tables',
                     idFieldName: 'id',
-                    fields: [{ name: `name`, type: 'json', required: true }],
+                    fields: [
+                        { name: `name`, type: 'json', required: true },
+                        { name: `tags`, type: 'json' },
+                        { name: `photos`, type: 'json' },
+                        { name: `guestCountMin`, type: 'int(11)' },
+                        { name: `guestCountMax`, type: 'int(11)' },
+                    ],
                 },
                 {
                     tableName: 'employees',

@@ -77,9 +77,11 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 
 	renderEditMode(): ReactNode {
 		return (
-			<div className="eatery-admin-container has-caption" onKeyUp={event => {
-				console.log(event);
-			}}>
+			<div
+				className="eatery-admin-container has-caption"
+				onKeyUp={event => {
+					console.log(event);
+				}}>
 				<div className="caption">EATERY: {this.toString(this.state.value.name)}</div>
 				<div className="toolbar">
 					<span onClick={this.save.bind(this)}>
@@ -139,34 +141,92 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 							this.setState(nState);
 						}}
 					/>
-					<MLStringEditor caption="URL caption" defaultValue={this.state.value.url !== undefined ? this.state.value.url.caption : ""} />
+					<MLStringEditor
+						caption="URL caption"
+						defaultValue={this.state.value.url !== undefined ? this.state.value.url.caption : ""}
+						onChange={newVal => {
+							const nState = this.state;
+							if (nState.value.url !== undefined) nState.value.url.caption = newVal;
+							else nState.value.url = { caption: newVal, url: "" };
+							this.setState(nState);
+						}}
+					/>
 					<div className="has-caption">
 						<div className="caption">URL</div>
-						<input type="text" />
+						<input
+							defaultValue={this.state.value.url?.url}
+							type="text"
+							onChange={event => {
+								const nState = this.state;
+								if (nState.value.url !== undefined) nState.value.url.url = event.currentTarget.value;
+								else nState.value.url = { caption: "", url: event.currentTarget.value };
+								this.setState(nState);
+							}}
+						/>
 					</div>
 					<div className="has-caption eatery-admin-tables-container">
-						<div className="caption">Tables</div> 
-						<div className="toolbar"><span>+</span></div>
-						{this.state.value.tables?.map((table, idx)=>
-						<div className="has-caption eatery-admin-table-container" key={idx}>
-							<div className="caption">TABLE: {this.toString(table.name)}</div>
-							<MLStringEditor 
-								defaultValue={table.name}
-								caption="Name"
-							/>
-							<Tags editMode={true}/>
-							<Photos editMode={true} className="eatery-admin-table-photos"/>
-							<div className="has-caption">
-								<div className="caption">Min guests</div>
-								<input type="number"/>
+						<div className="caption">Tables</div>
+						<div className="toolbar">
+							<span>+</span>
+						</div>
+						{this.state.value.tables?.map((table, idx) => (
+							<div className="has-caption eatery-admin-table-container" key={idx}>
+								<div className="caption">TABLE: {this.toString(table.name)}</div>
+								<MLStringEditor
+									defaultValue={table.name}
+									caption="Name"
+									onChange={newVal => {
+										const nState = this.state;
+										nState.value.tables[idx].name = newVal;
+										this.setState(nState);
+									}}
+								/>
+								<Tags
+									defaultValue={this.state.value.tables[idx].tags}
+									editMode={true}
+									onChange={newVal => {
+										const nState = this.state;
+										nState.value.tables[idx].tags = newVal;
+										this.setState(nState);
+									}}
+								/>
+								<Photos
+									defaultValue={this.state.value.tables[idx].photos}
+									editMode={true}
+									className="eatery-admin-table-photos"
+									onChange={newVal => {
+										const nState = this.state;
+										nState.value.tables[idx].photos = newVal;
+										this.setState(nState);
+									}}
+								/>
+								<div className="has-caption">
+									<div className="caption">Min guests</div>
+									<input
+										defaultValue={this.state.value.tables[idx].guestCountMin}
+										type="number"
+										onChange={event => {
+											const nState = this.state;
+											nState.value.tables[idx].guestCountMin = parseInt(event.currentTarget.value);
+											this.setState(nState);
+										}}
+									/>
+								</div>
+								<div className="has-caption">
+									<div className="caption">Max guests</div>
+									<input
+										type="number"
+										defaultValue={this.state.value.tables[idx].guestCountMax}
+										onChange={event => {
+											const nState = this.state;
+											nState.value.tables[idx].guestCountMax = parseInt(event.currentTarget.value);
+											this.setState(nState);
+										}}
+									/>
+								</div>
 							</div>
-							<div className="has-caption">
-								<div className="caption">Max guests</div>
-								<input type="number"/>
-							</div>
-						</div>)}
+						))}
 					</div>
-					<Menu admin={true} />
 				</div>
 			</div>
 		);

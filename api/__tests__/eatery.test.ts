@@ -227,13 +227,11 @@ describe('Meals editing', () => {
     const m: IMenu = {
         headerHtml: "Here's the header of menu. The CoodFORT eatery presents:",
         footerHtml: 'The footer of entire menu. Copyright 2025',
-        notesHtml: 'Notes. Since 1664 we open our dors for you every day',
         chapters: [
             {
                 name: 'Rum & Whisky & Vodka',
                 description: 'All drinks with alcohol above 40%',
                 headerHtml: '',
-                notesHtml: '',
                 footerHtml: '',
                 items: [
                     {
@@ -255,7 +253,6 @@ describe('Meals editing', () => {
                 name: 'Coffee and Tea',
                 description: 'All hot drinks',
                 headerHtml: '',
-                notesHtml: '',
                 footerHtml: '',
                 items: [
                     {

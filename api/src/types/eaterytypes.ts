@@ -1,6 +1,8 @@
 import { RowDataPacket } from 'mysql2/promise';
 import { IDocument, Types } from './prototypes';
 
+export type ITag = Types.IMLString;
+
 export interface ITimeSlot {
     start: Date;
     duration: number;
@@ -13,7 +15,7 @@ export interface ITimeSlot {
 export interface IPhoto {
     url: string;
     caption?: Types.IMLString;
-    tags?: Types.IMLString[];
+    tags?: ITag[];
 }
 
 export interface IRating {
@@ -36,8 +38,10 @@ export enum EateryRoleCode {
 }
 export interface ITable extends IDocument {
     name: Types.IMLString;
+    tags: ITag[];
+    photos?: IPhoto[];
     guestCountMax?: number;
-    guestCountComfort?: number;
+    guestCountMin?: number;
     timeSlots?: ITimeSlot[];
 }
 export interface IEatery extends IDocument {
@@ -56,7 +60,7 @@ export interface IEatery extends IDocument {
     url?: { url: string; caption: Types.IMLString };
     photos?: IPhoto[];
     description?: Types.IMLString;
-    tags?: Types.IMLString[];
+    tags?: ITag[];
     cuisines?: Types.IMLString[];
     averageBills?: { cuisine: Types.IMLString; withAlcohol: number; withoutAlcohol: number }[];
     menuId?: Types.ObjectId;
@@ -77,7 +81,7 @@ export interface IEmployee extends IDocument {
     awards?: IAward[];
     photos?: IPhoto[];
     bios?: Types.MLString[];
-    tags?: Types.MLString[];
+    tags?: ITag[];
 }
 interface IBooking extends IDocument {
     eateryId: Types.ObjectId;
@@ -109,13 +113,10 @@ export interface IMeal extends IDocument {
     description: Types.IMLString;
     photos: IPhoto[];
     options: IMealVolumeOption[];
-    tags?: Types.IMLString[];
+    tags?: ITag[];
 }
 
 export interface IMenuItem extends IMeal {
-    headerHtml?: Types.IMLString;
-    footerHtml?: Types.IMLString;
-    notesHtml?: Types.IMLString;
     mealId?: Types.ObjectId;
     restrictions?: Types.IMLString[];
     rating?: IRating;
@@ -128,7 +129,6 @@ export interface IMenuChapter {
     items: IMenuItem[];
     headerHtml: Types.IMLString;
     footerHtml: Types.IMLString;
-    notesHtml: Types.IMLString;
     restrictions?: Types.IMLString[];
 }
 
@@ -136,7 +136,6 @@ export interface IMenu extends IDocument {
     eateryAuthorId?: Types.ObjectId;
     headerHtml: Types.IMLString;
     footerHtml: Types.IMLString;
-    notesHtml: Types.IMLString;
     restrictions?: Types.IMLString[];
     chapters: IMenuChapter[];
 }

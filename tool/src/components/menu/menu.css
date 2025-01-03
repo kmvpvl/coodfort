@@ -1,4 +1,22 @@
-.menu-container {
-    width: 100%;
+.menu-admin-container {
+    width: fit-content;
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+}
+
+.menu-admin-chapters-container {
     grid-column: span 2;
 }
+
+.menu-admin-header {
+    grid-column: span 2;
+}
+
+.menu-container {
+    width: fit-content;
+    height: min-content;
+    overflow-y: auto;
+}
+

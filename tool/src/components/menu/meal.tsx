@@ -76,7 +76,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						⚯
 					</span>
 					<span onClick={this.save.bind(this)}>
-						<i className="fa fa-save" style={this.state.changed?{color:"red"}:{}}/>
+						<i className="fa fa-save" style={this.state.changed ? { color: "red" } : {}} />
 					</span>
 				</div>
 				<div className="meal-admin-requisites-container has-caption">

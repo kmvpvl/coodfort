@@ -67,21 +67,22 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 
 	renderEditMode(): ReactNode {
 		return (
-			<div className={`photos-admin-edit-container has-caption ${this.props.className}`}
+			<div
+				className={`photos-admin-edit-container has-caption ${this.props.className}`}
 				onDragEnter={event => {
 					//event.stopPropagation();
 					event.preventDefault();
 					event.dataTransfer.dropEffect = "copy";
-					console.log('Enter');
+					console.log("Enter");
 				}}
 				onDragOver={event => {
-					console.log('Over');
+					console.log("Over");
 					//event.stopPropagation();
 					event.preventDefault();
 					event.dataTransfer.dropEffect = "copy";
 				}}
 				onDrop={event => {
-					console.log('Drop');
+					console.log("Drop");
 					//debugger
 					//event.stopPropagation();
 
@@ -106,10 +107,7 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 								event.currentTarget.value = "";
 							}}></input>
 					</label>
-					or{" "}
-					<span>
-						drop files here
-					</span>
+					or <span>drop files here</span>
 				</div>
 				<div className="photos-admin-list-container">
 					{this.state.value.map((photo, idx) => (
