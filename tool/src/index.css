@@ -150,3 +150,22 @@ body {
 .tabs-list > span:not(.tab-list-tab-selected){
   border-bottom: 1px solid;
 }
+
+@keyframes ready-to-drop-animation {
+  0% {
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+  50% {
+    color: var(--background-color);
+    background-color: var(--text-color);
+  }
+  100% {
+    background-color: var(--background-color);
+    color: var(--text-color);
+  }
+
+}
+.ready-to-drop {
+  animation: ready-to-drop-animation 2s infinite;
+}

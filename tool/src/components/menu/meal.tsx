@@ -6,8 +6,10 @@ import { IMeal } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
 import Photos from "../photos/photos";
 import Tags from "../tags/tags";
+import { Types } from "@betypes/prototypes";
 
 export interface IMealProps extends IProtoProps {
+	mealId?: Types.ObjectId;
 	defaultValue?: IMeal;
 	admin?: boolean;
 	onSave?: (newValue: IMeal) => void;
@@ -27,6 +29,10 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 		value: this.props.defaultValue ? this.props.defaultValue : this.new(),
 	};
 
+	componentDidMount(): void {
+		if (this.props.defaultValue === undefined && this.props.mealId !== undefined) this.load();
+	}
+
 	new(): IMeal {
 		const newMeal: IMeal = {
 			name: "New meal",
@@ -35,6 +41,24 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 			options: [],
 		};
 		return newMeal;
+	}
+
+	protected load() {
+		this.serverCommand(
+			"meal/view",
+			JSON.stringify({id: this.props.mealId}),
+			res => {
+				console.log(res);
+				if (!res.ok) return;
+				const nState = this.state;
+				nState.changed = false;
+				nState.value = res.meal;
+				this.setState(nState);
+			},
+			err => {
+				console.log(err);
+			}
+		);
 	}
 
 	protected save() {
@@ -189,8 +213,14 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 	render(): ReactNode {
 		if (this.state.editMode) return this.renderEditMode();
 		return (
-			<span className={`meal-container${this.state.maximized ? " maximized" : ""}`}>
-				<Photos defaultValue={this.props.defaultValue?.photos} />
+			<span
+				className={`meal-container${this.state.maximized ? " maximized" : ""}`}
+				draggable={true}
+				onDragStart={event => {
+					event.dataTransfer.setData("coodfort/meal", JSON.stringify(this.state.value));
+					console.log("dragstart", event);
+				}}>
+				{this.state.value.photos !== undefined?<Photos defaultValue={this.state.value.photos} />:<span/>}
 				<div className="meal-meal-name">
 					<span>{this.toString(this.state.value.name)}</span>
 				</div>

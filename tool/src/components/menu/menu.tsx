@@ -3,6 +3,7 @@ import "./menu.css";
 import Proto, { IProtoProps, IProtoState } from "../proto";
 import { IMenu } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
+import MenuItem from "./menuitem";
 
 export interface IMenuProps extends IProtoProps {
 	admin?: boolean;
@@ -106,7 +107,8 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						<span
 							onClick={event => {
 								const nState = this.state;
-								nState.value.chapters.push({ name: "", description: "", headerHtml: "", footerHtml: "", items: [] });
+								nState.value.chapters.push({headerHtml: "", footerHtml: "", items: [] });
+								nState.changed = true;
 								this.setState(nState);
 							}}>
 							+
@@ -116,17 +118,62 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						{this.state.value.chapters.map((chapter, idx) => (
 							<div className="has-caption" key={idx}>
 								<div className="caption">CHAPTER</div>
-								<div className="toolbar">
-									<span>+</span>
-								</div>
-								<MLStringEditor caption="Chapter name" />
-								<MLStringEditor caption="Description" />
-								<MLStringEditor caption="Header" />
-								<div className="has-caption">
+								<MLStringEditor caption="Chapter Header" 
+									defaultValue={this.toString(chapter.headerHtml)}
+									onChange={newVal => {
+										const nState = this.state;
+										nState.changed = true;
+										nState.value.chapters[idx].headerHtml = newVal;
+										this.setState(nState);
+									}}
+								/>
+								<div className="has-caption menu-admin-meals-container">
 									<div className="caption">Menu items</div>
+									<div
+										onDragEnter={event => {
+											event.preventDefault();
+											event.currentTarget.classList.toggle("ready-to-drop", true);
+											event.dataTransfer.dropEffect = "link";
+										}}
+										onDragOver={event => {
+											event.preventDefault();
+											event.dataTransfer.dropEffect = "link";
+										}}
+										onDragLeave={event => {
+											console.log("leave");
+											event.preventDefault();
+											event.currentTarget.classList.toggle("ready-to-drop", false);
+										}}
+										onDragEnd={event => {
+											console.log("end");
+											event.preventDefault();
+											event.currentTarget.classList.toggle("ready-to-drop", false);
+										}}
+										onDrop={event => {
+											event.preventDefault();
+											const meal = JSON.parse(event.dataTransfer.getData("coodfort/meal"));
+											event.currentTarget.classList.toggle("ready-to-drop", false);
+											console.log(meal);
+											const nState = this.state;
+											nState.value.chapters[idx].items.push({ mealId: meal.id });
+											nState.changed = true;
+											this.setState(nState);
+										}}>
+										Drop meals here
+									</div>
+									{chapter.items.map((item, iidx) => (
+										<MenuItem key={iidx} defaultValue={item} />
+									))}
 								</div>
-								<MLStringEditor caption="Footer" />
-								{this.toString(chapter.name)}
+								<MLStringEditor caption="Chapter Footer" 
+									defaultValue={this.toString(chapter.footerHtml)}
+									onChange={newVal => {
+										const nState = this.state;
+										nState.changed = true;
+										nState.value.chapters[idx].footerHtml = newVal;
+										this.setState(nState);
+									}}
+								/>
 							</div>
 						))}
 					</div>
@@ -146,16 +193,40 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 	}
 	render(): ReactNode {
 		if (this.state.editMode) return this.renderEditMode();
+		const menuHeader = this.toString(this.state.value.headerHtml);
+		const menuFooter = this.toString(this.state.value.footerHtml);
 		return (
 			<div className="menu-container">
-				<div dangerouslySetInnerHTML={{ __html: this.toString(this.state.value.headerHtml) }}></div>
+				{this.isHTML(menuHeader) ? <div dangerouslySetInnerHTML={{ __html: menuHeader }}></div> : <h1>{menuHeader}</h1>}
 				{this.state.value.chapters.map((chapter, idx) => (
-					<div>
-						<div dangerouslySetInnerHTML={{ __html: this.toString(chapter.headerHtml) }}></div>
+					<div className="menu-chapter-container" key={idx}>
+						{!this.isHTML(this.toString(chapter.headerHtml))?<h2 key={idx}>{this.toString(chapter.headerHtml)}</h2>:
+						<div key={idx} dangerouslySetInnerHTML={{ __html: this.toString(chapter.headerHtml) }}></div>}
+						<div className="menu-chapter-items-container">
+							{chapter.items.map((item, idx) => (
+							<MenuItem key={idx} defaultValue={item} />
+							))}
+						</div>
 						<div dangerouslySetInnerHTML={{ __html: this.toString(chapter.footerHtml) }}></div>
 					</div>
 				))}
-				<div dangerouslySetInnerHTML={{ __html: this.toString(this.state.value.footerHtml) }}></div>
+				{this.isHTML(menuFooter) ? <div dangerouslySetInnerHTML={{ __html: menuFooter }}></div> : <h1>{menuFooter}</h1>}
+				<div className="context-toolbar">
+					{this.props.admin ? (
+						<span
+							onClick={event => {
+								const nState = this.state;
+								nState.editMode = !this.state.editMode;
+								this.setState(nState);
+							}}>
+							✎
+						</span>
+					) : (
+						<></>
+					)}
+					<span>⤢</span>
+					<span>☷</span>
+				</div>
 			</div>
 		);
 	}

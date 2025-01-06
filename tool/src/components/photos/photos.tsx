@@ -64,33 +64,19 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 		if (nState.currentPhotoIndex < 0) nState.currentPhotoIndex = nState.value.length - 1;
 		this.setState(nState);
 	}
+	componentDidUpdate(prevProps: Readonly<IPhotosProps>, prevState: Readonly<IPhotosState>, snapshot?: any): void {
+		if (!this.props.editMode && this.props.defaultValue !== undefined) {
+			const nState = this.state;
+			if (nState.value === this.props.defaultValue) return;
+			nState.value = this.props.defaultValue;
+			nState.currentPhotoIndex = this.props.defaultValue !== undefined && this.props.defaultValue.length > 0 ? 0 : undefined,
+			this.setState(nState);
+		}
+	}
 
 	renderEditMode(): ReactNode {
 		return (
-			<div
-				className={`photos-admin-edit-container has-caption ${this.props.className}`}
-				onDragEnter={event => {
-					//event.stopPropagation();
-					event.preventDefault();
-					event.dataTransfer.dropEffect = "copy";
-					console.log("Enter");
-				}}
-				onDragOver={event => {
-					console.log("Over");
-					//event.stopPropagation();
-					event.preventDefault();
-					event.dataTransfer.dropEffect = "copy";
-				}}
-				onDrop={event => {
-					console.log("Drop");
-					//debugger
-					//event.stopPropagation();
-
-					const dt = event.dataTransfer;
-					const files = dt.files;
-					this.editModeLoadImages(files);
-					event.preventDefault();
-				}}>
+			<div className={`photos-admin-edit-container has-caption ${this.props.className !== undefined ? this.props.className : ""}`}>
 				<span className="caption">Photos</span>
 				<div className="toolbar">
 					<label>
@@ -107,9 +93,41 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 								event.currentTarget.value = "";
 							}}></input>
 					</label>
-					or <span>drop files here</span>
 				</div>
 				<div className="photos-admin-list-container">
+					<div
+						className="photo-admin-container"
+						onDragEnter={event => {
+							event.preventDefault();
+							event.dataTransfer.dropEffect = "copy";
+							event.currentTarget.classList.toggle("ready-to-drop", true);
+							console.log("Enter");
+						}}
+						onDragLeave={event => {
+							console.log("leave");
+							event.preventDefault();
+							event.currentTarget.classList.toggle("ready-to-drop", false);
+						}}
+						onDragEnd={event => {
+							console.log("end");
+							event.preventDefault();
+							event.currentTarget.classList.toggle("ready-to-drop", false);
+						}}
+						onDragOver={event => {
+							console.log("Over");
+							event.preventDefault();
+							event.dataTransfer.dropEffect = "copy";
+						}}
+						onDrop={event => {
+							console.log("Drop");
+							const dt = event.dataTransfer;
+							const files = dt.files;
+							this.editModeLoadImages(files);
+							event.preventDefault();
+							event.currentTarget.classList.toggle("ready-to-drop", false);
+						}}>
+						Drop image here
+					</div>
 					{this.state.value.map((photo, idx) => (
 						<span className="photo-admin-container has-context-toolbar" key={idx}>
 							<span className="context-toolbar">

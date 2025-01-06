@@ -80,9 +80,22 @@ paths:
       responses:
         '200':
           description: OK
+  /employee/menusList:
+    post:
+      operationId: employeeMenusList
+      responses:
+        '200':
+          description: OK
   /meal/new:
     post:
       operationId: newMeal
+      security: []      
+      responses:
+        '200':
+          description: OK
+  /meal/view:
+    post:
+      operationId: viewMeal
       security: []      
       responses:
         '200':

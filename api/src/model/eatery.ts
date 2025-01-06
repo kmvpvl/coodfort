@@ -3,9 +3,9 @@ import { DocumentError, Document, IDocumentDataSchema, IDocumentWFSchema } from 
 import { WorkflowStatusCode } from '../types/prototypes';
 import { DocumentErrorCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
-import { EateryRoleCode, IEatery, IEateryBrief, IEmployee, IMealRow } from '../types/eaterytypes';
+import { EateryRoleCode, IEatery, IEateryBrief, IEmployee, IMealRow, IMenuRow } from '../types/eaterytypes';
 import { mconsole } from './console';
-import { Meal } from './meal';
+import { Meal, Menu } from './meal';
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
 
@@ -157,6 +157,18 @@ export class Employee extends Document<IEmployee, IEmployeeSchema, IEateryWFSche
         mconsole.sqlq(sql, params);
         const [rows, fields] = await this.sqlConnection.query<IMealRow[]>(sql, [this.id]);
         const schema = new Meal().dataSchema;
+        rows.forEach(row => this.jsonTranslate(row, schema));
+        mconsole.sqlinfo(rows, fields);
+        return rows;
+    }
+
+    async menusList(eateryId?: Types.ObjectId): Promise<IMenuRow[]> {
+        const sql = `select \`menus\`.* from \`menus\` where \`employeeId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ?' : ''}`;
+        const params = [this.id];
+        if (eateryId !== undefined) params.push(eateryId);
+        mconsole.sqlq(sql, params);
+        const [rows, fields] = await this.sqlConnection.query<IMenuRow[]>(sql, [this.id]);
+        const schema = new Menu().dataSchema;
         rows.forEach(row => this.jsonTranslate(row, schema));
         mconsole.sqlinfo(rows, fields);
         return rows;

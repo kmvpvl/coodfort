@@ -9,7 +9,7 @@
 
 .employee-manus-and-meals-container {
     display: grid;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr 5px 1fr;
     padding: 5px;
     overflow: hidden;
     height: 100%;

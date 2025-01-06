@@ -19,6 +19,7 @@
     width: 8em;
     --height: 100%;
     display: block;
+    text-align: center;
 }
 
 .photo-admin-container > img {

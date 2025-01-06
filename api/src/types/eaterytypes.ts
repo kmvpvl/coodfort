@@ -73,6 +73,9 @@ export interface IEateryBrief extends IEatery {
 export interface IMealRow extends RowDataPacket {}
 export interface IMealRow extends IMeal {}
 
+export interface IMenuRow extends RowDataPacket {}
+export interface IMenuRow extends IMenu {}
+
 export interface IEmployee extends IDocument {
     login: number | string /**Telegram ID or login or phone */;
     hash: string /** */;
@@ -116,7 +119,7 @@ export interface IMeal extends IDocument {
     tags?: ITag[];
 }
 
-export interface IMenuItem extends IMeal {
+export interface IMenuItem {
     mealId?: Types.ObjectId;
     restrictions?: Types.IMLString[];
     rating?: IRating;
@@ -124,8 +127,6 @@ export interface IMenuItem extends IMeal {
 }
 
 export interface IMenuChapter {
-    name: Types.IMLString;
-    description: Types.IMLString;
     items: IMenuItem[];
     headerHtml: Types.IMLString;
     footerHtml: Types.IMLString;

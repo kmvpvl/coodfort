@@ -122,7 +122,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		this.setState(nStatus);
 
 		const h: Headers = new Headers([
-			["Access-Control-Allow-Origin", "*"],
+			//["Access-Control-Allow-Origin", "*"],
 			["ngrok-skip-browser-warning", "any"],
 			["Content-Type", "application/json; charset=utf-8"],
 		]);
@@ -185,5 +185,10 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 			successcb,
 			failcb
 		);
+	}
+	protected isHTML(str: string): boolean {
+		const doc = new DOMParser().parseFromString(str, "text/html");
+		const ret = Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
+		return ret
 	}
 }

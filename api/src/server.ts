@@ -9,9 +9,9 @@ import { randomUUID } from 'crypto';
 import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
 import { AuthUser, startCommand } from './model/security';
-import { employeeEateriesList, employeeMealsList, newEmployee, viewEmployee } from './api/employee';
+import { employeeEateriesList, employeeMealsList, employeeMenusList, newEmployee, viewEmployee } from './api/employee';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
-import { updateMeal, updateMenu } from './api/meal';
+import { updateMeal, updateMenu, viewMeal } from './api/meal';
 import cors from 'cors';
 import { Telegraf } from 'telegraf';
 
@@ -85,9 +85,11 @@ api.register({
     viewEmployee: viewEmployee,
     newMeal: updateMeal,
     updateMeal: updateMeal,
+    viewMeal: viewMeal,
     updateMenu: updateMenu,
     employeeEateriesList: employeeEateriesList,
     employeeMealsList: employeeMealsList,
+    employeeMenusList: employeeMenusList,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {

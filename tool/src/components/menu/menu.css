@@ -12,10 +12,20 @@
 .menu-admin-header {
     --grid-column: span 2;
 }
-
+.menu-admin-meals-container {
+    display: flex;
+}
 .menu-container {
     width: fit-content;
     height: min-content;
     overflow-y: auto;
+    position: relative;
 }
 
+.menu-chapter-container {
+    
+}
+
+.menu-chapter-items-container {
+    display: flex;
+}

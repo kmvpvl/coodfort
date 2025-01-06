@@ -44,6 +44,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				break;
 			case "meals":
 				this.updateMealsList();
+				this.updateMenusList();
 				break;
 		}
 		this.setState(nState);
@@ -58,6 +59,23 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				if (res.ok) {
 					const nState = this.state;
 					nState.meals = res.meals;
+					this.setState(nState);
+				}
+			},
+			err => {
+				console.log(err);
+			}
+		);
+	}
+	updateMenusList() {
+		this.serverCommand(
+			"employee/menusList",
+			undefined,
+			res => {
+				console.log(res);
+				if (res.ok) {
+					const nState = this.state;
+					nState.menus = res.menus;
 					this.setState(nState);
 				}
 			},
@@ -126,6 +144,9 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 						))}
 					</div>
 				</div>
+				<div style={{cursor: "n-resize", height:"5px"}} onTouchStart={event=> {
+					console.log(event)
+				}}></div>
 				<div className="employee-menus-container has-caption">
 					<div className="caption">Menus</div>
 					<div className="toolbar">
