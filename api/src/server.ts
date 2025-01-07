@@ -18,8 +18,10 @@ import { Telegraf } from 'telegraf';
 configDotenv();
 const TGTOKEN = process.env.tgtoken;
 const TGWEBHOOK = process.env.tgwebhook;
+const TGWEBAPP = process.env.tgwebapp;
 if (TGTOKEN === undefined) throw new Error('TGTOKEN undefined');
 if (TGWEBHOOK === undefined) throw new Error('TGWEBHOOK undefined');
+if (TGWEBAPP === undefined) throw new Error('TGWEBAPP undefined');
 
 let tgBot: Telegraf;
 try {
