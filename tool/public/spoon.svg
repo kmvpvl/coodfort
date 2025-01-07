@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" height="100%" 
+viewBox="0 0 180 830" ><g>
+<path d="
+M 100 300 L 120 800 
+C 120 800, 90 845, 60 800 
+L 80 300
+C 80 300, 0 300, 0 200
+Q 90 -200, 180 200
+C 180 200, 180 300, 100 300
+" 
+fill="#cbb26a" stroke="none" />
+</g></svg>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="100%" 
+viewBox="0 0 100 100" >
+<defs>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu');
+</style>
+</defs>
+<rect x="0" y="0" width="100" height="100" fill="#1172B8" rx="10"/>
+<g>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="100%" 
+viewBox="0 0 100 100" >
+<g>
+<circle cx="50" cy="40" r="25" stroke="#cbb26a" fill="none" />
+<circle cx="50" cy="40" r="35" stroke="#cbb26a" fill="none" stroke-width="2"/>
+</g>
+</svg>
+</g>
+<g style="transform: scale(0.9) rotate(90deg) translate(-15%, -100%)">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="100%" 
+viewBox="0 0 180 830" ><g>
+<path d="
+M 100 300 L 120 800 
+C 120 800, 90 845, 60 800 
+L 80 300
+C 80 300, 0 300, 0 200
+Q 20 -150, 40 120
+Q 40 300, 50 150
+Q 70 -120, 80 120
+Q 90 300, 100 150
+Q 110 -120, 130 120
+Q 140 300, 140 150
+Q 160 -170, 180 200
+C 180 200, 180 300, 100 300
+" 
+fill="#cbb26a" stroke="#be9e44" stroke-width="2"/>
+</g></svg>
+</g>
+<g style="transform: scale(0.9) rotate(90deg) translate(5%, -100%)">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" height="100%" 
+viewBox="0 0 90 830" ><g>
+<path d="
+M 60 0 L 90 800 
+C 90 800, 60 845, 30 800 
+L 40 520 L 0 520
+C 0 520, 0 0, 60 0 
+" 
+fill="#cbb26a" stroke="#be9e44" stroke-width="2"/>
+</g></svg></g>
+<text x="50%" y="90" font-family="Ubuntu" dominant-baseline="middle" text-anchor="middle" fill="#cbb26a">CoodFort</text> 
+</svg>

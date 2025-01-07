@@ -107,7 +107,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						<span
 							onClick={event => {
 								const nState = this.state;
-								nState.value.chapters.push({headerHtml: "", footerHtml: "", items: [] });
+								nState.value.chapters.push({ headerHtml: "", footerHtml: "", items: [] });
 								nState.changed = true;
 								this.setState(nState);
 							}}>
@@ -118,7 +118,8 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						{this.state.value.chapters.map((chapter, idx) => (
 							<div className="has-caption" key={idx}>
 								<div className="caption">CHAPTER</div>
-								<MLStringEditor caption="Chapter Header" 
+								<MLStringEditor
+									caption="Chapter Header"
 									defaultValue={this.toString(chapter.headerHtml)}
 									onChange={newVal => {
 										const nState = this.state;
@@ -165,7 +166,8 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 										<MenuItem key={iidx} defaultValue={item} />
 									))}
 								</div>
-								<MLStringEditor caption="Chapter Footer" 
+								<MLStringEditor
+									caption="Chapter Footer"
 									defaultValue={this.toString(chapter.footerHtml)}
 									onChange={newVal => {
 										const nState = this.state;
@@ -200,11 +202,10 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 				{this.isHTML(menuHeader) ? <div dangerouslySetInnerHTML={{ __html: menuHeader }}></div> : <h1>{menuHeader}</h1>}
 				{this.state.value.chapters.map((chapter, idx) => (
 					<div className="menu-chapter-container" key={idx}>
-						{!this.isHTML(this.toString(chapter.headerHtml))?<h2 key={idx}>{this.toString(chapter.headerHtml)}</h2>:
-						<div key={idx} dangerouslySetInnerHTML={{ __html: this.toString(chapter.headerHtml) }}></div>}
+						{!this.isHTML(this.toString(chapter.headerHtml)) ? <h2 key={idx}>{this.toString(chapter.headerHtml)}</h2> : <div key={idx} dangerouslySetInnerHTML={{ __html: this.toString(chapter.headerHtml) }}></div>}
 						<div className="menu-chapter-items-container">
 							{chapter.items.map((item, idx) => (
-							<MenuItem key={idx} defaultValue={item} />
+								<MenuItem key={idx} defaultValue={item} />
 							))}
 						</div>
 						<div dangerouslySetInnerHTML={{ __html: this.toString(chapter.footerHtml) }}></div>

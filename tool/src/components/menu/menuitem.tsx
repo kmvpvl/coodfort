@@ -22,13 +22,15 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 	};
 	new(meal?: IMeal): IMenuItem {
 		if (meal !== undefined) {
-            return { mealId: meal.id };
-        }
+			return { mealId: meal.id };
+		}
 		return {};
 	}
 	render(): ReactNode {
-		return <div className="menu-item-container">
-            <Meal defaultValue={this.props.meal} mealId={this.state.value.mealId}/>
-        </div>;
+		return (
+			<div className="menu-item-container">
+				<Meal defaultValue={this.props.meal} mealId={this.state.value.mealId} />
+			</div>
+		);
 	}
 }

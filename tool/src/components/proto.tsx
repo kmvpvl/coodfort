@@ -7,6 +7,7 @@ import { IEmployee } from "@betypes/eaterytypes";
 export enum ProtoErrorCode {
 	serverNotAvailable,
 	httpError,
+	authDataExpected,
 }
 export class ProtoError extends Error {
 	protected _code: ProtoErrorCode;
@@ -38,11 +39,12 @@ export interface IProtoState {
 	employee?: IEmployee;
 }
 export default class Proto<IProps extends IProtoProps, IState extends IProtoState> extends React.Component<IProps, IState> {
-	protected get token(): string | undefined {
+	private get token(): string | undefined {
 		const ls = localStorage.getItem("coodforttoken");
 		return ls ? (ls as string) : undefined;
 	}
-	protected getTokenPair(token?: string | null): [string | undefined, string | undefined] {
+
+	private getTokenPair(token?: string | null): [string | undefined, string | undefined] {
 		if ((token === undefined || token === null) && this.token !== undefined) token = this.token;
 		if (token) {
 			const token_parts = token.split(":");
@@ -52,38 +54,29 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 				return [login, password];
 			}
 		}
-		return ["", ""];
+		return [undefined, undefined];
 	}
 
-	login(token: string) {
-		const [login, password] = this.getTokenPair(token);
-		if (password !== undefined && login !== undefined) {
-			this.serverFetch(
-				"employee/view",
-				"POST",
-				new Headers([
-					["content-type", "application/json"],
-					["coodfort-login", login],
-					["coodfort-password", password],
-				]),
-				undefined,
-				res => {
-					console.log(res);
-					if (res.ok) {
-						const nState: IState = this.state;
-						nState.employee = res.employee;
-						nState.signedIn = true;
-						this.setState(nState);
-						localStorage.setItem("coodforttoken", token);
-						if (this.props.onSingIn) this.props.onSingIn(res.employee);
-					}
-				},
-				err => {
-					console.log(err);
-					if (this.props.onSignError !== undefined) this.props.onSignError(err);
+	login(token?: string) {
+		if (token !== undefined) localStorage.setItem("coodforttoken", token);
+		this.serverCommand(
+			"employee/view",
+			undefined,
+			res => {
+				console.log(res);
+				if (res.ok) {
+					const nState: IState = this.state;
+					nState.employee = res.employee;
+					nState.signedIn = true;
+					this.setState(nState);
+					if (this.props.onSingIn) this.props.onSingIn(res.employee);
 				}
-			);
-		}
+			},
+			err => {
+				console.log(err);
+				if (this.props.onSignError !== undefined) this.props.onSignError(err);
+			}
+		);
 	}
 
 	protected getLanguage(): string {
@@ -121,11 +114,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		nStatus.serverStatus = ServerStatusCode.connecting;
 		this.setState(nStatus);
 
-		const h: Headers = new Headers([
-			//["Access-Control-Allow-Origin", "*"],
-			["ngrok-skip-browser-warning", "any"],
-			["Content-Type", "application/json; charset=utf-8"],
-		]);
+		const h: Headers = new Headers([["Content-Type", "application/json; charset=utf-8"]]);
 		if (headers) {
 			const oheaders = new Headers(headers);
 			for (const [h1, h2] of oheaders.entries()) {
@@ -173,22 +162,27 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 	}
 
 	protected serverCommand(command: string, body?: BodyInit, successcb?: (res: any) => void, failcb?: (err: ProtoError) => void) {
-		const [login, password] = this.getTokenPair();
-		this.serverFetch(
-			command,
-			"POST",
-			{
-				"coodfort-login": login !== undefined ? login : "",
-				"coodfort-password": password !== undefined ? password : "",
-			},
-			body,
-			successcb,
-			failcb
-		);
+		const [login, password] = this.getTokenPair(this.token);
+		const headers: Headers = new Headers();
+
+		if ("user" in window.Telegram.WebApp.initDataUnsafe) {
+			headers.append("coodfort-tguid", window.Telegram.WebApp.initDataUnsafe.user.id.toString());
+			headers.append("coodfort-tgquerycheckstring", window.Telegram.WebApp.initData);
+		} else {
+			if (password === undefined && login === undefined) {
+				if (failcb !== undefined) failcb(new ProtoError(ProtoErrorCode.authDataExpected, ""));
+				return;
+			} else {
+				headers.append("coodfort-login", login !== undefined ? login : "");
+				headers.append("coodfort-password", password !== undefined ? password : "");
+			}
+		}
+
+		this.serverFetch(command, "POST", headers, body, successcb, failcb);
 	}
 	protected isHTML(str: string): boolean {
 		const doc = new DOMParser().parseFromString(str, "text/html");
 		const ret = Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
-		return ret
+		return ret;
 	}
 }

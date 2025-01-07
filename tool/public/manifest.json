@@ -1,21 +1,11 @@
 {
-  "short_name": "Plutchart",
-  "name": "Plutchart tool for researchers",
+  "short_name": "CoodFort",
+  "name": "Tool for eateries staff and guests",
   "icons": [
     {
-      "src": "plutchart_logo.svg",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "src": "logo_icon.svg",
+      "sizes": "512x512 192x192 64x64 32x32 24x24 16x16",
       "type": "image/svg"
-    },
-    {
-      "src": "plutchart192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "plutchart512.png",
-      "type": "image/png",
-      "sizes": "512x512"
     }
   ],
   "start_url": ".",

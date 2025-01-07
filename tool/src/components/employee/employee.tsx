@@ -144,9 +144,11 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 						))}
 					</div>
 				</div>
-				<div style={{cursor: "n-resize", height:"5px"}} onTouchStart={event=> {
-					console.log(event)
-				}}></div>
+				<div
+					style={{ cursor: "n-resize", height: "5px" }}
+					onTouchStart={event => {
+						console.log(event);
+					}}></div>
 				<div className="employee-menus-container has-caption">
 					<div className="caption">Menus</div>
 					<div className="toolbar">

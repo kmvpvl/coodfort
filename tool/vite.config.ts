@@ -9,6 +9,9 @@ import react from "@vitejs/plugin-react";
 export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
   const env = loadEnv(mode, process.cwd(), "");
   return {
+    server: {
+      //  port: 4000
+    },
     build: {
       sourcemap: true,
     },

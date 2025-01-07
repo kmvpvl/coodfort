@@ -22,12 +22,6 @@ export interface IWebAppState extends IProtoState {
 	serverVersion?: string;
 }
 
-declare global {
-	interface Window {
-		Telegram: any;
-	}
-}
-
 export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 	protected toasterRef = React.createRef<Toaster>();
 	state: IWebAppState = {
@@ -43,9 +37,11 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 		});
 	}
 	componentDidMount(): void {
+		window.Telegram.WebApp.expand();
+
 		this.ping();
 		if (this.intervalPing === undefined) this.intervalPing = setInterval(this.ping.bind(this), this.props.pingFrequency === undefined ? (process.env.MODE === "production" ? 30000 : 120000) : this.props.pingFrequency);
-		if (this.token !== undefined) this.login(this.token);
+		this.login();
 	}
 	renderServerStatus(): ReactNode {
 		return (
@@ -166,7 +162,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 					}}
 					className="web-app-logo">
 					<div className="web-app-logo-container">
-						<img src="./logo_large.svg" />
+						<img src="./logo_new.svg" />
 					</div>
 					<div>CoodFort</div>
 				</div>
@@ -195,8 +191,6 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 		);
 	}
 	render(): ReactNode {
-		//window.Telegram.WebApp.expand();
-
 		return this.state.employee === undefined ? (
 			this.renderNoToken()
 		) : (

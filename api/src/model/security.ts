@@ -72,9 +72,5 @@ export async function startCommand(ctx: Context<Update.MessageUpdate<Message.Tex
         await empl.save(login);
     }
 
-    return ctx.reply(`Your token: ${login}:${secretKey}`, 
-        {reply_markup: 
-            {inline_keyboard:[[
-                {text: "Order", web_app:{url:`${process.env.tgwebapp}order`}}
-            ]]}});
+    return ctx.reply(`Your token: ${login}:${secretKey}`, { reply_markup: { inline_keyboard: [[{ text: 'Order', web_app: { url: `${process.env.tgwebapp}/order` } }]] } });
 }

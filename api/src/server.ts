@@ -5,7 +5,7 @@ import { mconsole, mConsoleInit } from './model/console';
 import OpenAPIBackend, { Context } from 'openapi-backend';
 import path from 'path';
 import fs from 'fs';
-import { randomUUID } from 'crypto';
+import { createHmac, randomUUID } from 'crypto';
 import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
 import { AuthUser, startCommand } from './model/security';
@@ -115,9 +115,22 @@ api.registerSecurityHandler('COODFortTGUserId', (c: Context, req: Request, res: 
     return tguid !== undefined;
 });
 api.registerSecurityHandler('TGQueryCheckString', (c: Context, req: Request, res: Response, user: AuthUser) => {
-    const check = req.headers['coodfort-tgquerycheckstring'];
-    mconsole.auth(`TGQueryCheckString security check. coodfort-tgquerycheckstring = ${check !== undefined ? check : '-'}`);
-    return check !== undefined;
+    try {
+        const tgquerycheckstring = decodeURIComponent(req.headers['coodfort-tgquerycheckstring'] as string);
+        const arr = tgquerycheckstring.split('&');
+        const hashIndex = arr.findIndex(str => str.startsWith('hash='));
+        const hash = arr.splice(hashIndex)[0].split('=')[1];
+
+        const secret_key = createHmac('sha256', 'WebAppData')
+            .update(process.env.TGTOKEN as string)
+            .digest();
+        arr.sort((a, b) => a.localeCompare(b));
+
+        const check_hash = createHmac('sha256', secret_key).update(arr.join('\n')).digest('hex');
+        return check_hash === hash;
+    } catch (e) {
+        return false;
+    }
 });
 api.registerSecurityHandler('COODFortLogin', (c: Context, req: Request, res: Response, user: AuthUser) => {
     const login = req.headers['coodfort-login'];
@@ -159,6 +172,19 @@ app.use(async (req: Request, res: Response) => {
     if (login !== undefined) {
         try {
             user.employee = new Employee('login', login);
+            await user.employee.load();
+            if (user.employee.data.blocked)
+                return res.status(403).json({
+                    ok: false,
+                    error: { message: `User was blocked` },
+                });
+        } catch (e: any) {
+            if (e instanceof DocumentError) user.employee = undefined;
+        }
+    }
+    if (tguid !== undefined) {
+        try {
+            user.employee = new Employee('login', `TG:${tguid}`);
             await user.employee.load();
             if (user.employee.data.blocked)
                 return res.status(403).json({

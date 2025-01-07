@@ -46,7 +46,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 	protected load() {
 		this.serverCommand(
 			"meal/view",
-			JSON.stringify({id: this.props.mealId}),
+			JSON.stringify({ id: this.props.mealId }),
 			res => {
 				console.log(res);
 				if (!res.ok) return;
@@ -220,7 +220,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 					event.dataTransfer.setData("coodfort/meal", JSON.stringify(this.state.value));
 					console.log("dragstart", event);
 				}}>
-				{this.state.value.photos !== undefined?<Photos defaultValue={this.state.value.photos} />:<span/>}
+				{this.state.value.photos !== undefined ? <Photos defaultValue={this.state.value.photos} /> : <span />}
 				<div className="meal-meal-name">
 					<span>{this.toString(this.state.value.name)}</span>
 				</div>
