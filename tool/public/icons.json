@@ -1,6 +1,4 @@
 {
-  "short_name": "CoodFort",
-  "name": "Tool for eateries staff and guests",
   "icons": [
     {
       "src": "windows11/SmallTile.scale-100.png",
@@ -450,10 +448,5 @@
       "src": "ios/1024.png",
       "sizes": "1024x1024"
     }
-  ],
-  "start_url": ".",
-  "display_override": ["fullscreen", "minimal-ui"],
-  "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  ]
 }

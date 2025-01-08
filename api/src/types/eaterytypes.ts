@@ -12,6 +12,8 @@ export interface ITimeSlot {
     excludes?: ITimeSlot[];
 }
 
+export type ICoords = {lat: number; lng: number} | string;
+
 export interface IPhoto {
     url: string;
     caption?: Types.IMLString;
@@ -58,6 +60,7 @@ export interface IEatery extends IDocument {
     deliveryPartnerIds: Types.ObjectId[];
     entertainmentIds: Types.ObjectId[];
     url?: { url: string; caption: Types.IMLString };
+    coords?: ICoords;
     photos?: IPhoto[];
     description?: Types.IMLString;
     tags?: ITag[];

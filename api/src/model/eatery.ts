@@ -20,6 +20,7 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
             fields: [
                 { name: `name`, type: 'json', required: true },
                 { name: `url`, type: 'json' },
+                { name: 'coords', type: 'json'},
                 { name: `photos`, type: 'json' },
                 { name: `description`, type: 'json' },
                 { name: `tags`, type: 'json' },

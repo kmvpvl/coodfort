@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import EmployeeApp from "./employeeApp";
+import GuestApp from "./guestApp";
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 
 window.Telegram.WebApp.expand();
@@ -31,14 +32,18 @@ declare global {
 }
 
 function getContentByPath(): React.ReactNode {
-	const path = window.location.pathname;
+	const path = window.location.pathname.substring(1);
 	console.log("path", path);
 	const params = new URLSearchParams(window.location.search);
 	switch (path) {
-		case "/order":
-			return <div>Guest collects the order</div>;
+		case "guest":
+			return <GuestApp 
+				mode={params.get("mode")?params.get("mode") as string:undefined} 
+				eatery={params.get("eatery")?parseInt(params.get("eatery") as string):undefined}
+				table={params.get("table")?parseInt(params.get("table") as string):undefined}
+			/>
 		default:
-			return <EmployeeApp mode="guest" />;
+			return <EmployeeApp mode={path} />;
 	}
 }
 root.render(<React.StrictMode>{getContentByPath()}</React.StrictMode>);
