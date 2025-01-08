@@ -1,51 +1,49 @@
 import React, { ReactNode } from "react";
-import "./WebApp.css";
+import "./employeeApp.css";
 import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/proto";
 
 import Toaster from "./components/toast";
 import Employee from "./components/employee/employee";
 
-export interface IWebAppProps extends IProtoProps {
+export interface IEmployeeAppProps extends IProtoProps {
 	mode: string;
 	pingFrequency?: number;
 }
 
-enum ExhibitViewCode {
+enum EmployeeAppExhibitViewCode {
 	none,
 	newEmployee,
 	newEatery,
 	enterToken,
 }
 
-export interface IWebAppState extends IProtoState {
-	exhibit: ExhibitViewCode;
+export interface IEmployeeAppState extends IProtoState {
+	exhibit: EmployeeAppExhibitViewCode;
 	serverVersion?: string;
 }
 
-export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
+export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppState> {
 	protected toasterRef = React.createRef<Toaster>();
-	state: IWebAppState = {
-		exhibit: ExhibitViewCode.enterToken,
+	state: IEmployeeAppState = {
+		exhibit: EmployeeAppExhibitViewCode.enterToken,
 	};
 	protected intervalPing?: NodeJS.Timeout;
 	ping() {
 		this.serverFetch("version", "GET", undefined, undefined, res => {
 			if (!res.ok) return;
-			const nState: IWebAppState = this.state;
+			const nState: IEmployeeAppState = this.state;
 			nState.serverVersion = res.version;
 			this.setState(nState);
 		});
 	}
 	componentDidMount(): void {
-		window.Telegram.WebApp.expand();
-
 		this.ping();
 		if (this.intervalPing === undefined) this.intervalPing = setInterval(this.ping.bind(this), this.props.pingFrequency === undefined ? (process.env.MODE === "production" ? 30000 : 120000) : this.props.pingFrequency);
 		this.login();
 	}
 	renderServerStatus(): ReactNode {
 		return (
-			<span className="webapp-server-status">
+			<span className="employee-app-server-status">
 				{this.state.serverStatus !== undefined ? ServerStatusCode[this.state.serverStatus] : "unknown"} {process.env.SERVER_BASE_URL} {this.state.serverVersion}
 			</span>
 		);
@@ -53,12 +51,12 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 	renderNoToken(): ReactNode {
 		const emp: ReactNode = (
 			<>
-				{this.state.exhibit !== ExhibitViewCode.newEmployee ? (
-					<span className="webapp-choose-button">
+				{this.state.exhibit !== EmployeeAppExhibitViewCode.newEmployee ? (
+					<span className="employee-app-choose-button">
 						<span
 							onClick={event => {
 								const nState = this.state;
-								nState.exhibit = ExhibitViewCode.newEmployee;
+								nState.exhibit = EmployeeAppExhibitViewCode.newEmployee;
 								this.setState(nState);
 							}}>
 							I'm a new Eployee
@@ -66,7 +64,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 						<span className="tip">{this.ML(`If you're have no account in CoodFort or you want create new account as an employee`)}</span>
 					</span>
 				) : (
-					<span className="webapp-enter-info">
+					<span className="employee-app-enter-info">
 						<h2>{this.ML(`New Employee`)}</h2>
 						<div>
 							<span>
@@ -96,12 +94,12 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 
 		const eat: ReactNode = (
 			<>
-				{this.state.exhibit !== ExhibitViewCode.newEatery ? (
-					<span className="webapp-choose-button">
+				{this.state.exhibit !== EmployeeAppExhibitViewCode.newEatery ? (
+					<span className="employee-app-choose-button">
 						<span
 							onClick={event => {
 								const nState = this.state;
-								nState.exhibit = ExhibitViewCode.newEatery;
+								nState.exhibit = EmployeeAppExhibitViewCode.newEatery;
 								this.setState(nState);
 							}}>
 							I want to register new Eatery
@@ -109,7 +107,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 						<span className="tip">{this.ML(`If you're a manager or owner of the new Eatery and want to register one`)}</span>
 					</span>
 				) : (
-					<span className="webapp-enter-info">
+					<span className="employee-app-enter-info">
 						<h2>{this.ML(`New Eatery`)}</h2>
 						<span className="tip">{this.ML("To create new Eatery you have to fill master data of Eatery: Names, address, tables, its meals and drinks")}</span>
 						<input placeholder={this.ML("Enter new Eatery name")}></input>
@@ -121,12 +119,12 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 
 		const havet: ReactNode = (
 			<>
-				{this.state.exhibit !== ExhibitViewCode.enterToken ? (
-					<span className="webapp-choose-button">
+				{this.state.exhibit !== EmployeeAppExhibitViewCode.enterToken ? (
+					<span className="employee-app-choose-button">
 						<span
 							onClick={event => {
 								const nState = this.state;
-								nState.exhibit = ExhibitViewCode.enterToken;
+								nState.exhibit = EmployeeAppExhibitViewCode.enterToken;
 								this.setState(nState);
 							}}>
 							I have token
@@ -134,7 +132,7 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 						<span className="tip">{this.ML(`You've registered earlier and had token. Insert token or recover your token here`)}</span>
 					</span>
 				) : (
-					<span className="webapp-enter-info">
+					<span className="employee-app-enter-info">
 						<h2>{this.ML(`Sign in`)}</h2>
 						<span className="tip">{this.ML(`The result of your registration was token which we sent to your e-mail or/and Telegram. Check out you token or recover it by Telegram or e-mail`)}</span>
 						<input
@@ -153,26 +151,26 @@ export default class WebApp extends Proto<IWebAppProps, IWebAppState> {
 		);
 
 		return (
-			<div className={this.state.exhibit === ExhibitViewCode.none ? "webapp-container-notoken-none" : "webapp-container-notoken-choosen"}>
+			<div className={this.state.exhibit === EmployeeAppExhibitViewCode.none ? "employee-app-container-notoken-none" : "employee-app-container-notoken-choosen"}>
 				<div
 					onClick={event => {
 						const nState = this.state;
-						nState.exhibit = ExhibitViewCode.none;
+						nState.exhibit = EmployeeAppExhibitViewCode.none;
 						this.setState(nState);
 					}}
-					className="web-app-logo">
-					<div className="web-app-logo-container">
+					className="employee-app-logo">
+					<div className="employee-app-logo-container">
 						<img src="./logo_new.svg" />
 					</div>
 					<div>CoodFort</div>
 				</div>
-				{this.state.exhibit === ExhibitViewCode.none || this.state.exhibit === ExhibitViewCode.enterToken ? (
+				{this.state.exhibit === EmployeeAppExhibitViewCode.none || this.state.exhibit === EmployeeAppExhibitViewCode.enterToken ? (
 					<>
 						{havet}
 						{emp}
 						{eat}
 					</>
-				) : this.state.exhibit === ExhibitViewCode.newEmployee ? (
+				) : this.state.exhibit === EmployeeAppExhibitViewCode.newEmployee ? (
 					<>
 						{emp}
 						{havet}

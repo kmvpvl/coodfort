@@ -1,8 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import WebApp from "./WebApp";
+import EmployeeApp from "./employeeApp";
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
+
+window.Telegram.WebApp.expand();
 
 declare global {
 	interface Window {
@@ -36,7 +38,7 @@ function getContentByPath(): React.ReactNode {
 		case "/order":
 			return <div>Guest collects the order</div>;
 		default:
-			return <WebApp mode="guest" />;
+			return <EmployeeApp mode="guest" />;
 	}
 }
 root.render(<React.StrictMode>{getContentByPath()}</React.StrictMode>);

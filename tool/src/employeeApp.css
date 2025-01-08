@@ -1,4 +1,4 @@
-.webapp-container-notoken-none {
+.employee-app-container-notoken-none {
     display: grid;
     width: 100%;
     height: 100%;
@@ -8,7 +8,7 @@
     position: relative;
 }
 
-.web-app-logo {
+.employee-app-logo {
     padding: 0.5em;
     cursor: pointer;
     width: 100%;
@@ -20,19 +20,19 @@
     grid-template-rows: auto auto;
 }
 
-.web-app-logo-container {
+.employee-app-logo-container {
     display: block;
     width: 100%;
     height: 100%;
     overflow: hidden;
 }
 
-.web-app-logo > div > img {
+.employee-app-logo > div > img {
     max-height: 100%;
     max-width: 100%;
 }
 
-.webapp-container-notoken-choosen {
+.employee-app-container-notoken-choosen {
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
@@ -42,7 +42,7 @@
     position: relative;
 }
 
-.webapp-choose-button {
+.employee-app-choose-button {
     margin: auto;
     padding: 0.75em;
     display: flex;
@@ -51,7 +51,7 @@
     width: 100%;
 }
 
-.webapp-enter-info {
+.employee-app-enter-info {
     margin: auto;
     --padding: 0.75em;
     display: flex;
@@ -59,16 +59,16 @@
     gap: 0.5em;
 }
 
-.--webapp-enter-info > div {
+.--web-app-enter-info > div {
     display: flex;
 }
 
-.webapp-enter-info > div > span {
+.employee-app-enter-info > div > span {
     display: flex;
     flex-flow: column;
 }
 
-.webapp-choose-button > span:first-child {
+.employee-app-choose-button > span:first-child {
     margin: auto;
     border: 1px solid var(--text-color);
     border-radius: 1.5em;
@@ -79,35 +79,35 @@
 }
 
 @media (orientation:landscape) {
-    .webapp-container-notoken-none {
+    .employee-app-container-notoken-none {
         grid-template-columns: 1fr 1fr 1fr;
         grid-template-rows: auto 1fr;
     }
-    .web-app-logo {
+    .employee-app-logo {
         grid-column: 1 / 4;
     }
-    .webapp-enter-info {
+    .employee-app-enter-info {
         grid-column: 1 / 4;
 
     }
-    .webapp-container-notoken-choosen {
+    .employee-app-container-notoken-choosen {
         grid-template-columns: 1fr 1fr;
         grid-template-rows: auto 1fr auto;
     }
 }
 
 @media (orientation:portrait) {
-    .webapp-container-notoken-none {
+    .employee-app-container-notoken-none {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr 1fr 1fr;
     }
-    .webapp-container-notoken-choosen {
+    .employee-app-container-notoken-choosen {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr auto auto;
     }
 }
 
-.webapp-server-status {
+.employee-app-server-status {
     position: absolute;
     right: 0;
     top: 0;
