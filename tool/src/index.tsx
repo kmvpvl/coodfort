@@ -23,6 +23,7 @@ declare global {
 						last_name: string;
 						photo_url: string;
 						username: string;
+						start_param: string;
 					};
 				};
 				expand: () => void;
@@ -37,11 +38,13 @@ function getContentByPath(): React.ReactNode {
 	const params = new URLSearchParams(window.location.search);
 	switch (path) {
 		case "guest":
-			return <GuestApp 
-				mode={params.get("mode")?params.get("mode") as string:undefined} 
-				eatery={params.get("eatery")?parseInt(params.get("eatery") as string):undefined}
-				table={params.get("table")?parseInt(params.get("table") as string):undefined}
-			/>
+			return (
+				<GuestApp
+					mode={params.get("mode") ? (params.get("mode") as string) : undefined}
+					eatery={params.get("eatery") ? parseInt(params.get("eatery") as string) : undefined}
+					table={params.get("table") ? parseInt(params.get("table") as string) : undefined}
+				/>
+			);
 		default:
 			return <EmployeeApp mode={path} />;
 	}

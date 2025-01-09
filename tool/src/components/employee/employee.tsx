@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState } from "../proto";
 import "./employee.css";
-import { IEateryBrief, IEmployee, IMeal, IMenu } from "@betypes/eaterytypes";
+import { IEateryBrief, IUser, IMeal, IMenu } from "@betypes/eaterytypes";
 import Meal from "../menu/meal";
 import { Eatery } from "../eatery/eatery";
 import Menu from "../menu/menu";
@@ -9,7 +9,7 @@ import Menu from "../menu/menu";
 type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "orders";
 
 export interface IEmployeeProps extends IProtoProps {
-	employee: IEmployee;
+	employee: IUser;
 }
 
 export interface IEmployeeState extends IProtoState {

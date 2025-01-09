@@ -1,7 +1,7 @@
 import mysql, { Connection, FieldPacket, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { mconsole } from './console';
-import { Employee } from './eatery';
-import { DocumentErrorCode, IDocument, Types, WorkflowStatusCode } from '../types/prototypes';
+import { DocumentErrorCode, IDocument, IPhoto, ITag, Types, WorkflowStatusCode } from '../types/prototypes';
+import { User } from './user';
 
 export class DocumentError extends Error {
     code: DocumentErrorCode;
@@ -399,9 +399,9 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         }
     }
 
-    async wfNext(employee: Employee): Promise<WorkflowStatusCode>;
-    async wfNext(employee: Employee, newStatus: WorkflowStatusCode): Promise<WorkflowStatusCode>;
-    async wfNext(employee: Employee, predict: (availableStatuses: WorkflowStatusCode[]) => WorkflowStatusCode): Promise<WorkflowStatusCode>;
+    async wfNext(user: User): Promise<WorkflowStatusCode>;
+    async wfNext(user: User, newStatus: WorkflowStatusCode): Promise<WorkflowStatusCode>;
+    async wfNext(user: User, predict: (availableStatuses: WorkflowStatusCode[]) => WorkflowStatusCode): Promise<WorkflowStatusCode>;
     async wfNext(...arg: any[]): Promise<WorkflowStatusCode> {
         const availableTransfers = this.wfSchema.transfers?.filter(transfer => transfer.from === this.data.wfStatus);
         let ret: WorkflowStatusCode;
@@ -443,4 +443,12 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         const [rows, fields] = await this.sqlConnection.query<[]>(sql, params);
         this._collection = rows;
     }
+}
+export interface IUser extends IDocument {
+    login: number | string /**Telegram ID or login or phone */;
+    hash: string /** */;
+    name?: string;
+    photos?: IPhoto[];
+    bios?: Types.MLString[];
+    tags?: ITag[];
 }

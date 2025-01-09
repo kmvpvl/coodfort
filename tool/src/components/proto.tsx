@@ -2,7 +2,7 @@ import React from "react";
 import { Types } from "@betypes/prototypes";
 import MLString, { mlStrings } from "../model/mlstring";
 import Toaster from "./toast";
-import { IEmployee } from "@betypes/eaterytypes";
+import { IUser } from "@betypes/eaterytypes";
 
 export enum ProtoErrorCode {
 	serverNotAvailable,
@@ -28,7 +28,7 @@ export enum ServerStatusCode {
 export interface IProtoProps {
 	lang?: string;
 	toaster?: React.RefObject<Toaster | null>;
-	onSingIn?: (employee: IEmployee) => void;
+	onSingIn?: (employee: IUser) => void;
 	onSignOut?: () => void;
 	onSignError?: (err: ProtoError) => void;
 }
@@ -36,7 +36,7 @@ export interface IProtoProps {
 export interface IProtoState {
 	serverStatus?: ServerStatusCode;
 	signedIn?: boolean;
-	employee?: IEmployee;
+	employee?: IUser;
 }
 export default class Proto<IProps extends IProtoProps, IState extends IProtoState> extends React.Component<IProps, IState> {
 	private get token(): string | undefined {

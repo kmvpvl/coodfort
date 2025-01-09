@@ -415,17 +415,16 @@ Response body if error
 ### Working with GUEST class
 Working with|Methods
 -|-
-Guest root object|guest/view, [guest/new](#post-guestnew), [guest/edit](#post-guestedit), [guest/join](#post-guestjoin), guest/search
+Guest root object|guest/view, [guest/update](#post-guestupdate), [guest/edit](#post-guestedit), [guest/join](#post-guestjoin), guest/search
 Booking|guest/eatery/search, guest/eatery/table/view, guest/book/new, guest/book/cancel 
 Order|guest/order/inviteGuest, guest/order/acceptInvitation, guest/order/rejectInvitation, 
 Meals of order|guest/eatery/meals/veiw, guest/order/meal/add, guest/order/meal/approve
 Pay of Order|guest/order/payment/send, guest/order/promo/apply
 Promos and discounts|guest/promo/view
 
-#### POST `guest/new`
-Creates new Guest object.
-#### POST `guest/edit`
-Makes changes to existing Guest object.
+#### POST `guest/update`
+Creates new Guest object or makes changes to existing Guest object.
+
 #### POST `guest/join`
 Unites two Guest objects. It's useful when user had been an anonymous guest, had booked table or had ordered and decided to sign them in.
 ## Structures and Classes

@@ -1,38 +1,8 @@
 import { RowDataPacket } from 'mysql2/promise';
-import { IDocument, Types } from './prototypes';
+import { IAward, ICoords, IDocument, IPhoto, IRating, ITag, ITimeSlot, Types } from './prototypes';
+import { IUser } from '../model/protodocument';
 
-export type ITag = Types.IMLString;
-
-export interface ITimeSlot {
-    start: Date;
-    duration: number;
-    repeat?: string;
-    until?: Date;
-    includes?: ITimeSlot[];
-    excludes?: ITimeSlot[];
-}
-
-export type ICoords = {lat: number; lng: number} | string;
-
-export interface IPhoto {
-    url: string;
-    caption?: Types.IMLString;
-    tags?: ITag[];
-}
-
-export interface IRating {
-    ratingValue: number;
-    ratingCount: number;
-}
-
-export interface IAward {
-    awardName: Types.IMLString;
-    logo?: {
-        url: string;
-        caption: Types.IMLString;
-    };
-    url: string;
-}
+export interface IEmployee extends IUser {}
 export enum EateryRoleCode {
     'supervisor' = 'supervisor',
     'owner' = 'owner',
@@ -79,16 +49,6 @@ export interface IMealRow extends IMeal {}
 export interface IMenuRow extends RowDataPacket {}
 export interface IMenuRow extends IMenu {}
 
-export interface IEmployee extends IDocument {
-    login: number | string /**Telegram ID or login or phone */;
-    hash: string /** */;
-    name?: string;
-    rating?: IRating;
-    awards?: IAward[];
-    photos?: IPhoto[];
-    bios?: Types.MLString[];
-    tags?: ITag[];
-}
 interface IBooking extends IDocument {
     eateryId: Types.ObjectId;
     mnemNumber: string;
@@ -98,8 +58,6 @@ interface IBooking extends IDocument {
     tableIds: Types.ObjectId[];
     timeSlot: ITimeSlot;
 }
-interface IGuest extends IDocument {}
-interface IOrder extends IDocument {}
 interface IEntertainment extends IDocument {}
 interface IDeliveryPartner extends IDocument {}
 interface IInvoice extends IDocument {}

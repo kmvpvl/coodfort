@@ -71,3 +71,30 @@ export interface IDocument {
     changedByUser?: string;
     wfStatus?: WorkflowStatusCode;
 }
+export interface IPhoto {
+    url: string;
+    caption?: Types.IMLString;
+    tags?: ITag[];
+}
+export interface ITimeSlot {
+    start: Date;
+    duration: number;
+    repeat?: string;
+    until?: Date;
+    includes?: ITimeSlot[];
+    excludes?: ITimeSlot[];
+}
+export type ICoords = { lat: number; lng: number } | string;
+export type ITag = Types.IMLString;
+export interface IRating {
+    ratingValue: number;
+    ratingCount: number;
+}
+export interface IAward {
+    awardName: Types.IMLString;
+    logo?: {
+        url: string;
+        caption: Types.IMLString;
+    };
+    url: string;
+}

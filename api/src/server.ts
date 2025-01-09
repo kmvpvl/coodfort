@@ -1,6 +1,5 @@
 import { configDotenv } from 'dotenv';
 import express, { Request, Response } from 'express';
-import { Employee } from './model/eatery';
 import { mconsole, mConsoleInit } from './model/console';
 import OpenAPIBackend, { Context } from 'openapi-backend';
 import path from 'path';
@@ -8,12 +7,13 @@ import fs from 'fs';
 import { createHmac, randomUUID } from 'crypto';
 import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
-import { AuthUser, startCommand } from './model/security';
+import { startCommand } from './model/tgEvents';
 import { employeeEateriesList, employeeMealsList, employeeMenusList, newEmployee, viewEmployee } from './api/employee';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
 import { updateMeal, updateMenu, viewMeal } from './api/meal';
 import cors from 'cors';
 import { Telegraf } from 'telegraf';
+import { User } from './model/user';
 
 configDotenv();
 const TGTOKEN = process.env.tgtoken;
@@ -109,12 +109,12 @@ api.register({
     unauthorizedHandler: (c: Context, req: Request, res: Response) => res.status(401).json({ ok: false, err: 'not auth' }),
 });
 
-api.registerSecurityHandler('COODFortTGUserId', (c: Context, req: Request, res: Response, user: AuthUser) => {
+api.registerSecurityHandler('COODFortTGUserId', (c: Context, req: Request, res: Response, user: User) => {
     const tguid = req.headers['coodfort-tguid'];
     mconsole.auth(`COODFortTGUserId security check. coodfort-tguid = ${tguid === undefined ? '-' : tguid}`);
     return tguid !== undefined;
 });
-api.registerSecurityHandler('TGQueryCheckString', (c: Context, req: Request, res: Response, user: AuthUser) => {
+api.registerSecurityHandler('TGQueryCheckString', (c: Context, req: Request, res: Response, user: User) => {
     try {
         const tgquerycheckstring = decodeURIComponent(req.headers['coodfort-tgquerycheckstring'] as string);
         const arr = tgquerycheckstring.split('&');
@@ -132,15 +132,15 @@ api.registerSecurityHandler('TGQueryCheckString', (c: Context, req: Request, res
         return false;
     }
 });
-api.registerSecurityHandler('COODFortLogin', (c: Context, req: Request, res: Response, user: AuthUser) => {
+api.registerSecurityHandler('COODFortLogin', (c: Context, req: Request, res: Response, user: User) => {
     const login = req.headers['coodfort-login'];
     mconsole.auth(`COODFortLogin security check. coodfort-login = ${login === undefined ? '-' : login}`);
     return login !== undefined;
 });
-api.registerSecurityHandler('COODFortPassword', (c: Context, req: Request, res: Response, user: AuthUser) => {
+api.registerSecurityHandler('COODFortPassword', (c: Context, req: Request, res: Response, user: User) => {
     const password = req.headers['coodfort-password'] as string;
     mconsole.auth(`COODFortPassword security check. coodfort-password = ${password === undefined ? '-' : '*******'}`);
-    return user.employee?.checkSecretKey(password);
+    return user.checkSecretKey(password);
 });
 
 export const app = express();
@@ -168,31 +168,31 @@ app.use(async (req: Request, res: Response) => {
     const tguid = req.headers['coodfort-tguid'];
     const login = req.headers['coodfort-login'];
 
-    const user: AuthUser = {};
+    let user: User | undefined;
     if (login !== undefined) {
         try {
-            user.employee = new Employee('login', login);
-            await user.employee.load();
-            if (user.employee.data.blocked)
+            user = new User('login', login);
+            await user.load();
+            if (user.data.blocked)
                 return res.status(403).json({
                     ok: false,
                     error: { message: `User was blocked` },
                 });
         } catch (e: any) {
-            if (e instanceof DocumentError) user.employee = undefined;
+            if (e instanceof DocumentError) user = undefined;
         }
     }
     if (tguid !== undefined) {
         try {
-            user.employee = new Employee('login', `TG:${tguid}`);
-            await user.employee.load();
-            if (user.employee.data.blocked)
+            user = new User('login', `TG:${tguid}`);
+            await user.load();
+            if (user.data.blocked)
                 return res.status(403).json({
                     ok: false,
                     error: { message: `User was blocked` },
                 });
         } catch (e: any) {
-            if (e instanceof DocumentError) user.employee = undefined;
+            if (e instanceof DocumentError) user = undefined;
         }
     }
 
@@ -209,8 +209,8 @@ app.use(async (req: Request, res: Response) => {
             res,
             user
         );
-    } catch (e) {
-        ret = res.status(500).json({ ok: false, error: e });
+    } catch (e: any) {
+        ret = res.status(500).json({ ok: false, error: { message: e.message } });
     }
     const requestEnd = new Date();
     console.log(
