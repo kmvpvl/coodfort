@@ -2,7 +2,8 @@ import React from "react";
 import { Types } from "@betypes/prototypes";
 import MLString, { mlStrings } from "../model/mlstring";
 import Toaster from "./toast";
-import { IUser } from "@betypes/eaterytypes";
+import { IUser } from "@betypes/prototypes";
+import Pending from "./pending";
 
 export enum ProtoErrorCode {
 	serverNotAvailable,
@@ -28,7 +29,7 @@ export enum ServerStatusCode {
 export interface IProtoProps {
 	lang?: string;
 	toaster?: React.RefObject<Toaster | null>;
-	onSingIn?: (employee: IUser) => void;
+	onSingIn?: (user: IUser) => void;
 	onSignOut?: () => void;
 	onSignError?: (err: ProtoError) => void;
 }
@@ -36,9 +37,11 @@ export interface IProtoProps {
 export interface IProtoState {
 	serverStatus?: ServerStatusCode;
 	signedIn?: boolean;
-	employee?: IUser;
+	user?: IUser;
 }
 export default class Proto<IProps extends IProtoProps, IState extends IProtoState> extends React.Component<IProps, IState> {
+	protected pendingRef: React.RefObject<Pending | null> = React.createRef();
+	
 	private get token(): string | undefined {
 		const ls = localStorage.getItem("coodforttoken");
 		return ls ? (ls as string) : undefined;
@@ -60,16 +63,16 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 	login(token?: string) {
 		if (token !== undefined) localStorage.setItem("coodforttoken", token);
 		this.serverCommand(
-			"employee/view",
+			"user/view",
 			undefined,
 			res => {
 				console.log(res);
 				if (res.ok) {
 					const nState: IState = this.state;
-					nState.employee = res.employee;
+					nState.user = res.user;
 					nState.signedIn = true;
 					this.setState(nState);
-					if (this.props.onSingIn) this.props.onSingIn(res.employee);
+					if (this.props.onSingIn !== undefined) this.props.onSingIn(res.user);
 				}
 			},
 			err => {
@@ -121,12 +124,14 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 				h.append(h1, h2);
 			}
 		}
+		this.pendingRef.current?.incDeepCount();
 		fetch(`${process.env.SERVER_BASE_URL}/${command}`, {
 			method: method,
 			headers: h,
 			body: body,
 		})
 			.then(res => {
+				this.pendingRef.current?.decDeepCount();
 				if (!res.ok) return Promise.reject(res);
 				return res.json();
 			})
@@ -138,6 +143,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 				if (successcb) successcb(v);
 			})
 			.catch(v => {
+				this.pendingRef.current?.decDeepCount();
 				if (v instanceof Error) {
 					const nStatus: IState = this.state;
 					nStatus.serverStatus = ServerStatusCode.notAvailable;

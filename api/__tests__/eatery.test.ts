@@ -31,14 +31,14 @@ afterAll(done => {
 
 let firstEateryId: number;
 
-describe('employee -> eatery', () => {
+describe('user -> eatery', () => {
     /**
      * SUCCESS
      * Creating new Employee who shall become owner of Eatery
      */
     test('Creating new Employee who shall become owner of Eatery', async () => {
         const owner = await request(app)
-            .post('/employee/new')
+            .post('/user/new')
             .set('content-type', 'application/json')
             .set('coodfort-login', 'new_employee')
             .set('coodfort-password', 'password_of_new_employee')
@@ -190,7 +190,7 @@ describe('Checking Employee security', () => {
     });
     test('Attempt to create Employee with the same login', async () => {
         const newEmployee = await request(app)
-            .post('/employee/new')
+            .post('/user/new')
             .set('content-type', 'application/json')
             .set('coodfort-login', 'new_employee')
             .set('coodfort-password', 'password_of_new_employee')

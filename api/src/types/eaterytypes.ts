@@ -1,6 +1,6 @@
 import { RowDataPacket } from 'mysql2/promise';
 import { IAward, ICoords, IDocument, IPhoto, IRating, ITag, ITimeSlot, Types } from './prototypes';
-import { IUser } from '../model/protodocument';
+import { IUser } from './prototypes';
 
 export interface IEmployee extends IUser {}
 export enum EateryRoleCode {
@@ -102,3 +102,4 @@ export interface IMenu extends IDocument {
     restrictions?: Types.IMLString[];
     chapters: IMenuChapter[];
 }
+

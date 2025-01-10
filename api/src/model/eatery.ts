@@ -3,7 +3,7 @@ import { WorkflowStatusCode } from '../types/prototypes';
 import { DocumentErrorCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
 import { EateryRoleCode, IEatery, IEateryBrief, IMealRow, IMenuRow } from '../types/eaterytypes';
-import { IUser } from './protodocument';
+import { IUser } from '../types/prototypes';
 import { mconsole } from './console';
 import { Meal, Menu } from './meal';
 import { User } from './user';

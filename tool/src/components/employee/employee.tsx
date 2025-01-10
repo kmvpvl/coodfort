@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState } from "../proto";
 import "./employee.css";
-import { IEateryBrief, IUser, IMeal, IMenu } from "@betypes/eaterytypes";
+import { IEateryBrief, IMeal, IMenu } from "@betypes/eaterytypes";
 import Meal from "../menu/meal";
 import { Eatery } from "../eatery/eatery";
 import Menu from "../menu/menu";
+import { IUser } from "@betypes/prototypes";
 
 type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "orders";
 
@@ -52,7 +53,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 
 	updateMealsList() {
 		this.serverCommand(
-			"employee/mealsList",
+			"user/mealsList",
 			undefined,
 			res => {
 				console.log(res);
@@ -69,7 +70,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 	}
 	updateMenusList() {
 		this.serverCommand(
-			"employee/menusList",
+			"user/menusList",
 			undefined,
 			res => {
 				console.log(res);

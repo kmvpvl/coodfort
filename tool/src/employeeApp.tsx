@@ -189,11 +189,11 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 		);
 	}
 	render(): ReactNode {
-		return this.state.employee === undefined ? (
+		return this.state.user === undefined ? (
 			this.renderNoToken()
 		) : (
 			<>
-				<Employee employee={this.state.employee} toaster={this.toasterRef} />
+				<Employee employee={this.state.user} toaster={this.toasterRef} />
 				{this.renderServerStatus()}
 			</>
 		);

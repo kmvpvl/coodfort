@@ -55,34 +55,34 @@ paths:
       responses:
         '200':
           description: OK
-  /employee/new:
+  /user/new:
     post:
-      operationId: newEmployee
+      operationId: newUser
       security: []      
       responses:
         '200':
           description: OK
-  /employee/view:
+  /user/view:
     post:
-      operationId: viewEmployee
+      operationId: viewUser
       responses:
         '200':
           description: OK
-  /employee/eateriesList:
+  /user/eateriesList:
     post:
-      operationId: employeeEateriesList
+      operationId: userEateriesList
       responses:
         '200':
           description: OK
-  /employee/mealsList:
+  /user/mealsList:
     post:
-      operationId: employeeMealsList
+      operationId: userMealsList
       responses:
         '200':
           description: OK
-  /employee/menusList:
+  /user/menusList:
     post:
-      operationId: employeeMenusList
+      operationId: userMenusList
       responses:
         '200':
           description: OK

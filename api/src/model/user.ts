@@ -1,5 +1,6 @@
 import { DocumentErrorCode, IDocument, Types, WorkflowStatusCode } from '../types/prototypes';
-import { Document, DocumentError, IDocumentDataSchema, IDocumentWFSchema, IUser } from './protodocument';
+import { Document, DocumentError, IDocumentDataSchema, IDocumentWFSchema } from './protodocument';
+import { IUser } from '../types/prototypes';
 import { createHmac } from 'crypto';
 import { Eatery } from './eatery';
 import { EateryRoleCode, IEatery, IEateryBrief, IMealRow, IMenuRow } from '../types/eaterytypes';
@@ -48,8 +49,8 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
     get dataSchema(): IUserDataSchema {
         return {
             idFieldName: 'id',
-            tableName: 'employees',
-            relatedTablesPrefix: 'employee_',
+            tableName: 'users',
+            relatedTablesPrefix: 'user_',
             fields: [
                 { name: `login`, type: 'varchar(128)', required: true },
                 { name: `hash`, type: 'varchar(128)', required: true },

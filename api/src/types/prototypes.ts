@@ -98,3 +98,11 @@ export interface IAward {
     };
     url: string;
 }
+export interface IUser extends IDocument {
+    login: number | string /**Telegram ID or login or phone */;
+    hash: string /** */;
+    name?: string;
+    photos?: IPhoto[];
+    bios?: Types.MLString[];
+    tags?: ITag[];
+}

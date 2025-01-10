@@ -21,7 +21,7 @@ Owner role has all permission in one or more Eateries. Every Eatery has at least
 ### `MDM` role
 ## Security schemas
 ## Paths
-[Employee](#working-with-employee-class) | [Eatery](#working-with-eatery-class) | [Meal](#working-with-meal-class) | [Menu](#working-with-menu-class) | [Guest](#working-with-guest-class)
+[User](#working-with-user-class) | [Eatery](#working-with-eatery-class) | [Meal](#working-with-meal-class) | [Menu](#working-with-menu-class) | [Guest](#working-with-guest-class)
 Name|Description
 -|-
 [eatery/edit](#post-eateryedit)|Changes existing eatery object
@@ -32,7 +32,7 @@ Name|Description
 Working with|Methods
 -|-
 Eatery root object and master data| [eatery/new](#post-eaterynew), [eatery/update](#post-eateryupdate), [eatery/view](#post-eateryview), eatery/checkout, eatery/checkin,  [eatery/publish](#post-eaterypublish), eatery/table/new, eatery/table/update, eatery/table/block
-Employees of Eatery| eatery/employee/invite, eatery/employee/update, eatery/employee/fire
+Employees of Eatery| eatery/user/invite, eatery/user/update, eatery/user/fire
 Delivery partners of Eatery| eatery/deliveryPartner/add,  eatery/deliveryPartner/edit
 PaymentMethods of Eatery| eatery/paymentMethod/add,  eatery/paymentMethod/edit
 Promos and Discounts| eatery/promo/add, eatery/promo/edit
@@ -48,8 +48,8 @@ Reveals information about Eatery by its unique id. If an Employee of Eatery requ
 *Parameters*
 Mand|Parameter|Where|Type|Description
 -|-|-|-|-
-✅|coodfort-login|header|string|Login name of Employee or Guest 
-✅|coodfort-password|header|string|Password of Employee or Guest
+✅|coodfort-login|header|string|Login name of User 
+✅|coodfort-password|header|string|Password of User
 ✅|id|requestBody|number|Unique id of the Eatery
 
 *Returns*

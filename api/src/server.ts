@@ -8,7 +8,7 @@ import { createHmac, randomUUID } from 'crypto';
 import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
 import { startCommand } from './model/tgEvents';
-import { employeeEateriesList, employeeMealsList, employeeMenusList, newEmployee, viewEmployee } from './api/employee';
+import { userEateriesList, userMealsList, userMenusList, newUser, viewUser } from './api/user';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
 import { updateMeal, updateMenu, viewMeal } from './api/meal';
 import cors from 'cors';
@@ -83,15 +83,15 @@ api.register({
     updateEatery: updateEatery,
     viewEatery: viewEatery,
     publishEatery: publishEatery,
-    newEmployee: newEmployee,
-    viewEmployee: viewEmployee,
+    newUser: newUser,
+    viewUser: viewUser,
     newMeal: updateMeal,
     updateMeal: updateMeal,
     viewMeal: viewMeal,
     updateMenu: updateMenu,
-    employeeEateriesList: employeeEateriesList,
-    employeeMealsList: employeeMealsList,
-    employeeMenusList: employeeMenusList,
+    userEateriesList: userEateriesList,
+    userMealsList: userMealsList,
+    userMenusList: userMenusList,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {

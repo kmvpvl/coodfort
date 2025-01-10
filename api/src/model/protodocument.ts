@@ -1,6 +1,6 @@
 import mysql, { Connection, FieldPacket, ResultSetHeader, RowDataPacket } from 'mysql2/promise';
 import { mconsole } from './console';
-import { DocumentErrorCode, IDocument, IPhoto, ITag, Types, WorkflowStatusCode } from '../types/prototypes';
+import { DocumentErrorCode, IDocument, Types, WorkflowStatusCode } from '../types/prototypes';
 import { User } from './user';
 
 export class DocumentError extends Error {
@@ -444,11 +444,4 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         this._collection = rows;
     }
 }
-export interface IUser extends IDocument {
-    login: number | string /**Telegram ID or login or phone */;
-    hash: string /** */;
-    name?: string;
-    photos?: IPhoto[];
-    bios?: Types.MLString[];
-    tags?: ITag[];
-}
+
