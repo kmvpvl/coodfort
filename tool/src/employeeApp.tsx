@@ -5,10 +5,10 @@ import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/
 import Toaster from "./components/toast";
 import Employee from "./components/employee/employee";
 import Logo from "./components/logo/logo";
+import Pinger from "./components/pinger/pinger";
 
 export interface IEmployeeAppProps extends IProtoProps {
 	mode: string;
-	pingFrequency?: number;
 }
 
 enum EmployeeAppExhibitViewCode {
@@ -20,7 +20,6 @@ enum EmployeeAppExhibitViewCode {
 
 export interface IEmployeeAppState extends IProtoState {
 	exhibit: EmployeeAppExhibitViewCode;
-	serverVersion?: string;
 }
 
 export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppState> {
@@ -28,26 +27,8 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 	state: IEmployeeAppState = {
 		exhibit: EmployeeAppExhibitViewCode.enterToken,
 	};
-	protected intervalPing?: NodeJS.Timeout;
-	ping() {
-		this.serverFetch("version", "GET", undefined, undefined, res => {
-			if (!res.ok) return;
-			const nState: IEmployeeAppState = this.state;
-			nState.serverVersion = res.version;
-			this.setState(nState);
-		});
-	}
 	componentDidMount(): void {
-		this.ping();
-		if (this.intervalPing === undefined) this.intervalPing = setInterval(this.ping.bind(this), this.props.pingFrequency === undefined ? (process.env.MODE === "production" ? 30000 : 120000) : this.props.pingFrequency);
 		this.login();
-	}
-	renderServerStatus(): ReactNode {
-		return (
-			<span className="employee-app-server-status">
-				{this.state.serverStatus !== undefined ? ServerStatusCode[this.state.serverStatus] : "unknown"} {process.env.SERVER_BASE_URL} {this.state.serverVersion}
-			</span>
-		);
 	}
 	renderNoToken(): ReactNode {
 		const emp: ReactNode = (
@@ -179,7 +160,7 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 						{emp}
 					</>
 				)}
-				{this.renderServerStatus()}
+				<Pinger />
 				<Toaster placesCount={3} ref={this.toasterRef} />
 			</div>
 		);
@@ -190,7 +171,7 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 		) : (
 			<>
 				<Employee employee={this.state.user} toaster={this.toasterRef} />
-				{this.renderServerStatus()}
+				<Pinger />
 			</>
 		);
 	}

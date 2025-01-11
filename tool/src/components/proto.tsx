@@ -141,11 +141,11 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 			body: body,
 		})
 			.then(res => {
-				this.pendingRef.current?.decDeepCount();
 				if (!res.ok) return Promise.reject(res);
 				return res.json();
 			})
 			.then(v => {
+				this.pendingRef.current?.decDeepCount();
 				const nStatus: IState = this.state;
 				nStatus.serverStatus = ServerStatusCode.connected;
 				this.setState(nStatus);
@@ -181,7 +181,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		const [login, password] = this.getTokenPair(this.token);
 		const headers: Headers = new Headers();
 
-		if ("user" in window.Telegram.WebApp.initDataUnsafe) {
+		if ("user" in window.Telegram?.WebApp.initDataUnsafe) {
 			headers.append("coodfort-tguid", window.Telegram.WebApp.initDataUnsafe.user.id.toString());
 			headers.append("coodfort-tgquerycheckstring", window.Telegram.WebApp.initData);
 		} else {

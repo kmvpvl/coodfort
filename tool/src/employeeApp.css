@@ -82,11 +82,3 @@
         grid-template-rows: auto 1fr auto auto;
     }
 }
-
-.employee-app-server-status {
-    position: absolute;
-    right: 0;
-    top: 0;
-    font-size: xx-small;
-    cursor: pointer;
-}

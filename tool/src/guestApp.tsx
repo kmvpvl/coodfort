@@ -8,6 +8,7 @@ import Pending from "./components/pending";
 import Toaster from "./components/toast";
 import React from "react";
 import Logo from "./components/logo/logo";
+import Pinger from "./components/pinger/pinger";
 
 export interface IGuestAppProps extends IProtoProps {
 	mode?: string;
@@ -107,6 +108,9 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 								}),
 								res => {
 									console.log(res);
+									const nState = this.state;
+									nState.user = res.user;
+									this.setState(nState);
 								},
 								err => {
 									console.log(err.json);
@@ -170,6 +174,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 				{this.renderNavBottom()}
 				<Pending ref={this.pendingRef} />
 				<Toaster placesCount={3} ref={this.toasterRef} />
+				<Pinger />
 			</div>
 		);
 	}
