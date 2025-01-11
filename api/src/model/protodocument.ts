@@ -444,4 +444,3 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         this._collection = rows;
     }
 }
-

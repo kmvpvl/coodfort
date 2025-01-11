@@ -106,3 +106,8 @@ export interface IUser extends IDocument {
     bios?: Types.MLString[];
     tags?: ITag[];
 }
+export interface IDocumentError {
+    code: DocumentErrorCode;
+    shortName: string;
+    message: string;
+}

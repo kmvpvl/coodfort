@@ -21,6 +21,7 @@ declare global {
 						id: number;
 						language_code: string;
 						last_name: string;
+						first_name: string;
 						photo_url: string;
 						username: string;
 						start_param: string;

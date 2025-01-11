@@ -4,6 +4,7 @@
 
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
@@ -24,6 +25,11 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
       "process.env.MODE": JSON.stringify(mode),
     },
     plugins: [react()],
+    resolve: {
+      alias: {
+        "@betypes": path.resolve(__dirname, "../api/src/types/"),
+      },
+    },
     test: {
       globals: true,
       environment: "jsdom",

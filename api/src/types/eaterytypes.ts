@@ -102,4 +102,3 @@ export interface IMenu extends IDocument {
     restrictions?: Types.IMLString[];
     chapters: IMenuChapter[];
 }
-

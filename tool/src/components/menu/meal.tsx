@@ -56,7 +56,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 				this.setState(nState);
 			},
 			err => {
-				console.log(err);
+				console.log(err.json);
 			}
 		);
 	}
@@ -74,7 +74,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 				this.setState(nState);
 			},
 			err => {
-				console.log(err);
+				console.log(err.json);
 			}
 		);
 	}

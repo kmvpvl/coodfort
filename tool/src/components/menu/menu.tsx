@@ -47,7 +47,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 				this.setState(nState);
 			},
 			err => {
-				console.log(err);
+				console.log(err.json);
 			}
 		);
 	}

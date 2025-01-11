@@ -1,8 +1,7 @@
 import React from "react";
-import { Types } from "@betypes/prototypes";
+import { Types, IUser, IDocumentError } from "@betypes/prototypes";
 import MLString, { mlStrings } from "../model/mlstring";
 import Toaster from "./toast";
-import { IUser } from "@betypes/prototypes";
 import Pending from "./pending";
 
 export enum ProtoErrorCode {
@@ -10,14 +9,23 @@ export enum ProtoErrorCode {
 	httpError,
 	authDataExpected,
 }
-export class ProtoError extends Error {
+class ProtoError extends Error {
 	protected _code: ProtoErrorCode;
-	constructor(code: ProtoErrorCode, message: string) {
+	protected _httpCode?: number;
+	protected _serverError?: IDocumentError;
+	constructor(code: ProtoErrorCode, message: string, httpCode?: number, serverError?: IDocumentError) {
 		super(message);
 		this._code = code;
+		this._httpCode = httpCode;
+		this._serverError = serverError;
 	}
 	get json() {
-		return { code: this._code, message: this.message };
+		return {
+			code: this._code,
+			message: this.message,
+			httpCode: this._httpCode,
+			serverError: this._serverError,
+		};
 	}
 }
 export enum ServerStatusCode {
@@ -41,7 +49,7 @@ export interface IProtoState {
 }
 export default class Proto<IProps extends IProtoProps, IState extends IProtoState> extends React.Component<IProps, IState> {
 	protected pendingRef: React.RefObject<Pending | null> = React.createRef();
-	
+
 	private get token(): string | undefined {
 		const ls = localStorage.getItem("coodforttoken");
 		return ls ? (ls as string) : undefined;
@@ -60,7 +68,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		return [undefined, undefined];
 	}
 
-	login(token?: string) {
+	login(token?: string, sucesscb?: (res: any) => void, failcb?: (err: ProtoError) => void) {
 		if (token !== undefined) localStorage.setItem("coodforttoken", token);
 		this.serverCommand(
 			"user/view",
@@ -74,10 +82,12 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 					this.setState(nState);
 					if (this.props.onSingIn !== undefined) this.props.onSingIn(res.user);
 				}
+				if (sucesscb !== undefined) sucesscb(res);
 			},
 			err => {
-				console.log(err);
+				console.log(err.json);
 				if (this.props.onSignError !== undefined) this.props.onSignError(err);
+				if (failcb !== undefined) failcb(err);
 			}
 		);
 	}
@@ -154,7 +164,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 				} else {
 					v.json()
 						.then((j: any) => {
-							const err = new ProtoError(ProtoErrorCode.httpError, `url='${v.url}'; status='${v.status}'; text='${v.statusText}'; server_desc='${JSON.stringify(j)}'`);
+							const err = new ProtoError(ProtoErrorCode.httpError, v.statusText, v.status, j);
 							const nStatus: IState = this.state;
 							nStatus.serverStatus = ServerStatusCode.connected;
 							this.setState(nStatus);
@@ -176,7 +186,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 			headers.append("coodfort-tgquerycheckstring", window.Telegram.WebApp.initData);
 		} else {
 			if (password === undefined && login === undefined) {
-				if (failcb !== undefined) failcb(new ProtoError(ProtoErrorCode.authDataExpected, ""));
+				if (failcb !== undefined) failcb(new ProtoError(ProtoErrorCode.authDataExpected, "Both login and password are undefined. Call to server didn't take place"));
 				return;
 			} else {
 				headers.append("coodfort-login", login !== undefined ? login : "");

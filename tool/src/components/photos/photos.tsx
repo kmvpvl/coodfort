@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import "./photos.css";
 import React from "react";
-import { IPhoto } from "@betypes/eaterytypes";
+import { IPhoto } from "@betypes/prototypes";
 
 export interface IPhotosProps {
 	defaultValue?: IPhoto[];

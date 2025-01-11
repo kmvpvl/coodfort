@@ -8,30 +8,6 @@
     position: relative;
 }
 
-.employee-app-logo {
-    padding: 0.5em;
-    cursor: pointer;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    text-align: center;
-    font-size: 3em;
-    display: grid;
-    grid-template-rows: auto auto;
-}
-
-.employee-app-logo-container {
-    display: block;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.employee-app-logo > div > img {
-    max-height: 100%;
-    max-width: 100%;
-}
-
 .employee-app-container-notoken-choosen {
     max-width: 800px;
     margin-left: auto;

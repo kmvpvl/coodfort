@@ -38,7 +38,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 				if (this.props.onSave !== undefined) this.props.onSave(res.eatery);
 			},
 			err => {
-				console.log(err);
+				console.log(err.json);
 			}
 		);
 		//	}
@@ -58,7 +58,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 				}
 			},
 			err => {
-				console.log(err);
+				console.log(err.json);
 			}
 		);
 	}

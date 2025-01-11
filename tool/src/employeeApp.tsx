@@ -4,6 +4,7 @@ import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/
 
 import Toaster from "./components/toast";
 import Employee from "./components/employee/employee";
+import Logo from "./components/logo/logo";
 
 export interface IEmployeeAppProps extends IProtoProps {
 	mode: string;
@@ -152,18 +153,13 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 
 		return (
 			<div className={this.state.exhibit === EmployeeAppExhibitViewCode.none ? "employee-app-container-notoken-none" : "employee-app-container-notoken-choosen"}>
-				<div
-					onClick={event => {
+				<Logo
+					onClick={() => {
 						const nState = this.state;
 						nState.exhibit = EmployeeAppExhibitViewCode.none;
 						this.setState(nState);
 					}}
-					className="employee-app-logo">
-					<div className="employee-app-logo-container">
-						<img src="./logo_new.svg" />
-					</div>
-					<div>CoodFort</div>
-				</div>
+				/>
 				{this.state.exhibit === EmployeeAppExhibitViewCode.none || this.state.exhibit === EmployeeAppExhibitViewCode.enterToken ? (
 					<>
 						{havet}

@@ -64,7 +64,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				}
 			},
 			err => {
-				console.log(err);
+				console.log(err.json);
 			}
 		);
 	}
@@ -81,7 +81,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				}
 			},
 			err => {
-				console.log(err);
+				console.log(err.json);
 			}
 		);
 	}
@@ -98,7 +98,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				}
 			},
 			err => {
-				console.log(err);
+				console.log(err.json);
 			}
 		);
 	}
