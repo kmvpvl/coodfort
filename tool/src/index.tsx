@@ -42,8 +42,8 @@ function getContentByPath(): React.ReactNode {
 			return (
 				<GuestApp
 					mode={params.get("mode") ? (params.get("mode") as string) : undefined}
-					eatery={params.get("eatery") ? parseInt(params.get("eatery") as string) : undefined}
-					table={params.get("table") ? parseInt(params.get("table") as string) : undefined}
+					eateryId={params.get("eateryId") ? parseInt(params.get("eateryId") as string) : undefined}
+					tableId={params.get("tableId") ? parseInt(params.get("tableId") as string) : undefined}
 				/>
 			);
 		default:
