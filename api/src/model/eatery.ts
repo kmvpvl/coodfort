@@ -19,15 +19,18 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
             tableName: 'eateries',
             relatedTablesPrefix: 'eatery_',
             fields: [
-                { name: `name`, type: 'json', required: true },
-                { name: `url`, type: 'json' },
-                { name: 'coords', type: 'json' },
-                { name: `photos`, type: 'json' },
-                { name: `description`, type: 'json' },
-                { name: `tags`, type: 'json' },
+                { name: `name`, type: 'json', required: true, comment: "Multi-language name of Eatery" },
+                { name: `url`, type: 'json', comment: "Caption and href to Eatery website" },
+                { name: 'coords', type: 'json', comment: "Pointer to eatery place" },
+                { name: `photos`, type: 'json', comment: "Photos array" },
+                { name: `description`, type: 'json', comment: "2-lines description" },
+                { name: `tags`, type: 'json', comment: "Array of tags" },
                 { name: `cuisines`, type: 'json' },
                 { name: `averageBills`, type: 'json' },
                 { name: `menuId`, type: 'BIGINT(20)', required: false },
+                { name: `tableRequiredToInhouseOrder`, type: 'tinyint(1)', required: false },
+                { name: `approveRequiredToReserve`, type: 'tinyint(1)', required: false },
+                { name: `esId`, type: 'varchar(256)', required: false },
             ],
             related: [
                 {
@@ -39,6 +42,8 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
                         { name: `photos`, type: 'json' },
                         { name: `guestCountMin`, type: 'int(11)' },
                         { name: `guestCountMax`, type: 'int(11)' },
+                        { name: `approveRequiredToReserve`, type: 'tinyint(1)', required: false },
+                        { name: `esId`, type: 'varchar(256)', required: false },
                     ],
                 },
                 {

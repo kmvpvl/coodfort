@@ -4,6 +4,7 @@ import "./index.css";
 import EmployeeApp from "./employeeApp";
 import GuestApp from "./guestApp";
 import { Types } from "@betypes/prototypes";
+import { takeApartTelegramStartAppParams } from "./model/tools";
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 //debugger
 window.Telegram?.WebApp.expand();
@@ -38,16 +39,8 @@ function getContentByPath(): React.ReactNode {
 	const path = window.location.pathname.substring(1);
 	console.log("path", path);
 	const params = new URLSearchParams(window.location.search);
-	let eateryId: Types.ObjectId | undefined;
-	let tableId: Types.ObjectId | undefined;
-	if (window.Telegram?.WebApp.initDataUnsafe.start_param !== undefined) {
-		const pp = window.Telegram.WebApp.initDataUnsafe.start_param.split("__");
-		const map = pp.map(el => el.split("_"));
-		const eId = map.filter(el => el[0] === "eateryId");
-		if (eId.length > 0) eateryId = parseInt(eId[0][1]);
-		const tId = map.filter(el => el[0] === "tableId");
-		if (tId.length > 0) tableId = parseInt(tId[0][1]);
-	} else {
+	let [eateryId, tableId] = takeApartTelegramStartAppParams(window.Telegram?.WebApp.initDataUnsafe.start_param !== undefined ? window.Telegram.WebApp.initDataUnsafe.start_param : "");
+	if (window.Telegram?.WebApp.initDataUnsafe.start_param === undefined) {
 		eateryId = params.get("eateryId") ? parseInt(params.get("eateryId") as string) : undefined;
 		tableId = params.get("tableId") ? parseInt(params.get("tableId") as string) : undefined;
 	}

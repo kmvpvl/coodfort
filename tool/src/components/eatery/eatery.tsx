@@ -311,7 +311,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 						onClick={event => {
 							this.photosRef.current?.qr(`${process.env.QR_BASE_URL}?startapp=eateryId_${this.state.value.id}`);
 						}}>
-						☷
+						<i className="fa fa-qrcode"></i>
 					</span>
 				</div>
 				<Photos ref={this.photosRef} defaultValue={this.state.value.photos} />

@@ -227,7 +227,9 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						<></>
 					)}
 					<span>⤢</span>
-					<span>☷</span>
+					<span>
+						<i className="fa fa-qrcode"></i>
+					</span>
 				</div>
 			</div>
 		);

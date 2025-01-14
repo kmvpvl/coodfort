@@ -11,6 +11,7 @@ import Pinger from "./components/pinger/pinger";
 import { Html5Qrcode } from "html5-qrcode";
 import { IEatery, ITable } from "@betypes/eaterytypes";
 import { Eatery, ViewModeCode } from "./components/eatery/eatery";
+import { revealTelegramStartAppParams } from "./model/tools";
 
 export interface IGuestAppProps extends IProtoProps {
 	mode?: string;
@@ -221,8 +222,13 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			{ facingMode: "environment" },
 			{ fps: 10, qrbox: { width: 200, height: 200 } },
 			((decode: any, decoded: any) => {
-				alert(decode);
+				const [eateryId, tableId] = revealTelegramStartAppParams(decode);
+				const nState = this.state;
+				nState.eateryId = eateryId;
+				nState.tableId = eateryId;
+				this.setState(nState);
 				this.stopScanner();
+				this.checkEateryId();
 			}).bind(this),
 			err => {}
 		);

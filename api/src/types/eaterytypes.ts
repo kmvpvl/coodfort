@@ -15,6 +15,8 @@ export interface ITable extends IDocument {
     guestCountMax?: number;
     guestCountMin?: number;
     timeSlots?: ITimeSlot[];
+    esId?: string;
+    approveRequiredToReserve?: boolean;
 }
 export interface IEatery extends IDocument {
     name: Types.IMLString;
@@ -37,6 +39,9 @@ export interface IEatery extends IDocument {
     cuisines?: Types.IMLString[];
     averageBills?: { cuisine: Types.IMLString; withAlcohol: number; withoutAlcohol: number }[];
     menuId?: Types.ObjectId;
+    esId?: string;
+    tableRequiredToInhouseOrder?: boolean;
+    approveRequiredToReserve?: boolean;
 }
 export interface IEateryBrief extends RowDataPacket {}
 export interface IEateryBrief extends IEatery {
@@ -68,6 +73,7 @@ export interface IMealVolumeOption {
     currency: Types.IMLString;
     includeOptions?: IMealVolumeOption[];
     excludeOptions?: IMealVolumeOption[];
+    esId?: string;
 }
 
 export interface IMeal extends IDocument {
@@ -78,13 +84,12 @@ export interface IMeal extends IDocument {
     photos: IPhoto[];
     options: IMealVolumeOption[];
     tags?: ITag[];
+    esId?: string;
 }
 
 export interface IMenuItem {
     mealId?: Types.ObjectId;
     restrictions?: Types.IMLString[];
-    rating?: IRating;
-    awards?: IAward[];
 }
 
 export interface IMenuChapter {

@@ -271,7 +271,10 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						}}>
 						{this.state.maximized ? "⚊" : "⤢"}
 					</span>
-					<span>☷</span>
+					<span>
+						{" "}
+						<i className="fa fa-qrcode"></i>
+					</span>
 				</div>
 			</span>
 		);
