@@ -290,7 +290,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 						}}>
 						Drop actual menu here
 					</div>
-					<Menu viewMode={ViewModeCode.compact} menuId={this.state.value.menuId} />
+					{this.state.value.menuId !== undefined ? <Menu viewMode={ViewModeCode.compact} menuId={this.state.value.menuId} /> : <></>}
 				</div>
 			</div>
 		);
