@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Proto, { IProtoProps, IProtoState } from "../proto";
+import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import "./employee.css";
 import { IEateryBrief, IMeal, IMenu } from "@betypes/eaterytypes";
 import Meal from "../menu/meal";
@@ -42,6 +42,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		switch (nState.focus) {
 			case "eateries":
 				this.updateEateriesList();
+				this.updateMenusList();
 				break;
 			case "meals":
 				this.updateMealsList();
@@ -118,6 +119,11 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				<div className="employee-eateries-list">
 					{this.state.eateriesBrief.map((eatery, idx) => (
 						<Eatery key={idx} defaultValue={eatery} admin={true} />
+					))}
+				</div>
+				<div className="employee-eateries-menus-palette-container">
+					{this.state.menus.map((menu, idx) => (
+						<Menu key={idx} defaultValue={menu} viewMode={ViewModeCode.compact} />
 					))}
 				</div>
 			</div>

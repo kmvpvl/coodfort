@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Proto, { IProtoProps, IProtoState } from "../proto";
+import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import "./eatery.css";
 import { IEatery } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
@@ -9,12 +9,6 @@ import Menu from "../menu/menu";
 import React from "react";
 
 type EateryFocus = "none" | "profile" | "tables" | "menu" | "entertainments";
-
-export enum ViewModeCode {
-	compact = "compact",
-	normal = "normal",
-	maximized = "maximized",
-}
 
 export interface IEateryProps extends IProtoProps {
 	defaultValue?: IEatery;
@@ -264,6 +258,39 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 							</div>
 						))}
 					</div>
+					<div
+						onDragEnter={event => {
+							event.preventDefault();
+							event.currentTarget.classList.toggle("ready-to-drop", true);
+							event.dataTransfer.dropEffect = "link";
+						}}
+						onDragOver={event => {
+							event.preventDefault();
+							event.dataTransfer.dropEffect = "link";
+						}}
+						onDragLeave={event => {
+							console.log("leave");
+							event.preventDefault();
+							event.currentTarget.classList.toggle("ready-to-drop", false);
+						}}
+						onDragEnd={event => {
+							console.log("end");
+							event.preventDefault();
+							event.currentTarget.classList.toggle("ready-to-drop", false);
+						}}
+						onDrop={event => {
+							event.preventDefault();
+							const menu = JSON.parse(event.dataTransfer.getData("coodfort/menu"));
+							event.currentTarget.classList.toggle("ready-to-drop", false);
+							console.log(menu);
+							const nState = this.state;
+							nState.value.menuId = menu.id;
+							nState.changed = true;
+							this.setState(nState);
+						}}>
+						Drop actual menu here
+					</div>
+					<Menu viewMode={ViewModeCode.compact} menuId={this.state.value.menuId} />
 				</div>
 			</div>
 		);

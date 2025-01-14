@@ -10,7 +10,7 @@ import { DocumentError } from './model/protodocument';
 import { startCommand } from './model/tgEvents';
 import { userEateriesList, userMealsList, userMenusList, newUser, viewUser } from './api/user';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
-import { updateMeal, updateMenu, viewMeal } from './api/meal';
+import { updateMeal, updateMenu, viewMeal, viewMenu } from './api/meal';
 import cors from 'cors';
 import { Telegraf } from 'telegraf';
 import { User } from './model/user';
@@ -89,6 +89,7 @@ api.register({
     updateMeal: updateMeal,
     viewMeal: viewMeal,
     updateMenu: updateMenu,
+    viewMenu: viewMenu,
     userEateriesList: userEateriesList,
     userMealsList: userMealsList,
     userMenusList: userMenusList,

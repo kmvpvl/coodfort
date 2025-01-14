@@ -25,6 +25,7 @@
 }
 
 .employee-eateries-container {
+    grid-template-columns: 20% 1fr;
     grid-template-rows: auto 1fr;
 }
 
@@ -55,3 +56,6 @@
     gap: 0.5em;
 }
 
+.employee-eateries-list {
+    grid-row: span 2;
+}

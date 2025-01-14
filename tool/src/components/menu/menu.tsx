@@ -1,9 +1,10 @@
 import { ReactNode } from "react";
 import "./menu.css";
-import Proto, { IProtoProps, IProtoState } from "../proto";
+import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import { IMenu } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
 import MenuItem from "./menuitem";
+import { Types } from "@betypes/prototypes";
 
 export interface IMenuProps extends IProtoProps {
 	admin?: boolean;
@@ -11,12 +12,15 @@ export interface IMenuProps extends IProtoProps {
 	defaultValue?: IMenu;
 	onSave?: (newValue: IMenu) => void;
 	onChange?: (newValue: IMenu) => void;
+	viewMode?: ViewModeCode;
+	menuId?: Types.ObjectId;
 }
 
 export interface IMenuState extends IProtoState {
 	value: IMenu;
 	editMode?: boolean;
 	changed?: boolean;
+	viewMode: ViewModeCode;
 }
 
 export default class Menu extends Proto<IMenuProps, IMenuState> {
@@ -24,7 +28,30 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 		value: this.props.defaultValue !== undefined ? this.props.defaultValue : this.new(),
 		editMode: this.props.editMode,
 		changed: false,
+		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.normal,
 	};
+	componentDidMount(): void {
+		if (this.props.defaultValue === undefined && this.props.menuId !== undefined) this.load();
+	}
+
+	protected load() {
+		this.serverCommand(
+			"menu/view",
+			JSON.stringify({ id: this.props.menuId }),
+			res => {
+				console.log(res);
+				if (!res.ok) return;
+				const nState = this.state;
+				nState.changed = false;
+				nState.value = res.menu;
+				this.setState(nState);
+			},
+			err => {
+				console.log(err.json);
+			}
+		);
+	}
+
 	new(): IMenu {
 		const menu: IMenu = {
 			name: "New menu",
@@ -194,8 +221,21 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 			</div>
 		);
 	}
+	renderCompact(): ReactNode {
+		return (
+			<div
+				className="menu-compact-container"
+				draggable={true}
+				onDragStart={event => {
+					event.dataTransfer.setData("coodfort/menu", JSON.stringify(this.state.value));
+				}}>
+				MENU: {this.state.value.name}-{new Date(this.state.value.changed ? this.state.value.changed : new Date()).toLocaleString()}
+			</div>
+		);
+	}
 	render(): ReactNode {
 		if (this.state.editMode) return this.renderEditMode();
+		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
 		const menuHeader = this.toString(this.state.value.headerHtml);
 		const menuFooter = this.toString(this.state.value.footerHtml);
 		return (

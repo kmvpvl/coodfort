@@ -10,7 +10,8 @@ import Logo from "./components/logo/logo";
 import Pinger from "./components/pinger/pinger";
 import { Html5Qrcode } from "html5-qrcode";
 import { IEatery, ITable } from "@betypes/eaterytypes";
-import { Eatery, ViewModeCode } from "./components/eatery/eatery";
+import { Eatery } from "./components/eatery/eatery";
+import { ViewModeCode } from "./components/proto";
 import { revealTelegramStartAppParams } from "./model/tools";
 
 export interface IGuestAppProps extends IProtoProps {

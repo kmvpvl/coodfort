@@ -202,3 +202,9 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		return ret;
 	}
 }
+
+export enum ViewModeCode {
+	compact = "compact",
+	normal = "normal",
+	maximized = "maximized",
+}

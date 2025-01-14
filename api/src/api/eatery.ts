@@ -10,20 +10,9 @@ import { User } from '../model/user';
 
 function eateryDataFromBody(req: Request): IEatery {
     if (req.body.name === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Parameter 'name' is mandatory`);
-    const eateryData: IEatery = {
-        name: req.body.name,
-        tables: req.body.tables ? req.body.tables : [],
-        employees: [],
-        deliveryPartnerIds: [],
-        entertainmentIds: [],
 
-        description: req.body.description,
-        url: req.body.url,
-        cuisines: req.body.cuisines,
-        averageBills: req.body.averageBills,
-        photos: req.body.photos,
-        tags: req.body.tags,
-    };
+    const eateryData: IEatery = req.body;
+    eateryData.employees = [];
     return eateryData;
 }
 

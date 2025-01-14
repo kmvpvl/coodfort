@@ -114,6 +114,13 @@ paths:
       responses:
         '200':
           description: OK
+  /menu/view:
+    post:
+      operationId: viewMenu
+      security: []      
+      responses:
+        '200':
+          description: OK
 
 security:
   - COODFortTGUserId: []

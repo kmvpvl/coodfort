@@ -1,12 +1,7 @@
-import { DocumentError, Document, IDocumentDataSchema, IDocumentWFSchema } from './protodocument';
+import { Document, IDocumentDataSchema, IDocumentWFSchema } from './protodocument';
 import { WorkflowStatusCode } from '../types/prototypes';
-import { DocumentErrorCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
-import { EateryRoleCode, IEatery, IEateryBrief, IMealRow, IMenuRow } from '../types/eaterytypes';
-import { IUser } from '../types/prototypes';
-import { mconsole } from './console';
-import { Meal, Menu } from './meal';
-import { User } from './user';
+import { EateryRoleCode, IEatery } from '../types/eaterytypes';
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
 
@@ -19,15 +14,15 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
             tableName: 'eateries',
             relatedTablesPrefix: 'eatery_',
             fields: [
-                { name: `name`, type: 'json', required: true, comment: "Multi-language name of Eatery" },
-                { name: `url`, type: 'json', comment: "Caption and href to Eatery website" },
-                { name: 'coords', type: 'json', comment: "Pointer to eatery place" },
-                { name: `photos`, type: 'json', comment: "Photos array" },
-                { name: `description`, type: 'json', comment: "2-lines description" },
-                { name: `tags`, type: 'json', comment: "Array of tags" },
+                { name: `name`, type: 'json', required: true, comment: 'Multi-language name of Eatery' },
+                { name: `url`, type: 'json', comment: 'Caption and href to Eatery website' },
+                { name: 'coords', type: 'json', comment: 'Pointer to eatery place' },
+                { name: `photos`, type: 'json', comment: 'Photos array' },
+                { name: `description`, type: 'json', comment: '2-lines description' },
+                { name: `tags`, type: 'json', comment: 'Array of tags' },
                 { name: `cuisines`, type: 'json' },
                 { name: `averageBills`, type: 'json' },
-                { name: `menuId`, type: 'BIGINT(20)', required: false },
+                { name: `menuId`, type: 'bigint(20)', required: false },
                 { name: `tableRequiredToInhouseOrder`, type: 'tinyint(1)', required: false },
                 { name: `approveRequiredToReserve`, type: 'tinyint(1)', required: false },
                 { name: `esId`, type: 'varchar(256)', required: false },

@@ -58,3 +58,17 @@ export async function updateMenu(c: Context, req: Request, res: Response, user: 
         else return res.status(400).json({ ok: false, error: { message: e.message } });
     }
 }
+
+export async function viewMenu(c: Context, req: Request, res: Response, user: User) {
+    try {
+        if (req.body.id === undefined) {
+            throw new DocumentError(DocumentErrorCode.parameter_expected, `Menu id expected`);
+        }
+        const menu = new Menu(req.body.id);
+        await menu.load();
+        return res.status(200).json({ ok: true, menu: menu.data });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });
+        else return res.status(400).json({ ok: false, error: { message: e.message } });
+    }
+}
