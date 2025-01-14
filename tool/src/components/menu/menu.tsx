@@ -41,8 +41,9 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 			res => {
 				console.log(res);
 				if (!res.ok) return;
-				if (this.props.onSave !== undefined) this.props.onSave(res.meal);
+				if (this.props.onSave !== undefined) this.props.onSave(res.menu);
 				const nState = this.state;
+				nState.value = res.menu;
 				nState.changed = false;
 				this.setState(nState);
 			},

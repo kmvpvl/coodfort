@@ -1,15 +1,16 @@
 import { Types } from "@betypes/prototypes";
-import { OrderFunelStages } from "@betypes/ordertypes";
 
 import { Fragment, ReactNode } from "react";
-import Proto, { IProtoProps, IProtoState, ProtoErrorCode, ServerStatusCode } from "./components/proto";
+import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/proto";
 import "./guestApp.css";
 import Pending from "./components/pending";
 import Toaster from "./components/toast";
 import React from "react";
 import Logo from "./components/logo/logo";
 import Pinger from "./components/pinger/pinger";
-import { Html5Qrcode, Html5QrcodeScanner, Html5QrcodeScanType } from "html5-qrcode";
+import { Html5Qrcode } from "html5-qrcode";
+import { IEatery, ITable } from "@betypes/eaterytypes";
+import { Eatery, ViewModeCode } from "./components/eatery/eatery";
 
 export interface IGuestAppProps extends IProtoProps {
 	mode?: string;
@@ -19,11 +20,13 @@ export interface IGuestAppProps extends IProtoProps {
 	orderId?: Types.ObjectId;
 }
 
-const OrderStages = ["Reserve", "Choose", "Pay", "Enjoy"];
+const OrderStages = ["CheckIn", "Choose", "Pay", "Enjoy"];
 
 export interface IGuestAppState extends IProtoState {
 	eateryId?: Types.ObjectId;
+	choosenEatery?: IEatery;
 	tableId?: Types.ObjectId;
+	choosenTable?: ITable;
 	itemMenuId?: Types.ObjectId;
 	orderId?: Types.ObjectId;
 	passwordWrong?: boolean;
@@ -43,10 +46,11 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			undefined,
 			res => {
 				const nState = this.state;
-				if (this.state.eateryId === undefined && this.state.tableId === undefined) {
-					nState.stage = "reserve";
+				if (this.state.eateryId === undefined) {
+					nState.stage = "checkin";
 				} else {
-					nState.stage = "choose";
+					//nState.stage = "choose";
+					this.checkEateryId();
 				}
 				this.setState(nState);
 			},
@@ -74,6 +78,32 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			}
 		);
 	}
+	checkEateryId() {
+		this.serverCommand(
+			"eatery/view",
+			JSON.stringify({ id: this.state.eateryId }),
+			res => {
+				console.log(res);
+				const nState = this.state;
+				nState.choosenEatery = res.eatery;
+				if (this.state.tableId !== undefined) {
+					const suitableTables = this.state.choosenEatery?.tables.filter(table => table.id === this.state.tableId);
+					if (suitableTables?.length === 1) {
+						nState.choosenTable = suitableTables[0];
+					}
+				}
+				this.state.stage = "choose";
+				this.setState(nState);
+			},
+			err => {
+				console.log(err.json);
+				const nState = this.state;
+				nState.eateryId = undefined;
+				nState.tableId = undefined;
+				this.setState(nState);
+			}
+		);
+	}
 	/**
 	 * 3-state interface
 	 * passwordWrong and user are undefined both - greetings new user
@@ -81,7 +111,12 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	 * user is not undefined - successful login attempt
 	 */
 	renderGreetings(): ReactNode {
-		const tgUser = "user" in window.Telegram.WebApp.initDataUnsafe ? window.Telegram.WebApp.initDataUnsafe.user : null;
+		const tgUser = window.Telegram !== undefined && "user" in window.Telegram?.WebApp.initDataUnsafe ? window.Telegram?.WebApp.initDataUnsafe.user : null;
+		if (tgUser?.photo_url !== undefined) {
+			//            URI2DataURL(tgUser.photo_url, userpic=> {
+			//                if (userpic) document.getElementById("user_pic")?.setAttribute("src", userpic as string);
+			//            });
+		}
 		return (
 			<div className="guest-app-greetings-container">
 				<div style={{ textAlign: "center", fontSize: "120%" }}>Давайте познакомимся</div>
@@ -105,7 +140,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 					<div>
 						{tgUser ? (
 							<div style={{ height: "100%" }}>
-								<img src={tgUser.photo_url} />
+								<img id="user_pic" src={tgUser.photo_url} />
 							</div>
 						) : (
 							<></>
@@ -128,14 +163,15 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 							this.serverCommand(
 								"user/new",
 								JSON.stringify({
-									name: document.getElementById("name")?.nodeValue,
-									bio: document.getElementById("bio")?.nodeValue,
+									name: document.getElementById("name")?.attributes.getNamedItem("value")?.value,
+									bio: document.getElementById("bio")?.attributes.getNamedItem("value")?.value,
 								}),
 								res => {
 									console.log(res);
 									const nState = this.state;
 									nState.user = res.user;
 									this.setState(nState);
+									this.checkEateryId();
 								},
 								err => {
 									console.log(err.json);
@@ -199,9 +235,9 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		delete nState.scanner;
 		this.setState(nState);
 	}
-	renderReserve(): ReactNode {
+	renderCheckIn(): ReactNode {
 		return (
-			<div className="guest-app-reserve-container">
+			<div className="guest-app-checkin-container">
 				<div id="reader"></div>
 				<div>
 					<div>You can find the eatery and table or scan QR code on the table or on eatery's wall or door. </div>
@@ -228,7 +264,19 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		);
 	}
 	renderChoose(): ReactNode {
-		return <div>Choose</div>;
+		return (
+			<div className="guest-app-choose-container">
+				<div>
+					Вы выбрали заведение и столик верно?<button>Да, все ок!</button>
+					<button>Нет, что-то пошло не так</button>
+				</div>
+				<div>Сформируйте заказ. Если что-то забудете, то потом можно будет дополнить.</div>
+				<div>
+					Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the
+					Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected
+				</div>
+			</div>
+		);
 	}
 	renderPay(): ReactNode {
 		return <div>Pay</div>;
@@ -239,6 +287,10 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	renderNavTop(): ReactNode {
 		return (
 			<div className="guest-app-nav-top">
+				<div className="guest-app-nav-top-choosen">
+					<span>{this.state.user?.name} @ </span>
+					{this.state.choosenEatery !== undefined ? <Eatery viewMode={ViewModeCode.compact} defaultValue={this.state.choosenEatery} /> : <></>}
+				</div>
 				<Logo />
 			</div>
 		);
@@ -247,12 +299,15 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		return (
 			<div className="guest-app-nav-bottom">
 				{this.state.user !== undefined ? (
-					OrderStages.map((stage: string, idx: number, arr) => (
-						<Fragment key={idx}>
-							<span className="stage">{stage}</span>
-							{idx + 1 < arr.length ? <span>→</span> : <></>}{" "}
-						</Fragment>
-					))
+					OrderStages.map((stage: string, idx: number, arr) => {
+						const curStage = this.state.stage?.toLowerCase() === OrderStages[idx].toLowerCase();
+						return (
+							<Fragment key={idx}>
+								<span className={`stage ${curStage ? "current" : ""}`}>{stage}</span>
+								{idx + 1 < arr.length ? <span>→</span> : <></>}{" "}
+							</Fragment>
+						);
+					})
 				) : (
 					<></>
 				)}
@@ -272,8 +327,8 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 				content = this.renderWrongToken();
 			} else
 				switch (this.state.stage) {
-					case "reserve":
-						content = this.renderReserve();
+					case "checkin":
+						content = this.renderCheckIn();
 						break;
 					case "choose":
 						content = this.renderChoose();

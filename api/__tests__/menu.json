@@ -1,0 +1,42 @@
+{
+    "name": "New menu",
+    "headerHtml": {
+        "default": "Меню Корчмы",
+        "values": []
+    },
+    "footerHtml": {
+        "default": "Конец меню Корчмы",
+        "values": []
+    },
+    "chapters": [
+        {
+            "headerHtml": {
+                "default": "Холодные закуски",
+                "values": [
+                    [
+                        "",
+                        ""
+                    ]
+                ]
+            },
+            "footerHtml": {
+                "default": "Конец холодных закусок",
+                "values": []
+            },
+            "items": [
+            ]
+        },
+        {
+            "headerHtml": {
+                "default": "Горячее",
+                "values": []
+            },
+            "footerHtml": {
+                "default": "Конец горячего",
+                "values": []
+            },
+            "items": [
+            ]
+        }
+    ]
+}

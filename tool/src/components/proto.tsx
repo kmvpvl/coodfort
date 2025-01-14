@@ -181,7 +181,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		const [login, password] = this.getTokenPair(this.token);
 		const headers: Headers = new Headers();
 
-		if ("user" in window.Telegram?.WebApp.initDataUnsafe) {
+		if (window.Telegram !== undefined && "user" in window.Telegram?.WebApp.initDataUnsafe) {
 			headers.append("coodfort-tguid", window.Telegram.WebApp.initDataUnsafe.user.id.toString());
 			headers.append("coodfort-tgquerycheckstring", window.Telegram.WebApp.initData);
 		} else {

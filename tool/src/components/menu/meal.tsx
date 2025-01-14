@@ -12,6 +12,7 @@ export interface IMealProps extends IProtoProps {
 	mealId?: Types.ObjectId;
 	defaultValue?: IMeal;
 	admin?: boolean;
+	maximized?: boolean;
 	onSave?: (newValue: IMeal) => void;
 	onChange?: (newValue: IMeal) => void;
 }
@@ -27,6 +28,7 @@ export interface IMealState extends IProtoState {
 export default class Meal extends Proto<IMealProps, IMealState> {
 	state: IMealState = {
 		value: this.props.defaultValue ? this.props.defaultValue : this.new(),
+		maximized: this.props.maximized,
 	};
 
 	componentDidMount(): void {
@@ -70,6 +72,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 				if (!res.ok) return;
 				if (this.props.onSave !== undefined) this.props.onSave(res.meal);
 				const nState = this.state;
+				nState.value = res.meal;
 				nState.changed = false;
 				this.setState(nState);
 			},

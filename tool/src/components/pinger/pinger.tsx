@@ -9,6 +9,7 @@ export interface IPingerProps extends IProtoProps {
 }
 export interface IPingerState extends IProtoState {
 	serverVersion?: string;
+	extended?: boolean;
 }
 
 export default class Pinger extends Proto<IPingerProps, IPingerState> {
@@ -38,10 +39,17 @@ export default class Pinger extends Proto<IPingerProps, IPingerState> {
 			}
 		);
 	}
+	toggleExtended() {
+		const nState = this.state;
+		nState.extended = !nState.extended;
+		this.setState(nState);
+	}
 	render(): ReactNode {
+		const legend = ["⚬", "⚠", "☉"];
 		return (
-			<span className="pinger-container">
-				{this.state.serverStatus !== undefined ? ServerStatusCode[this.state.serverStatus] : "unknown"} {process.env.SERVER_BASE_URL} {this.state.serverVersion}
+			<span className="pinger-container" onClick={this.toggleExtended.bind(this)}>
+				{this.state.serverStatus !== undefined ? (this.state.extended ? ServerStatusCode[this.state.serverStatus] : legend[this.state.serverStatus]) : "unknown"}
+				{this.state.extended ? ` ${process.env.SERVER_BASE_URL} ${this.state.serverVersion}` : ""}
 			</span>
 		);
 	}

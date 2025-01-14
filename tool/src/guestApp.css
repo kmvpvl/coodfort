@@ -43,14 +43,14 @@
   object-fit: contain;
   border-radius: 50%;
 }
-.guest-app-reserve-container{
+.guest-app-checkin-container{
   width: 100%;
   height: 100%;
   display: grid;
   grid-template-rows: 1fr auto;
   gap: 0.5em;
 }
-.guest-app-reserve-container button {
+.guest-app-checkin-container button {
   font-size: large;
   height: 3em;
   width: 100%;
@@ -61,6 +61,18 @@
   font-size: 120%;
   font-weight: bold;
   overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+}
+
+.guest-app-nav-top-choosen {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: .5em;
 }
 
 .guest-app-nav-bottom {
@@ -75,6 +87,9 @@
   border: 1px solid;
   padding: 0.5em;
   border-radius: 0.5em;
+}
+.guest-app-nav-bottom span.stage.current {
+    background-color: gold;
 }
 .guest-app-nav-bottom span:not(.stage) {
   font-size: 200%;

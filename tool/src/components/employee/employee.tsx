@@ -87,7 +87,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 	}
 	updateEateriesList() {
 		this.serverCommand(
-			"employee/eateriesList",
+			"user/eateriesList",
 			undefined,
 			res => {
 				console.log(res);

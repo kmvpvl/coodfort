@@ -25,18 +25,20 @@ export default class Tags extends React.Component<ITagsProps, ITagsState> {
 			<div className={`tags-container ${this.props.editMode ? "has-caption" : ""}`}>
 				{this.props.editMode ? <div className="caption">TAGS</div> : <></>}
 				{this.state.value.map((s, idx) => (
-					<span key={idx}>
+					<span className="has-context-toolbar" key={idx}>
 						{s.toString()}
 						{this.props.editMode ? (
-							<span
-								data-index={idx}
-								onClick={event => {
-									const nState = this.state;
-									nState.value.splice(idx, 1);
-									this.setState(nState);
-									if (this.props.onChange !== undefined) this.props.onChange(this.value);
-								}}>
-								✕
+							<span className="context-toolbar">
+								<span
+									data-index={idx}
+									onClick={event => {
+										const nState = this.state;
+										nState.value.splice(idx, 1);
+										this.setState(nState);
+										if (this.props.onChange !== undefined) this.props.onChange(this.value);
+									}}>
+									⤬
+								</span>
 							</span>
 						) : (
 							<></>

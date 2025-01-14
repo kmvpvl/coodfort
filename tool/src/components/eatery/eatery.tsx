@@ -6,25 +6,38 @@ import MLStringEditor from "../mlstring/mlstring";
 import Tags from "../tags/tags";
 import Photos from "../photos/photos";
 import Menu from "../menu/menu";
+import React from "react";
 
 type EateryFocus = "none" | "profile" | "tables" | "menu" | "entertainments";
+
+export enum ViewModeCode {
+	compact = "compact",
+	normal = "normal",
+	maximized = "maximized",
+}
 
 export interface IEateryProps extends IProtoProps {
 	defaultValue?: IEatery;
 	admin?: boolean;
 	onSave?: (eatery: IEatery) => void;
+	viewMode?: ViewModeCode;
 }
 
 export interface IEateryState extends IProtoState {
 	value: IEatery;
 	editMode: boolean;
 	focus?: EateryFocus;
+	changed?: boolean;
+	viewMode: ViewModeCode;
 }
 
 export class Eatery extends Proto<IEateryProps, IEateryState> {
+	photosRef: React.RefObject<Photos | null> = React.createRef();
 	state: IEateryState = {
 		value: this.props.defaultValue ? this.props.defaultValue : this.new(),
 		editMode: false,
+		changed: false,
+		viewMode: this.props.viewMode === undefined ? ViewModeCode.normal : this.props.viewMode,
 	};
 
 	save() {
@@ -36,6 +49,10 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 				console.log(res);
 				if (!res.ok) return;
 				if (this.props.onSave !== undefined) this.props.onSave(res.eatery);
+				const nState = this.state;
+				nState.changed = false;
+				nState.value = res.eatery;
+				this.setState(nState);
 			},
 			err => {
 				console.log(err.json);
@@ -54,6 +71,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 				if (res.ok) {
 					const nState = this.state;
 					nState.value = res.eatery;
+					nState.changed = false;
 					this.setState(nState);
 				}
 			},
@@ -85,7 +103,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 				<div className="caption">EATERY: {this.toString(this.state.value.name)}</div>
 				<div className="toolbar">
 					<span onClick={this.save.bind(this)}>
-						<i className="fa fa-save" />
+						<i className="fa fa-save" style={this.state.changed ? { color: "red" } : {}} />
 					</span>
 					<span
 						onClick={event => {
@@ -109,6 +127,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 						onChange={newVal => {
 							const nState = this.state;
 							nState.value.name = newVal;
+							nState.changed = true;
 							this.setState(nState);
 						}}
 					/>
@@ -118,6 +137,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 						onChange={newTags => {
 							const nState = this.state;
 							nState.value.tags = newTags;
+							nState.changed = true;
 							this.setState(nState);
 						}}
 					/>
@@ -128,6 +148,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 						onChange={newVal => {
 							const nState = this.state;
 							nState.value.description = newVal;
+							nState.changed = true;
 							this.setState(nState);
 						}}
 					/>
@@ -138,6 +159,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 						onChange={newPhotos => {
 							const nState = this.state;
 							nState.value.photos = newPhotos;
+							nState.changed = true;
 							this.setState(nState);
 						}}
 					/>
@@ -148,6 +170,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 							const nState = this.state;
 							if (nState.value.url !== undefined) nState.value.url.caption = newVal;
 							else nState.value.url = { caption: newVal, url: "" };
+							nState.changed = true;
 							this.setState(nState);
 						}}
 					/>
@@ -160,6 +183,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 								const nState = this.state;
 								if (nState.value.url !== undefined) nState.value.url.url = event.currentTarget.value;
 								else nState.value.url = { caption: "", url: event.currentTarget.value };
+								nState.changed = true;
 								this.setState(nState);
 							}}
 						/>
@@ -171,6 +195,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 								onClick={event => {
 									const nState = this.state;
 									nState.value.tables.push({ name: "New table", tags: [] });
+									nState.changed = true;
 									this.setState(nState);
 								}}>
 								+
@@ -185,6 +210,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 									onChange={newVal => {
 										const nState = this.state;
 										nState.value.tables[idx].name = newVal;
+										nState.changed = true;
 										this.setState(nState);
 									}}
 								/>
@@ -194,6 +220,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 									onChange={newVal => {
 										const nState = this.state;
 										nState.value.tables[idx].tags = newVal;
+										nState.changed = true;
 										this.setState(nState);
 									}}
 								/>
@@ -204,6 +231,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 									onChange={newVal => {
 										const nState = this.state;
 										nState.value.tables[idx].photos = newVal;
+										nState.changed = true;
 										this.setState(nState);
 									}}
 								/>
@@ -215,6 +243,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 										onChange={event => {
 											const nState = this.state;
 											nState.value.tables[idx].guestCountMin = parseInt(event.currentTarget.value);
+											nState.changed = true;
 											this.setState(nState);
 										}}
 									/>
@@ -227,6 +256,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 										onChange={event => {
 											const nState = this.state;
 											nState.value.tables[idx].guestCountMax = parseInt(event.currentTarget.value);
+											nState.changed = true;
 											this.setState(nState);
 										}}
 									/>
@@ -238,10 +268,19 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 			</div>
 		);
 	}
+	renderCompact(): ReactNode {
+		return (
+			<div className="eatery-compact-container">
+				<Photos className="eatery-compact-photos" defaultValue={this.state.value.photos} />
+				<div>{this.toString(this.state.value.name)}</div>
+			</div>
+		);
+	}
 	render(): ReactNode {
 		if (this.state.editMode) return this.renderEditMode();
+		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
 		return (
-			<div className="eatery-container has-context-toolbar">
+			<div className={`eatery-container has-context-toolbar${this.state.viewMode === ViewModeCode.maximized ? " maximized" : ""}`}>
 				<div className="context-toolbar">
 					{this.props.admin ? (
 						<span
@@ -256,8 +295,26 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 					) : (
 						<></>
 					)}
+					{this.state.viewMode === ViewModeCode.maximized || this.state.viewMode === ViewModeCode.normal ? (
+						<span
+							onClick={event => {
+								const nState = this.state;
+								nState.viewMode = this.state.viewMode === ViewModeCode.maximized ? ViewModeCode.normal : ViewModeCode.maximized;
+								this.setState(nState);
+							}}>
+							{this.state.viewMode === ViewModeCode.maximized ? "⚊" : "⤢"}
+						</span>
+					) : (
+						<></>
+					)}
+					<span
+						onClick={event => {
+							this.photosRef.current?.qr(`${process.env.QR_BASE_URL}?startapp=eateryId_${this.state.value.id}`);
+						}}>
+						☷
+					</span>
 				</div>
-				<Photos defaultValue={this.state.value.photos} />
+				<Photos ref={this.photosRef} defaultValue={this.state.value.photos} />
 				<div className="eatery-name"> {this.toString(this.state.value.name)}</div>
 				<span className="eatery-description">{this.toString(this.state.value.description)}</span>
 			</div>

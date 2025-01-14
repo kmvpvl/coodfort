@@ -14,6 +14,8 @@
 }
 .menu-admin-meals-container {
     display: flex;
+    align-items: center;
+    gap: 1em;
 }
 .menu-container {
     width: fit-content;
@@ -23,9 +25,10 @@
 }
 
 .menu-chapter-container {
-    
+    display: block;
 }
 
 .menu-chapter-items-container {
     display: flex;
+    align-items: center;
 }

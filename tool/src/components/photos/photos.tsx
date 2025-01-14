@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import "./photos.css";
 import React from "react";
 import { IPhoto } from "@betypes/prototypes";
+import QRCode from "react-qr-code";
 
 export interface IPhotosProps {
 	defaultValue?: IPhoto[];
@@ -13,6 +14,7 @@ export interface IPhotosProps {
 export interface IPhotosState {
 	value: IPhoto[];
 	currentPhotoIndex?: number;
+	qr?: string;
 }
 
 export default class Photos extends React.Component<IPhotosProps, IPhotosState> {
@@ -62,6 +64,13 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 		const nState = this.state;
 		nState.currentPhotoIndex = nState.currentPhotoIndex !== undefined ? nState.currentPhotoIndex - 1 : 0;
 		if (nState.currentPhotoIndex < 0) nState.currentPhotoIndex = nState.value.length - 1;
+		this.setState(nState);
+	}
+	qr(text: string) {
+		if (this.props.editMode) return;
+		const nState = this.state;
+		nState.currentPhotoIndex = undefined;
+		nState.qr = text;
 		this.setState(nState);
 	}
 	componentDidUpdate(prevProps: Readonly<IPhotosProps>, prevState: Readonly<IPhotosState>, snapshot?: any): void {
@@ -178,7 +187,13 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 									}
 								}
 							}}>
-							{this.state.currentPhotoIndex !== undefined ? <img src={this.state.value[this.state.currentPhotoIndex].url}></img> : <img src={emptyDish} />}
+							{this.state.currentPhotoIndex !== undefined ? (
+								<img src={this.state.value[this.state.currentPhotoIndex].url}></img>
+							) : this.state.qr !== undefined ? (
+								<QRCode style={{ height: "auto", maxWidth: "100%", maxHeight: "100%" }} value={this.state.qr} size={256} viewBox={"0 0 256 256"} />
+							) : (
+								<img src={emptyDish} />
+							)}
 						</div>
 						<div className="photos-scroll">
 							{this.state.value.map((photo, idx) => (

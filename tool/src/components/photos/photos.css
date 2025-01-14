@@ -13,6 +13,7 @@
     justify-content:left;
     gap: 0.5em;
     width: 100%;
+    align-items: center;
 }
 
 .photo-admin-container {

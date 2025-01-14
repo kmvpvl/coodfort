@@ -204,24 +204,35 @@ describe('Checking Employee security', () => {
 });
 
 describe('Meals editing', () => {
+    let mealAmericano: any;
+    let mealSalad: any;
+    let mealChakho: any;
+    let mealKholo: any;
     test('Creating meal Americano', async () => {
         const meal1 = require('./americano.json');
-        const newMeal1 = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
-        expect(newMeal1.statusCode).toBe(200);
+        mealAmericano = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
+        expect(mealAmericano.statusCode).toBe(200);
     });
     test('Creating meal Salad', async () => {
         const meal1 = require('./salad.json');
-        const newMeal1 = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
-        expect(newMeal1.statusCode).toBe(200);
+        mealSalad = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
+        expect(mealSalad.statusCode).toBe(200);
     });
     test('Creating meal Chakhokhbilli', async () => {
         const meal1 = require('./chakhokhbili.json');
-        const newMeal1 = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
-        expect(newMeal1.statusCode).toBe(200);
+        mealChakho = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
+        expect(mealChakho.statusCode).toBe(200);
     });
     test('Creating meal Kholodets', async () => {
         const meal1 = require('./kholodets.json');
-        const newMeal1 = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
-        expect(newMeal1.statusCode).toBe(200);
+        mealKholo = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
+        expect(mealKholo.statusCode).toBe(200);
+    });
+    test('Creating menu', async () => {
+        const menu = require('./menu.json');
+        menu.chapters[0].items.push({ mealId: mealKholo.body.meal.id });
+        menu.chapters[1].items.push({ mealId: mealChakho.body.meal.id });
+        const newMenu = await request(app).post('/menu/update').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(menu);
+        expect(newMenu.statusCode).toBe(200);
     });
 });

@@ -3,13 +3,14 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import EmployeeApp from "./employeeApp";
 import GuestApp from "./guestApp";
+import { Types } from "@betypes/prototypes";
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
-
-window.Telegram.WebApp.expand();
+//debugger
+window.Telegram?.WebApp.expand();
 
 declare global {
 	interface Window {
-		Telegram: {
+		Telegram?: {
 			WebApp: {
 				initData: string;
 				initDataUnsafe: {
@@ -22,10 +23,10 @@ declare global {
 						language_code: string;
 						last_name: string;
 						first_name: string;
-						photo_url: string;
+						photo_url?: string;
 						username: string;
-						start_param: string;
 					};
+					start_param?: string;
 				};
 				expand: () => void;
 			};
@@ -37,15 +38,23 @@ function getContentByPath(): React.ReactNode {
 	const path = window.location.pathname.substring(1);
 	console.log("path", path);
 	const params = new URLSearchParams(window.location.search);
+	let eateryId: Types.ObjectId | undefined;
+	let tableId: Types.ObjectId | undefined;
+	if (window.Telegram?.WebApp.initDataUnsafe.start_param !== undefined) {
+		const pp = window.Telegram.WebApp.initDataUnsafe.start_param.split("__");
+		const map = pp.map(el => el.split("_"));
+		const eId = map.filter(el => el[0] === "eateryId");
+		if (eId.length > 0) eateryId = parseInt(eId[0][1]);
+		const tId = map.filter(el => el[0] === "tableId");
+		if (tId.length > 0) tableId = parseInt(tId[0][1]);
+	} else {
+		eateryId = params.get("eateryId") ? parseInt(params.get("eateryId") as string) : undefined;
+		tableId = params.get("tableId") ? parseInt(params.get("tableId") as string) : undefined;
+	}
+	//debugger
 	switch (path) {
 		case "guest":
-			return (
-				<GuestApp
-					mode={params.get("mode") ? (params.get("mode") as string) : undefined}
-					eateryId={params.get("eateryId") ? parseInt(params.get("eateryId") as string) : undefined}
-					tableId={params.get("tableId") ? parseInt(params.get("tableId") as string) : undefined}
-				/>
-			);
+			return <GuestApp mode={params.get("mode") ? (params.get("mode") as string) : undefined} eateryId={eateryId} tableId={tableId} />;
 		default:
 			return <EmployeeApp mode={path} />;
 	}
