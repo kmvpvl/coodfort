@@ -60,7 +60,7 @@
         grid-template-rows: auto 1fr;
     }
     .employee-app-logo {
-        grid-column: 1 / 4;
+        grid-column: span 3;
     }
     .employee-app-enter-info {
         grid-column: 1 / 4;
