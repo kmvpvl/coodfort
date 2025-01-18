@@ -4,7 +4,7 @@ import { Fragment, ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/proto";
 import "./guestApp.css";
 import Pending from "./components/pending";
-import Toaster from "./components/toast";
+import Toaster, { ToastType } from "./components/toast";
 import React from "react";
 import Logo from "./components/logo/logo";
 import Pinger from "./components/pinger/pinger";
@@ -13,6 +13,7 @@ import { IEatery, ITable } from "@betypes/eaterytypes";
 import { Eatery } from "./components/eatery/eatery";
 import { ViewModeCode } from "./components/proto";
 import { revealTelegramStartAppParams } from "./model/tools";
+import Menu from "./components/menu/menu";
 
 export interface IGuestAppProps extends IProtoProps {
 	mode?: string;
@@ -80,6 +81,33 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			}
 		);
 	}
+
+	informEateryTableInfo() {
+		this.toasterRef.current?.addToast({
+			type: ToastType.info,
+			message: (
+				<div>
+					<div>Вы выбрали заведение и столик верно?</div>
+					<button
+						onClick={event => {
+							const nState = this.state;
+							nState.choosenEatery = undefined;
+							nState.choosenTable = undefined;
+							nState.stage = "checkin";
+							this.setState(nState);
+						}}>
+						Нет, что-то пошло не так
+					</button>
+					<div>Сформируйте заказ. Если что-то забудете, то потом можно будет дополнить.</div>
+					<div>
+						Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the
+						internet.
+					</div>
+				</div>
+			),
+		});
+	}
+
 	checkEateryId() {
 		this.serverCommand(
 			"eatery/view",
@@ -273,15 +301,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	renderChoose(): ReactNode {
 		return (
 			<div className="guest-app-choose-container">
-				<div>
-					Вы выбрали заведение и столик верно?<button>Да, все ок!</button>
-					<button>Нет, что-то пошло не так</button>
-				</div>
-				<div>Сформируйте заказ. Если что-то забудете, то потом можно будет дополнить.</div>
-				<div>
-					Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the
-					Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected
-				</div>
+				<Menu menuId={this.state.choosenEatery?.id} />
 			</div>
 		);
 	}

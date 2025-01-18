@@ -1,72 +1,14 @@
 {
-    "name": "Americano",
+    "name": "Кофе Американо",
     "description": {
-        "default": "Coffee Americano (Brasilian arabica, middle roast)",
+        "default": "Brasilian arabica, middle roast",
         "values": [
             [
                 "ru",
-                "Кофе Американо (Арабика из Бразилии, средняя обжарка)"
+                "Арабика из Бразилии, средняя обжарка"
             ]
         ]
     },
-    "options": [
-        {
-            "volume": {
-                "default": "200 ml",
-                "values": [
-                    [
-                        "ru",
-                        "200 мл"
-                    ]
-                ]
-            },
-            "amount": 150,
-            "currency": {
-                "default": "RUR",
-                "values": [
-                    [
-                        "ru",
-                        "руб."
-                    ]
-                ]
-            },
-            "includeOptions": [
-                {
-                    "volume": "Coconut Syrup 10ml",
-                    "amount": 50,
-                    "currency": "RUR"
-                }
-            ]
-        },
-        {
-            "volume": {
-                "default": "300 ml",
-                "values": [
-                    [
-                        "ru",
-                        "300 мл"
-                    ]
-                ]
-            },
-            "amount": 250,
-            "currency": {
-                "default": "RUR",
-                "values": [
-                    [
-                        "ru",
-                        "руб."
-                    ]
-                ]
-            },
-            "includeOptions": [
-                {
-                    "volume": "Coconut Syrup 10ml",
-                    "amount": 50,
-                    "currency": "RUR"
-                }
-            ]
-        }
-    ],
     "photos": [
         {
             "caption": "",

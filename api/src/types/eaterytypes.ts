@@ -67,12 +67,12 @@ interface IEntertainment extends IDocument {}
 interface IDeliveryPartner extends IDocument {}
 interface IInvoice extends IDocument {}
 interface IPayment extends IDocument {}
-export interface IMealVolumeOption {
-    volume: Types.IMLString;
+export interface IMealOption {
+    name: Types.IMLString;
     amount: number;
     currency: Types.IMLString;
-    includeOptions?: IMealVolumeOption[];
-    excludeOptions?: IMealVolumeOption[];
+    includeOptions?: IMealOption[];
+    excludeOptions?: IMealOption[];
     esId?: string;
 }
 
@@ -82,21 +82,23 @@ export interface IMeal extends IDocument {
     eateryId?: Types.ObjectId;
     description: Types.IMLString;
     photos: IPhoto[];
-    options: IMealVolumeOption[];
     tags?: ITag[];
     esId?: string;
 }
 
 export interface IMenuItem {
     mealId?: Types.ObjectId;
+    options: IMealOption[];
     restrictions?: Types.IMLString[];
 }
 
 export interface IMenuChapter {
     items: IMenuItem[];
-    headerHtml: Types.IMLString;
-    footerHtml: Types.IMLString;
-    restrictions?: Types.IMLString[];
+    iconUrl?: string;
+    name: Types.IMLString;
+    headerHtml?: Types.IMLString;
+    footerHtml?: Types.IMLString;
+    restrictions?: Types.IMLString;
 }
 
 export interface IMenu extends IDocument {

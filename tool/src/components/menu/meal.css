@@ -1,7 +1,7 @@
 .meal-container {
     display: grid;
     /* Photo, description, price of all options*/
-    grid-template-rows: 1fr auto auto auto;
+    grid-template-rows: 1fr auto auto;
     width: 10em;
     height: 13em;
     position: relative;
@@ -31,41 +31,11 @@
     text-align: center;
 }
 
-.meal-meal-options {
-    display: flex;
-    font-size: 80%;
-    justify-content: space-around;
-}
-
-.meal-meal-option {
-    border-radius: 5px;
-    border: 1px dotted var(--text-color);
-    padding: 5px;
-    text-align: center;
-    display: grid;
-    grid-template-rows: auto 1fr;
-    grid-template-columns: auto 1fr;
-    cursor: pointer;
-    gap: 2px;
-    opacity: 0.3;
-}
-
-.meal-meal-option:hover,.selected {
-    opacity: 1;
-}
-
-.meal-meal-option-volume {
-    font-weight: bold;
-}
-.meal-meal-option-price {
-    font-size: 75%;
-}
-
 .meal-admin-container {
     max-height: 100%;
     min-height: fit-content;
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr;
     --overflow: hidden;
     gap: 0.5em;
 }
@@ -81,37 +51,4 @@
 
 .meal-admin-requisites-description {
     grid-column: span 2;
-}
-
-.meal-admin-options-list-container {
-    height: 100%;
-    max-height: 15em;
-    display: flex;
-    justify-content: space-between;
-}
-
-.meal-admin-options-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5em;
-    justify-content: space-between;
-    height: 100%;
-    overflow: auto;
-}
-
-.meal-admin-options-list > span {
-    display: grid;
-    grid-template-columns: 6em auto;
-    grid-template-rows: auto auto;
-    gap: 0.5em;
-}
-
-.meal-admin-options-list > span > :first-child {
-    --max-width: 9em;
-    grid-column: 1 / 3;
-}
-
-.meal-admin-options-list > span > input {
-    width: 100%;
-
 }

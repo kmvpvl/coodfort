@@ -11,12 +11,12 @@ export default class Pending extends React.Component<IPendingProps, IPendingStat
 	state: IPendingState = {
 		deepCount: 0,
 	};
-	incDeepCount() {
+	incUse() {
 		const nState = this.state;
 		nState.deepCount += 1;
 		this.setState(nState);
 	}
-	decDeepCount() {
+	decUse() {
 		const nState = this.state;
 		nState.deepCount -= 1;
 		this.setState(nState);
@@ -27,7 +27,7 @@ export default class Pending extends React.Component<IPendingProps, IPendingStat
 				{this.state.deepCount > 0 ? (
 					<div className="pending-container">
 						<span></span>
-						<span onClick={event => this.decDeepCount()}>Loading...</span>
+						<span onClick={event => this.decUse()}>Loading...</span>
 					</div>
 				) : (
 					<></>

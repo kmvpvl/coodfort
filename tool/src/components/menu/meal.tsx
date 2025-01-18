@@ -18,7 +18,6 @@ export interface IMealProps extends IProtoProps {
 }
 
 export interface IMealState extends IProtoState {
-	currentOptionSelected?: number;
 	maximized?: boolean;
 	editMode?: boolean;
 	value: IMeal;
@@ -40,7 +39,6 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 			name: "New meal",
 			description: "Mew meal description. Add photo!",
 			photos: [],
-			options: [],
 		};
 		return newMeal;
 	}
@@ -150,65 +148,6 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						this.setState(nState);
 					}}
 				/>
-				<div className="meal-admin-options-list-container has-caption">
-					<span className="caption">Options</span>
-					<div className="toolbar">
-						<span
-							onClick={event => {
-								const nState = this.state;
-								nState.value?.options.push({
-									volume: "",
-									amount: 0,
-									currency: "",
-								});
-								this.setState(nState);
-							}}>
-							+
-						</span>
-						<span>?</span>
-					</div>
-					<div className="meal-admin-options-list">
-						{this.state.value?.options.map((option, idx) => (
-							<span className="has-caption" key={idx}>
-								<MLStringEditor
-									defaultValue={option.volume}
-									caption="Volume"
-									onChange={newValue => {
-										const nState = this.state;
-										if (nState.value === undefined) return;
-										nState.changed = true;
-										nState.value.options[idx].volume = newValue;
-										this.setState(nState);
-									}}
-								/>
-								<input
-									type="number"
-									placeholder="Amount"
-									defaultValue={option.amount}
-									onChange={event => {
-										const nv = parseFloat(event.currentTarget.value);
-										if (!isNaN(nv)) {
-											const nState = this.state;
-											nState.changed = true;
-											nState.value.options[idx].amount = nv;
-											this.setState(nState);
-										}
-									}}></input>
-								<MLStringEditor
-									defaultValue={option.currency}
-									caption="Currency"
-									onChange={newValue => {
-										const nState = this.state;
-										if (nState.value === undefined) return;
-										nState.changed = true;
-										nState.value.options[idx].currency = newValue;
-										this.setState(nState);
-									}}
-								/>
-							</span>
-						))}
-					</div>
-				</div>
 			</div>
 		);
 	}
@@ -225,31 +164,9 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 				}}>
 				{this.state.value.photos !== undefined ? <Photos defaultValue={this.state.value.photos} /> : <span />}
 				<div className="meal-meal-name">
-					<span>{this.toString(this.state.value.name)}</span>
+					<span>{this.props.mealId !== undefined && this.state.value.id === undefined ? "" : this.toString(this.state.value.name)}</span>
 				</div>
-				<div className="meal-meal-description">{this.toString(this.state.value.description)}</div>
-				<div className="meal-meal-options">
-					{this.state.value.options.map((option, idx) => (
-						<span
-							className={`meal-meal-option${this.state.currentOptionSelected === idx ? " selected" : ""}`}
-							key={idx}
-							data-option-id={idx}
-							onClick={event => {
-								const optionId = event.currentTarget.attributes.getNamedItem("data-option-id")?.value;
-								if (optionId !== undefined) {
-									const nState = this.state;
-									nState.currentOptionSelected = parseInt(optionId);
-									this.setState(nState);
-								}
-							}}>
-							<span style={{ gridRow: "1 / 3" }}>{this.state.currentOptionSelected === idx ? "☑" : "☐"}</span>
-							<span className="meal-meal-option-volume">{this.toString(option.volume)}</span>
-							<span className="meal-meal-option-price">
-								{option.amount} {this.toString(option.currency)}
-							</span>
-						</span>
-					))}
-				</div>
+				<div className="meal-meal-description">{this.props.mealId !== undefined && this.state.value.id === undefined ? "Loading..." : this.toString(this.state.value.description)}</div>
 				<div className="context-toolbar">
 					{this.props.admin ? (
 						<span

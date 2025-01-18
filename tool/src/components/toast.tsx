@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import "./toast.css";
 /** ToastUID is type of unique identificator of the toast. It's used in events referenced with Toasts */
 type ToastUID = number;
@@ -15,9 +15,9 @@ interface IToast {
 	/**Reserved for future use */
 	code?: number;
 	/**Main message of toast. It's always visible if the toast is visible */
-	message: string;
+	message: string | ReactNode;
 	/**Extra message. If description is defined then Toast has ∴ button. User can see the description if ∴ button clicked by user. */
-	description?: string;
+	description?: string | ReactNode;
 	/**Count of seconds when the toast will be dissapeared without the user interaction. If autohide is undefined and the type of Toast is info, then Toaster set the 3 seconds to autohide as default */
 	autohide?: number;
 	/**If this parameter is set true then the Toast won't be deleted from Toaster on hide event. It will be marked as shown and will be saved in the Toaster for future use */

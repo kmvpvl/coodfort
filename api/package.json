@@ -1,6 +1,6 @@
 {
   "name": "coodfort-api",
-  "version": "1.0.56",
+  "version": "1.0.57",
   "main": "dist/index.js",
   "scripts": {
     "start:dev": "nodemon src/server.ts",

@@ -134,7 +134,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 				h.append(h1, h2);
 			}
 		}
-		this.pendingRef.current?.incDeepCount();
+		this.pendingRef.current?.incUse();
 		fetch(`${process.env.SERVER_BASE_URL}/${command}`, {
 			method: method,
 			headers: h,
@@ -145,7 +145,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 				return res.json();
 			})
 			.then(v => {
-				this.pendingRef.current?.decDeepCount();
+				this.pendingRef.current?.decUse();
 				const nStatus: IState = this.state;
 				nStatus.serverStatus = ServerStatusCode.connected;
 				this.setState(nStatus);
@@ -153,7 +153,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 				if (successcb) successcb(v);
 			})
 			.catch(v => {
-				this.pendingRef.current?.decDeepCount();
+				this.pendingRef.current?.decUse();
 				if (v instanceof Error) {
 					const nStatus: IState = this.state;
 					nStatus.serverStatus = ServerStatusCode.notAvailable;

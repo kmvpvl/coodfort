@@ -5,6 +5,7 @@ import { IMenu } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
 import MenuItem from "./menuitem";
 import { Types } from "@betypes/prototypes";
+import Meal from "./meal";
 
 export interface IMenuProps extends IProtoProps {
 	admin?: boolean;
@@ -21,6 +22,7 @@ export interface IMenuState extends IProtoState {
 	editMode?: boolean;
 	changed?: boolean;
 	viewMode: ViewModeCode;
+	currentChapterIndex?: number;
 }
 
 export default class Menu extends Proto<IMenuProps, IMenuState> {
@@ -29,6 +31,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 		editMode: this.props.editMode,
 		changed: false,
 		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.normal,
+		currentChapterIndex: this.props.defaultValue !== undefined && this.props.defaultValue.chapters.length > 0 ? 0 : undefined,
 	};
 	componentDidMount(): void {
 		if (this.props.defaultValue === undefined && this.props.menuId !== undefined) this.load();
@@ -44,6 +47,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 				const nState = this.state;
 				nState.changed = false;
 				nState.value = res.menu;
+				nState.currentChapterIndex = nState.value.chapters.length > 0 ? 0 : undefined;
 				this.setState(nState);
 			},
 			err => {
@@ -135,7 +139,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						<span
 							onClick={event => {
 								const nState = this.state;
-								nState.value.chapters.push({ headerHtml: "", footerHtml: "", items: [] });
+								nState.value.chapters.push({ name: "", items: [] });
 								nState.changed = true;
 								this.setState(nState);
 							}}>
@@ -146,6 +150,16 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						{this.state.value.chapters.map((chapter, idx) => (
 							<div className="has-caption" key={idx}>
 								<div className="caption">CHAPTER</div>
+								<MLStringEditor
+									caption="Chapter name"
+									defaultValue={this.toString(chapter.name)}
+									onChange={newVal => {
+										const nState = this.state;
+										nState.changed = true;
+										nState.value.chapters[idx].name = newVal;
+										this.setState(nState);
+									}}
+								/>
 								<MLStringEditor
 									caption="Chapter Header"
 									defaultValue={this.toString(chapter.headerHtml)}
@@ -184,14 +198,14 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 											event.currentTarget.classList.toggle("ready-to-drop", false);
 											console.log(meal);
 											const nState = this.state;
-											nState.value.chapters[idx].items.push({ mealId: meal.id });
+											nState.value.chapters[idx].items.push({ mealId: meal.id, options: [] });
 											nState.changed = true;
 											this.setState(nState);
 										}}>
 										Drop meals here
 									</div>
 									{chapter.items.map((item, iidx) => (
-										<MenuItem key={iidx} defaultValue={item} />
+										<MenuItem key={iidx} defaultValue={item} admin={true} editMode={true} />
 									))}
 								</div>
 								<MLStringEditor
@@ -238,23 +252,43 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
 		const menuHeader = this.toString(this.state.value.headerHtml);
 		const menuFooter = this.toString(this.state.value.footerHtml);
+		const curChapter = this.state.currentChapterIndex !== undefined ? this.state.value.chapters[this.state.currentChapterIndex] : undefined;
+
 		return (
 			<div className="menu-container">
-				{this.isHTML(menuHeader) ? <div dangerouslySetInnerHTML={{ __html: menuHeader }}></div> : <h1>{menuHeader}</h1>}
-				{this.state.value.chapters.map((chapter, idx) => (
-					<div className="menu-chapter-container" key={idx}>
-						{!this.isHTML(this.toString(chapter.headerHtml)) ? <h2 key={idx}>{this.toString(chapter.headerHtml)}</h2> : <div key={idx} dangerouslySetInnerHTML={{ __html: this.toString(chapter.headerHtml) }}></div>}
-						<div className="menu-chapter-items-container">
-							{chapter.items.map((item, idx) => (
-								<MenuItem key={idx} defaultValue={item} />
-							))}
-						</div>
-						<div dangerouslySetInnerHTML={{ __html: this.toString(chapter.footerHtml) }}></div>
-					</div>
-				))}
-				{this.isHTML(menuFooter) ? <div dangerouslySetInnerHTML={{ __html: menuFooter }}></div> : <h1>{menuFooter}</h1>}
-				<div className="context-toolbar">
-					{this.props.admin ? (
+				<div className="menu-toolbar-container"></div>
+				{this.isHTML(menuHeader) ? <div dangerouslySetInnerHTML={{ __html: menuHeader }}></div> : <span>{menuHeader}</span>}
+				<div className="menu-chapters-nav">
+					{this.state.value.chapters.map((chapter, idx) => (
+						<span
+							key={idx}
+							data-chapter-index={idx}
+							className={idx === this.state.currentChapterIndex ? "selected" : ""}
+							onClick={event => {
+								const nState = this.state;
+								const newIndex = event.currentTarget.attributes.getNamedItem("data-chapter-index")?.value;
+								if (newIndex === undefined) return;
+								nState.currentChapterIndex = parseInt(newIndex);
+								this.setState(nState);
+							}}>
+							{this.toString(chapter.name)}
+						</span>
+					))}
+				</div>
+				<div className="menu-chapter-container">
+					{curChapter !== undefined ? (
+						<>
+							{this.isHTML(this.toString(curChapter.headerHtml)) ? <div dangerouslySetInnerHTML={{ __html: this.toString(curChapter.headerHtml) }}></div> : <span>{this.toString(curChapter.headerHtml)}</span>}
+							<div className="menu-chapter-items-list">{curChapter?.items.map((menuItem, idx) => <MenuItem key={menuItem.mealId} defaultValue={menuItem} />)}</div>
+							{this.isHTML(this.toString(curChapter.footerHtml)) ? <div dangerouslySetInnerHTML={{ __html: this.toString(curChapter.footerHtml) }}></div> : <span>{this.toString(curChapter.footerHtml)}</span>}
+						</>
+					) : (
+						<></>
+					)}
+				</div>
+				{this.isHTML(menuFooter) ? <div dangerouslySetInnerHTML={{ __html: menuFooter }}></div> : <span>{menuFooter}</span>}
+				{this.props.admin !== undefined && this.props.admin ? (
+					<div className="context-toolbar">
 						<span
 							onClick={event => {
 								const nState = this.state;
@@ -263,14 +297,14 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 							}}>
 							✎
 						</span>
-					) : (
-						<></>
-					)}
-					<span>⤢</span>
-					<span>
-						<i className="fa fa-qrcode"></i>
-					</span>
-				</div>
+						<span>⤢</span>
+						<span>
+							<i className="fa fa-qrcode"></i>
+						</span>
+					</div>
+				) : (
+					<></>
+				)}
 			</div>
 		);
 	}

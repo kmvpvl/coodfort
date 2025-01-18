@@ -134,7 +134,8 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 
 		return (
 			<div className={this.state.exhibit === EmployeeAppExhibitViewCode.none ? "employee-app-container-notoken-none" : "employee-app-container-notoken-choosen"}>
-				<Logo className="employee-app-logo"
+				<Logo
+					className="employee-app-logo"
 					onClick={() => {
 						const nState = this.state;
 						nState.exhibit = EmployeeAppExhibitViewCode.none;

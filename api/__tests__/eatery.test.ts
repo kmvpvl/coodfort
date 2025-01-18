@@ -205,9 +205,21 @@ describe('Checking Employee security', () => {
 
 describe('Meals editing', () => {
     let mealAmericano: any;
+    let mealTea: any;
+    let mealTea1: any;
     let mealSalad: any;
     let mealChakho: any;
     let mealKholo: any;
+    test('Creating meal Tea', async () => {
+        const meal1 = require('./tea.json');
+        mealTea = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
+        expect(mealTea.statusCode).toBe(200);
+    });
+    test('Creating meal Tea1', async () => {
+        const meal1 = require('./tea1.json');
+        mealTea1 = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
+        expect(mealTea1.statusCode).toBe(200);
+    });
     test('Creating meal Americano', async () => {
         const meal1 = require('./americano.json');
         mealAmericano = await request(app).post('/meal/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(meal1);
@@ -230,8 +242,122 @@ describe('Meals editing', () => {
     });
     test('Creating menu', async () => {
         const menu = require('./menu.json');
-        menu.chapters[0].items.push({ mealId: mealKholo.body.meal.id });
-        menu.chapters[1].items.push({ mealId: mealChakho.body.meal.id });
+        menu.chapters[0].items.push({
+            mealId: mealKholo.body.meal.id,
+            options: [
+                {
+                    name: {
+                        default: '250 гр.',
+                        values: [],
+                    },
+                    amount: 89,
+                    currency: {
+                        default: 'руб.',
+                        values: [],
+                    },
+                },
+            ],
+        });
+        menu.chapters[1].items.push({
+            mealId: mealChakho.body.meal.id,
+            options: [
+                {
+                    name: {
+                        default: '350 гр.',
+                        values: [],
+                    },
+                    amount: 650,
+                    currency: {
+                        default: 'руб',
+                        values: [],
+                    },
+                },
+            ],
+        });
+        menu.chapters[0].items.push({
+            mealId: mealSalad.body.meal.id,
+            options: [
+                {
+                    name: {
+                        default: '350 гр.',
+                        values: [],
+                    },
+                    amount: 300,
+                    currency: {
+                        default: 'руб.',
+                        values: [],
+                    },
+                },
+            ],
+        });
+        menu.chapters[2].items.push({
+            mealId: mealAmericano.body.meal.id,
+            options: [
+                {
+                    name: {
+                        default: '200 ml',
+                        values: [['ru', '200 мл']],
+                    },
+                    amount: 150,
+                    currency: {
+                        default: 'RUR',
+                        values: [['ru', 'руб.']],
+                    },
+                    includeOptions: [
+                        {
+                            name: 'Coconut Syrup 10ml',
+                            amount: 50,
+                            currency: 'RUR',
+                        },
+                    ],
+                },
+                {
+                    name: {
+                        default: '300 ml',
+                        values: [['ru', '300 мл']],
+                    },
+                    amount: 250,
+                    currency: {
+                        default: 'RUR',
+                        values: [['ru', 'руб.']],
+                    },
+                    includeOptions: [
+                        {
+                            name: 'Coconut Syrup 10ml',
+                            amount: 50,
+                            currency: 'RUR',
+                        },
+                    ],
+                },
+            ],
+        });
+        menu.chapters[2].items.push({
+            mealId: mealTea.body.meal.id,
+            options: [
+                {
+                    name: {
+                        default: '200 ml',
+                        values: [['ru', '200 мл']],
+                    },
+                    amount: 99,
+                    currency: {
+                        default: 'RUR',
+                        values: [['ru', 'руб.']],
+                    },
+                },
+                {
+                    name: {
+                        default: 'with honey',
+                        values: [['ru', 'с медом']],
+                    },
+                    amount: 150,
+                    currency: {
+                        default: 'RUR',
+                        values: [['ru', 'руб.']],
+                    },
+                },
+            ],
+        });
         const newMenu = await request(app).post('/menu/update').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(menu);
         expect(newMenu.statusCode).toBe(200);
     });

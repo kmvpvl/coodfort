@@ -1,42 +1,36 @@
 {
     "name": "New menu",
     "headerHtml": {
-        "default": "Меню Корчмы",
+        "default": "<center>Приятного аппетита!</center>",
         "values": []
     },
     "footerHtml": {
-        "default": "Конец меню Корчмы",
+        "default": "Именинникам скидка 10%",
         "values": []
     },
     "chapters": [
         {
-            "headerHtml": {
+            "name": {
                 "default": "Холодные закуски",
-                "values": [
-                    [
-                        "",
-                        ""
-                    ]
-                ]
+                "values": [[]]
             },
-            "footerHtml": {
-                "default": "Конец холодных закусок",
-                "values": []
-            },
-            "items": [
-            ]
+            "headerHtml": "Овощи, сыр, мясо и фрукты",
+            "items": []
         },
         {
-            "headerHtml": {
-                "default": "Горячее",
+            "name": {
+                "default": "Горячие мясные блюда",
                 "values": []
             },
-            "footerHtml": {
-                "default": "Конец горячего",
+            "items": []
+        },
+        {
+            "name": {
+                "default": "Горячие безалкогольные напитки",
                 "values": []
             },
-            "items": [
-            ]
+            "headerHtml": "Кофе, чай, ягодные напитки",
+            "items": []
         }
     ]
 }
