@@ -6,12 +6,12 @@ import { Types } from "@betypes/prototypes";
 export interface IOrderProps extends IProtoProps {
 	defaultValue?: IOrder;
 	viewMode?: ViewModeCode;
-    orderId?: Types.ObjectId;
+	orderId?: Types.ObjectId;
 }
 export interface IOrderState extends IProtoState {
 	value: IOrder;
 	viewMode: ViewModeCode;
-    changed?: boolean;
+	changed?: boolean;
 }
 
 export default class Order extends Proto<IOrderProps, IOrderState> {
@@ -19,15 +19,15 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 		value: this.props.defaultValue !== undefined ? this.props.defaultValue : this.new(),
 		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.compact,
 	};
-    get value(): IOrder {
-        return this.state.value;
-    }
-    addNewOrderItem(item: IOrderItem) {
-        const nState = this.state;
-        nState.value.items.push(item);
-        this.setState(nState);
-        this.save();
-    }
+	get value(): IOrder {
+		return this.state.value;
+	}
+	addNewOrderItem(item: IOrderItem) {
+		const nState = this.state;
+		nState.value.items.push(item);
+		this.setState(nState);
+		this.save();
+	}
 	new(): IOrder {
 		return {
 			items: [],
@@ -72,29 +72,44 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 	renderCompact(): ReactNode {
 		const sum = this.state.value.items.reduce((prevVal, curItem) => prevVal + curItem.option.amount * curItem.count, 0);
 		return (
-			<div className="order-compact-container"
-                onClick={event => {
-                    this.setState({...this.state, viewMode: ViewModeCode.normal});
-                }}
-            >
-				<div><i className="fa fa-shopping-basket"></i>Total: {sum}</div>
+			<div
+				className="order-compact-container"
+				onClick={event => {
+					this.setState({ ...this.state, viewMode: ViewModeCode.normal });
+				}}>
+				<div>
+					<i className="fa fa-shopping-basket"></i>Total: {sum}
+				</div>
 			</div>
 		);
 	}
 	render(): ReactNode {
 		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
 		const sum = this.state.value.items.reduce((prevVal, curItem) => prevVal + curItem.option.amount * curItem.count, 0);
-		return <div className="order-container">
-            <div
-                onClick={event=>this.setState({...this.state, viewMode: ViewModeCode.compact})} 
-                className="order-grid">
-                <div style={{gridColumn: "span 5"}}>Your order</div>
-                <div>#</div><div>Name</div><div>Price</div><div>Count</div><div>Cost</div>
-                {this.state.value.items.map((item, idx)=><Fragment key={idx}> 
-                    <div>{idx}</div><div key={idx}>{this.toString(item.name)}</div><div>{item.option.amount}</div><div>{item.count}</div><div>{item.count*item.option.amount}</div>
-                </Fragment>)}
-                <div style={{gridColumn: "span 4"}}><i className="fa fa-shopping-basket"></i>Total:</div><div>{sum}</div>
-            </div>
-        </div>;
+		return (
+			<div className="order-container">
+				<div onClick={event => this.setState({ ...this.state, viewMode: ViewModeCode.compact })} className="order-grid">
+					<div style={{ gridColumn: "span 5" }}>Your order</div>
+					<div>#</div>
+					<div>Name</div>
+					<div>Price</div>
+					<div>Count</div>
+					<div>Cost</div>
+					{this.state.value.items.map((item, idx) => (
+						<Fragment key={idx}>
+							<div>{idx}</div>
+							<div key={idx}>{this.toString(item.name)}</div>
+							<div>{item.option.amount}</div>
+							<div>{item.count}</div>
+							<div>{item.count * item.option.amount}</div>
+						</Fragment>
+					))}
+					<div style={{ gridColumn: "span 4" }}>
+						<i className="fa fa-shopping-basket"></i>Total:
+					</div>
+					<div>{sum}</div>
+				</div>
+			</div>
+		);
 	}
 }
