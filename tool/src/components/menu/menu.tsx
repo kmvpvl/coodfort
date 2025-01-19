@@ -1,11 +1,12 @@
 import { ReactNode } from "react";
 import "./menu.css";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
-import { IMenu } from "@betypes/eaterytypes";
+import { IMenu, IMenuItem } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
 import MenuItem from "./menuitem";
 import { Types } from "@betypes/prototypes";
 import Meal from "./meal";
+import { IOrderItem } from "@betypes/ordertypes";
 
 export interface IMenuProps extends IProtoProps {
 	admin?: boolean;
@@ -13,6 +14,7 @@ export interface IMenuProps extends IProtoProps {
 	defaultValue?: IMenu;
 	onSave?: (newValue: IMenu) => void;
 	onChange?: (newValue: IMenu) => void;
+	onSelectMenuItem?: (item: IOrderItem) => void;
 	viewMode?: ViewModeCode;
 	menuId?: Types.ObjectId;
 }
@@ -279,7 +281,19 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 					{curChapter !== undefined ? (
 						<>
 							{this.isHTML(this.toString(curChapter.headerHtml)) ? <div dangerouslySetInnerHTML={{ __html: this.toString(curChapter.headerHtml) }}></div> : <span>{this.toString(curChapter.headerHtml)}</span>}
-							<div className="menu-chapter-items-list">{curChapter?.items.map((menuItem, idx) => <MenuItem key={menuItem.mealId} defaultValue={menuItem} />)}</div>
+							<div className="menu-chapter-items-list">
+								{curChapter?.items.map((menuItem, idx) => (
+									<MenuItem
+										key={menuItem.mealId}
+										defaultValue={menuItem}
+										onSelectOption={(meal, option) => {
+											if (this.props.onSelectMenuItem !== undefined) {
+												this.props.onSelectMenuItem({ ...meal, option: option, count: 1 });
+											}
+										}}
+									/>
+								))}
+							</div>
 							{this.isHTML(this.toString(curChapter.footerHtml)) ? <div dangerouslySetInnerHTML={{ __html: this.toString(curChapter.footerHtml) }}></div> : <span>{this.toString(curChapter.footerHtml)}</span>}
 						</>
 					) : (

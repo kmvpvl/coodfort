@@ -3,7 +3,6 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import EmployeeApp from "./employeeApp";
 import GuestApp from "./guestApp";
-import { Types } from "@betypes/prototypes";
 import { takeApartTelegramStartAppParams } from "./model/tools";
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 //debugger

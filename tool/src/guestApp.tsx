@@ -9,11 +9,13 @@ import React from "react";
 import Logo from "./components/logo/logo";
 import Pinger from "./components/pinger/pinger";
 import { Html5Qrcode } from "html5-qrcode";
-import { IEatery, ITable } from "@betypes/eaterytypes";
+import { IEatery, IMenuItem, ITable } from "@betypes/eaterytypes";
 import { Eatery } from "./components/eatery/eatery";
 import { ViewModeCode } from "./components/proto";
 import { revealTelegramStartAppParams } from "./model/tools";
 import Menu from "./components/menu/menu";
+import Order from "./components/order/order";
+import { IOrder, IOrderItem } from "@betypes/ordertypes";
 
 export interface IGuestAppProps extends IProtoProps {
 	mode?: string;
@@ -36,6 +38,7 @@ export interface IGuestAppState extends IProtoState {
 	connected?: boolean;
 	scanner?: Html5Qrcode;
 	stage?: string;
+	order?: IOrder;
 }
 
 export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
@@ -44,6 +47,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		eateryId: this.props.eateryId,
 		tableId: this.props.tableId,
 	};
+
 	init() {
 		this.login(
 			undefined,
@@ -298,10 +302,17 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			</div>
 		);
 	}
+	onSelectMenuItem(newItem: IOrderItem) {
+		const nState = this.state;
+		if (nState.order === undefined) nState.order = { discount: 1, items: [] };
+		nState.order.items.push({ ...newItem, count: 1 });
+		this.setState(nState);
+	}
 	renderChoose(): ReactNode {
 		return (
 			<div className="guest-app-choose-container">
-				<Menu menuId={this.state.choosenEatery?.id} />
+				<Menu menuId={this.state.choosenEatery?.id} onSelectMenuItem={this.onSelectMenuItem.bind(this)} />
+				<Order defaultValue={this.state.order} />
 			</div>
 		);
 	}

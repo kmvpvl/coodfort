@@ -80,6 +80,10 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 		);
 	}
 
+	get value(): IMeal {
+		return this.state.value;
+	}
+
 	renderEditMode(): ReactNode {
 		return (
 			<div className="meal-admin-container has-caption">

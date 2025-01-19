@@ -3,8 +3,9 @@ import Proto, { IProtoProps, IProtoState } from "../proto";
 import "./menuitem.css";
 import Meal, { IMealProps, IMealState } from "./meal";
 import { Types } from "@betypes/prototypes";
-import { IMenuItem } from "@betypes/eaterytypes";
+import { IMeal, IMealOption, IMenuItem } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
+import React from "react";
 
 export interface IMenuItemProps extends IProtoProps {
 	defaultValue?: IMenuItem;
@@ -13,6 +14,7 @@ export interface IMenuItemProps extends IProtoProps {
 	editMode?: boolean;
 	onSave?: (newValue: IMenuItem) => void;
 	onChange?: (newValue: IMenuItem) => void;
+	onSelectOption?: (meal: IMeal, option: IMealOption) => void;
 }
 export interface IMenuItemState extends IProtoState {
 	value: IMenuItem;
@@ -23,6 +25,7 @@ export interface IMenuItemState extends IProtoState {
 }
 
 export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
+	protected mealRef: React.RefObject<Meal | null> = React.createRef();
 	state: IMenuItemState = {
 		value: this.props.defaultValue !== undefined ? this.props.defaultValue : this.new(),
 		editMode: this.props.editMode,
@@ -103,7 +106,7 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 		if (this.state.editMode) return this.renderEditMode();
 		return (
 			<span className={`menu-item-container${this.state.maximized ? " maximized" : ""}`}>
-				<Meal mealId={this.state.value.mealId} />
+				<Meal mealId={this.state.value.mealId} ref={this.mealRef} />
 				<div className="menu-item-options">
 					{this.state.value.options?.map((option, idx) => (
 						<span
@@ -116,6 +119,7 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 									const nState = this.state;
 									nState.currentOptionSelected = parseInt(optionId);
 									this.setState(nState);
+									if (this.props.onSelectOption && this.mealRef.current) this.props.onSelectOption(this.mealRef.current.value, this.state.value.options[parseInt(optionId)]);
 								}
 							}}>
 							<span style={{ gridRow: "1 / 3" }}>{this.state.currentOptionSelected === idx ? "☑" : "☐"}</span>
