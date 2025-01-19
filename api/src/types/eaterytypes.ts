@@ -21,7 +21,7 @@ export interface ITable extends IDocument {
 export interface IEatery extends IDocument {
     name: Types.IMLString;
     employees: {
-        employeeId: Types.ObjectId;
+        userId: Types.ObjectId;
         roles: EateryRoleCode;
         objects?: {
             type: string;
@@ -78,7 +78,7 @@ export interface IMealOption {
 
 export interface IMeal extends IDocument {
     name: Types.IMLString;
-    employeeId?: Types.ObjectId;
+    userId?: Types.ObjectId;
     eateryId?: Types.ObjectId;
     description: Types.IMLString;
     photos: IPhoto[];
@@ -102,7 +102,7 @@ export interface IMenuChapter {
 }
 
 export interface IMenu extends IDocument {
-    employeeId?: Types.ObjectId;
+    userId?: Types.ObjectId;
     name: string;
     headerHtml: Types.IMLString;
     footerHtml: Types.IMLString;

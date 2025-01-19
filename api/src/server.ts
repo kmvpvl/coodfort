@@ -14,6 +14,7 @@ import { updateMeal, updateMenu, viewMeal, viewMenu } from './api/meal';
 import cors from 'cors';
 import { Telegraf } from 'telegraf';
 import { User } from './model/user';
+import { updateOrder, viewOrder } from './api/order';
 
 configDotenv();
 const TGTOKEN = process.env.tgtoken;
@@ -93,6 +94,8 @@ api.register({
     userEateriesList: userEateriesList,
     userMealsList: userMealsList,
     userMenusList: userMenusList,
+    updateOrder: updateOrder,
+    viewOrder: viewOrder,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {

@@ -23,4 +23,6 @@ export interface IOrder extends IDocument {
     tableId?: Types.ObjectId;
     items: IOrderItem[];
     discount: number;
+    comment?: string;
+    esId?: string;
 }

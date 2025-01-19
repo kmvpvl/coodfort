@@ -9,11 +9,11 @@ export async function updateMeal(c: Context, req: Request, res: Response, user: 
     try {
         const meal = new Meal();
         if (req.body.id === undefined) {
-            req.body.employeeId = user.id;
+            req.body.userId = user.id;
         } else {
             const tempMeal = new Meal(req.body.id);
             await tempMeal.load();
-            if (tempMeal.data.employeeId !== user.id) return res.status(403).json({ ok: false, error: `` });
+            if (tempMeal.data.userId !== user.id) return res.status(403).json({ ok: false, error: `` });
         }
         meal.checkMandatory(req.body);
         await meal.load(req.body);
@@ -43,11 +43,11 @@ export async function updateMenu(c: Context, req: Request, res: Response, user: 
     try {
         const menu = new Menu();
         if (req.body.id === undefined) {
-            req.body.employeeId = user.id;
+            req.body.userId = user.id;
         } else {
             const tempMenu = new Menu(req.body.id);
             await tempMenu.load();
-            if (tempMenu.data.employeeId !== user.id) return res.status(403).json({ ok: false, error: `` });
+            if (tempMenu.data.userId !== user.id) return res.status(403).json({ ok: false, error: `` });
         }
         menu.checkMandatory(req.body);
         await menu.load(req.body);

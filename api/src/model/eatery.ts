@@ -2,9 +2,9 @@ import { Document, IDocumentDataSchema, IDocumentWFSchema } from './protodocumen
 import { WorkflowStatusCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
 import { EateryRoleCode, IEatery } from '../types/eaterytypes';
+import { IOrder } from '../types/ordertypes';
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
-
 interface IEateryWFSchema extends IDocumentWFSchema {}
 
 export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema> {
@@ -45,7 +45,7 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
                     tableName: 'employees',
                     idFieldName: 'id',
                     fields: [
-                        { name: `employeeId`, type: 'bigint(20)', required: true },
+                        { name: `userId`, type: 'bigint(20)', required: true },
                         { name: `roles`, type: 'varchar(2048)' },
                     ],
                 },
@@ -82,7 +82,50 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
         };
     }
 
-    checkRoles(roleToCheck: EateryRoleCode, employeeId: Types.ObjectId): boolean {
-        return this.data.employees.some(empl => empl.employeeId === employeeId && (empl.roles === roleToCheck || empl.roles === EateryRoleCode.owner));
+    checkRoles(roleToCheck: EateryRoleCode, userId: Types.ObjectId): boolean {
+        return this.data.employees.some(empl => empl.userId === userId && (empl.roles === roleToCheck || empl.roles === EateryRoleCode.owner));
+    }
+}
+
+interface IOrderDataSchema extends IDocumentDataSchema {}
+interface IOrderyWFSchema extends IDocumentWFSchema {}
+
+export class Order extends Document<IOrder, IOrderDataSchema, IOrderyWFSchema> {
+    get dataSchema(): IEateryDataSchema {
+        return {
+            idFieldName: 'id',
+            tableName: 'orders',
+            relatedTablesPrefix: 'order_',
+            fields: [
+                { name: `userId`, type: 'bigint(20)', required: false, comment: '' },
+                { name: `eateryId`, type: 'bigint(20)', comment: '' },
+                { name: 'tableId', type: 'bigint(20)', comment: '' },
+                { name: `items`, type: 'json', comment: '' },
+                { name: `discount`, type: 'float', comment: '' },
+                { name: `comment`, type: 'varchar(2048)', comment: '' },
+                { name: `esId`, type: 'varchar(256)', required: false },
+            ],
+        };
+    }
+
+    get wfSchema(): IEateryWFSchema {
+        return {
+            tableName: 'orders',
+            initialState: WorkflowStatusCode.draft,
+            transfers: [
+                {
+                    from: WorkflowStatusCode.draft,
+                    to: WorkflowStatusCode.registered,
+                },
+                {
+                    from: WorkflowStatusCode.registered,
+                    to: WorkflowStatusCode.approved,
+                },
+                {
+                    from: WorkflowStatusCode.approved,
+                    to: WorkflowStatusCode.processing,
+                },
+            ],
+        };
     }
 }

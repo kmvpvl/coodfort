@@ -56,7 +56,7 @@ export async function viewEatery(c: Context, req: Request, res: Response, user: 
     try {
         const eatery = new Eatery(id);
         await eatery.load();
-        if (-1 === eatery.data.employees.findIndex(empl => empl.employeeId === user.id)) eatery.data.employees = [];
+        if (-1 === eatery.data.employees.findIndex(empl => empl.userId === user.id)) eatery.data.employees = [];
         return res.status(200).json({ ok: true, eatery: eatery.data });
     } catch (e: any) {
         if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });

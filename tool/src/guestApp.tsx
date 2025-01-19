@@ -33,16 +33,15 @@ export interface IGuestAppState extends IProtoState {
 	tableId?: Types.ObjectId;
 	choosenTable?: ITable;
 	itemMenuId?: Types.ObjectId;
-	orderId?: Types.ObjectId;
 	passwordWrong?: boolean;
 	connected?: boolean;
 	scanner?: Html5Qrcode;
 	stage?: string;
-	order?: IOrder;
 }
 
 export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	protected toasterRef = React.createRef<Toaster>();
+	protected orderRef = React.createRef<Order>();
 	state: IGuestAppState = {
 		eateryId: this.props.eateryId,
 		tableId: this.props.tableId,
@@ -303,16 +302,13 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		);
 	}
 	onSelectMenuItem(newItem: IOrderItem) {
-		const nState = this.state;
-		if (nState.order === undefined) nState.order = { discount: 1, items: [] };
-		nState.order.items.push({ ...newItem, count: 1 });
-		this.setState(nState);
+		this.orderRef.current?.addNewOrderItem(newItem);
 	}
 	renderChoose(): ReactNode {
 		return (
 			<div className="guest-app-choose-container">
 				<Menu menuId={this.state.choosenEatery?.id} onSelectMenuItem={this.onSelectMenuItem.bind(this)} />
-				<Order defaultValue={this.state.order} />
+				<Order ref={this.orderRef}/>
 			</div>
 		);
 	}

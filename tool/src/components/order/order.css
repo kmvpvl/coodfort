@@ -1,0 +1,33 @@
+.order-container, .order-compact-container {
+    position: absolute;
+    right: 0em;
+    bottom: 0em;
+    background-color: var(--background-color);
+    padding: 1em;
+}
+
+.order-grid {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto auto;
+    border-left: 1px solid;
+    border-top: 1px solid;
+    max-height: 50%;
+    overflow: auto;
+    --max-width: 67%;
+}
+
+.order-grid div {
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+    padding: 5px;
+}
+
+.order-grid div:nth-child(-n+6) {
+    font-weight: bold;
+    text-align: center;
+}
+
+.order-grid div:nth-child(1) {
+    text-align: left;
+    font-weight: normal;
+}

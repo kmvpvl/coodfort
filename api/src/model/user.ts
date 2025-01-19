@@ -81,7 +81,7 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
     }
     async createEatery(eateryData: IEatery): Promise<Eatery> {
         eateryData.employees.push({
-            employeeId: this.id,
+            userId: this.id,
             roles: EateryRoleCode.owner,
         });
         const eatery = new Eatery(eateryData);
@@ -100,7 +100,7 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
 
     async eateriesList(): Promise<IEateryBrief[]> {
         const sql =
-            'select `eateries`.*, `linkedEateries`.`roles` from (SELECT `eatery_employees`.`eatery_id` as `id`, `roles` FROM `eatery_employees` WHERE `eatery_employees`.`employeeId` = ?) as `linkedEateries` INNER join `eateries` on `linkedEateries`.`id` = `eateries`.`id`';
+            'select `eateries`.*, `linkedEateries`.`roles` from (SELECT `eatery_employees`.`eatery_id` as `id`, `roles` FROM `eatery_employees` WHERE `eatery_employees`.`userId` = ?) as `linkedEateries` INNER join `eateries` on `linkedEateries`.`id` = `eateries`.`id`';
         mconsole.sqlq(sql, [this.id]);
         const [rows, fields] = await this.sqlConnection.query<IEateryBrief[]>(sql, [this.id]);
         const schema = new Eatery().dataSchema;
@@ -110,7 +110,7 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
     }
 
     async mealsList(eateryId?: Types.ObjectId): Promise<IMealRow[]> {
-        const sql = `select \`meals\`.* from \`meals\` where \`employeeId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ?' : ''}`;
+        const sql = `select \`meals\`.* from \`meals\` where \`userId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ?' : ''}`;
         const params = [this.id];
         if (eateryId !== undefined) params.push(eateryId);
         mconsole.sqlq(sql, params);
@@ -122,7 +122,7 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
     }
 
     async menusList(eateryId?: Types.ObjectId): Promise<IMenuRow[]> {
-        const sql = `select \`menus\`.* from \`menus\` where \`employeeId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ?' : ''}`;
+        const sql = `select \`menus\`.* from \`menus\` where \`userId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ?' : ''}`;
         const params = [this.id];
         if (eateryId !== undefined) params.push(eateryId);
         mconsole.sqlq(sql, params);

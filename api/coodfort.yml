@@ -89,35 +89,42 @@ paths:
   /meal/new:
     post:
       operationId: newMeal
-      security: []      
       responses:
         '200':
           description: OK
   /meal/view:
     post:
       operationId: viewMeal
-      security: []      
       responses:
         '200':
           description: OK
   /meal/update:
     post:
       operationId: updateMeal
-      security: []      
       responses:
         '200':
           description: OK
   /menu/update:
     post:
       operationId: updateMenu
-      security: []      
       responses:
         '200':
           description: OK
   /menu/view:
     post:
       operationId: viewMenu
-      security: []      
+      responses:
+        '200':
+          description: OK
+  /order/view:
+    post:
+      operationId: viewOrder
+      responses:
+        '200':
+          description: OK
+  /order/update:
+    post:
+      operationId: updateOrder
       responses:
         '200':
           description: OK
