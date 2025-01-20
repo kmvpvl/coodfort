@@ -22,7 +22,6 @@ export interface IGuestAppProps extends IProtoProps {
 	eateryId?: Types.ObjectId;
 	tableId?: Types.ObjectId;
 	itemMenuId?: Types.ObjectId;
-	orderId?: Types.ObjectId;
 }
 
 const OrderStages = ["CheckIn", "Choose", "Pay", "Enjoy"];
@@ -37,6 +36,7 @@ export interface IGuestAppState extends IProtoState {
 	connected?: boolean;
 	scanner?: Html5Qrcode;
 	stage?: string;
+	orders?: IOrder[];
 }
 
 export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
@@ -85,6 +85,25 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		);
 	}
 
+	updateOrdersList() {
+		this.serverCommand(
+			"user/ordersList",
+			undefined,
+			res => {
+				console.log(res);
+				if (res.ok) {
+					const nState = this.state;
+					nState.orders = res.orders;
+
+					this.setState(nState);
+				}
+			},
+			err => {
+				console.log(err.json);
+			}
+		);
+	}
+
 	informEateryTableInfo() {
 		this.toasterRef.current?.addToast({
 			type: ToastType.info,
@@ -127,6 +146,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 				}
 				this.state.stage = "choose";
 				this.setState(nState);
+				this.updateOrdersList();
 			},
 			err => {
 				console.log(err.json);
@@ -308,7 +328,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		return (
 			<div className="guest-app-choose-container">
 				<Menu menuId={this.state.choosenEatery?.id} onSelectMenuItem={this.onSelectMenuItem.bind(this)} />
-				<Order ref={this.orderRef} />
+				<Order ref={this.orderRef} orderId={this.state.orders?.at(0)?.id} />
 			</div>
 		);
 	}

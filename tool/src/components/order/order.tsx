@@ -22,6 +22,9 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 	get value(): IOrder {
 		return this.state.value;
 	}
+	componentDidMount(): void {
+		if (this.props.defaultValue === undefined && this.props.orderId !== undefined) this.load();
+	}
 	addNewOrderItem(item: IOrderItem) {
 		const nState = this.state;
 		nState.value.items.push(item);

@@ -81,3 +81,12 @@ export async function userMenusList(c: Context, req: Request, res: Response, use
         return res.status(400).json({ ok: false, error: { message: e.message } });
     }
 }
+
+export async function userOrdersList(c: Context, req: Request, res: Response, user: User) {
+    try {
+        return res.status(200).json({ ok: true, orders: await user.ordersList() });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: (e as DocumentError).json });
+        return res.status(400).json({ ok: false, error: { message: e.message } });
+    }
+}

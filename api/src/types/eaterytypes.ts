@@ -1,6 +1,7 @@
 import { RowDataPacket } from 'mysql2/promise';
-import { IAward, ICoords, IDocument, IPhoto, IRating, ITag, ITimeSlot, Types } from './prototypes';
+import { ICoords, IDocument, IPhoto, ITag, ITimeSlot, Types } from './prototypes';
 import { IUser } from './prototypes';
+import { IOrder } from './ordertypes';
 
 export interface IEmployee extends IUser {}
 export enum EateryRoleCode {
@@ -53,6 +54,9 @@ export interface IMealRow extends IMeal {}
 
 export interface IMenuRow extends RowDataPacket {}
 export interface IMenuRow extends IMenu {}
+
+export interface IOrderRow extends RowDataPacket {}
+export interface IOrderRow extends IOrder {}
 
 interface IBooking extends IDocument {
     eateryId: Types.ObjectId;

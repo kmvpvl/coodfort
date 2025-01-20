@@ -2,8 +2,8 @@ import { DocumentErrorCode, IDocument, Types, WorkflowStatusCode } from '../type
 import { Document, DocumentError, IDocumentDataSchema, IDocumentWFSchema } from './protodocument';
 import { IUser } from '../types/prototypes';
 import { createHmac } from 'crypto';
-import { Eatery } from './eatery';
-import { EateryRoleCode, IEatery, IEateryBrief, IMealRow, IMenuRow } from '../types/eaterytypes';
+import { Eatery, Order } from './eatery';
+import { EateryRoleCode, IEatery, IEateryBrief, IMealRow, IMenuRow, IOrderRow } from '../types/eaterytypes';
 import { mconsole } from './console';
 import { Meal, Menu } from './meal';
 
@@ -128,6 +128,18 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
         mconsole.sqlq(sql, params);
         const [rows, fields] = await this.sqlConnection.query<IMenuRow[]>(sql, [this.id]);
         const schema = new Menu().dataSchema;
+        rows.forEach(row => this.jsonTranslate(row, schema));
+        mconsole.sqlinfo(rows, fields);
+        return rows;
+    }
+
+    async ordersList(eateryId?: Types.ObjectId): Promise<IOrderRow[]> {
+        const sql = `select \`orders\`.* from \`orders\` where \`userId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ?' : ''}`;
+        const params = [this.id];
+        if (eateryId !== undefined) params.push(eateryId);
+        mconsole.sqlq(sql, params);
+        const [rows, fields] = await this.sqlConnection.query<IOrderRow[]>(sql, [this.id]);
+        const schema = new Order().dataSchema;
         rows.forEach(row => this.jsonTranslate(row, schema));
         mconsole.sqlinfo(rows, fields);
         return rows;

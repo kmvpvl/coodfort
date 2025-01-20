@@ -8,7 +8,7 @@ import { createHmac, randomUUID } from 'crypto';
 import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
 import { startCommand } from './model/tgEvents';
-import { userEateriesList, userMealsList, userMenusList, newUser, viewUser } from './api/user';
+import { userEateriesList, userMealsList, userMenusList, newUser, viewUser, userOrdersList } from './api/user';
 import { updateEatery, newEatery, viewEatery, publishEatery } from './api/eatery';
 import { updateMeal, updateMenu, viewMeal, viewMenu } from './api/meal';
 import cors from 'cors';
@@ -94,6 +94,7 @@ api.register({
     userEateriesList: userEateriesList,
     userMealsList: userMealsList,
     userMenusList: userMenusList,
+    userOrdersList: userOrdersList,
     updateOrder: updateOrder,
     viewOrder: viewOrder,
 
