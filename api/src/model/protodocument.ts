@@ -274,6 +274,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         if (data !== undefined) {
             this._data = data;
             this._id = this._data.id;
+            if (this._id === undefined && this._data !== undefined) this._data.wfStatus = this.wfSchema.initialState;
         } else {
             const ou: DataType = await this.loadFromDB();
             this.load(ou);
@@ -434,6 +435,52 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         }
         this.data.wfStatus = ret;
         await this.save(arg[0].data.login);
+        return ret;
+    }
+
+    async wfRelatedNext(relFieldName: string, arrIndex: number, user: User): Promise<WorkflowStatusCode>;
+    async wfRelatedNext(relFieldName: string, arrIndex: number, user: User, newStatus: WorkflowStatusCode): Promise<WorkflowStatusCode>;
+    async wfRelatedNext(relFieldName: string, arrIndex: number, user: User, predict: (availableStatuses: WorkflowStatusCode[]) => WorkflowStatusCode): Promise<WorkflowStatusCode>;
+    async wfRelatedNext(...arg: any[]): Promise<WorkflowStatusCode> {
+        const relFieldName: string = arg[0];
+        const arrIndex: number = arg[1];
+        const availableTransfers = this.wfSchema.related
+            ?.filter(relObj => relObj.tableName === arg[0])
+            ?.at(0)
+            ?.transfers?.filter(transfer => transfer.from === this.data.wfStatus);
+        let ret: WorkflowStatusCode;
+        switch (arg.length) {
+            case 0:
+            case 1:
+                throw new DocumentError(DocumentErrorCode.parameter_expected, `First parameter must be related table name (field name) and second one must be array index of related record`);
+            case 2:
+                throw new DocumentError(DocumentErrorCode.parameter_expected, `Third parameter must be Employee (user) who has MDM role`);
+            case 3:
+                if (availableTransfers?.length === 1) {
+                    ret = availableTransfers[0].to;
+                    break;
+                } else {
+                    throw new DocumentError(
+                        DocumentErrorCode.wf_suspense,
+                        `Couldn't process wfNext function because ambiguity in transfer table of '${this.constructor.name}' with id = '${this.id}'. Current wfStatus = '${this.data.wfStatus}'; availaible transfers are: ${availableTransfers}`
+                    );
+                }
+            case 4:
+                if (typeof arg[3] !== 'function') {
+                    ret = arg[3];
+                } else {
+                    const predict = arg[3];
+                    ret = predict(availableTransfers);
+                }
+                break;
+            default:
+                throw new DocumentError(
+                    DocumentErrorCode.wf_suspense,
+                    `Couldn't process wfNext function because ambiguity in transfer table of '${this.constructor.name}' with id = '${this.id}'. Current wfStatus = '${this.data.wfStatus}'; availaible transfers are: ${availableTransfers}`
+                );
+        }
+        (this.data as any)[relFieldName][arrIndex].wfStatus = ret;
+        await this.save(arg[2].data.login);
         return ret;
     }
 

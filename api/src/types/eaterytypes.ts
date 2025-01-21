@@ -80,13 +80,17 @@ export interface IMealOption {
     esId?: string;
 }
 
-export interface IMeal extends IDocument {
+export interface IMealRequisites {
     name: Types.IMLString;
+    description: Types.IMLString;
+    tags?: ITag[];
+}
+
+export interface IMeal extends IMealRequisites {}
+export interface IMeal extends IDocument {
     userId?: Types.ObjectId;
     eateryId?: Types.ObjectId;
-    description: Types.IMLString;
     photos: IPhoto[];
-    tags?: ITag[];
     esId?: string;
 }
 

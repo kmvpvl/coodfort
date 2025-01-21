@@ -288,7 +288,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 										defaultValue={menuItem}
 										onSelectOption={(meal, option) => {
 											if (this.props.onSelectMenuItem !== undefined) {
-												this.props.onSelectMenuItem({ ...meal, option: option, count: 1 });
+												this.props.onSelectMenuItem({ name: meal.name, description: meal.description, option: option, count: 1 });
 											}
 										}}
 									/>

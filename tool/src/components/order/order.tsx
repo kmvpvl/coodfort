@@ -7,6 +7,7 @@ export interface IOrderProps extends IProtoProps {
 	defaultValue?: IOrder;
 	viewMode?: ViewModeCode;
 	orderId?: Types.ObjectId;
+	eateryId: Types.ObjectId;
 }
 export interface IOrderState extends IProtoState {
 	value: IOrder;
@@ -33,6 +34,7 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 	}
 	new(): IOrder {
 		return {
+			eateryId: this.props.eateryId,
 			items: [],
 			discount: 1,
 		};
@@ -78,10 +80,13 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 			<div
 				className="order-compact-container"
 				onClick={event => {
-					this.setState({ ...this.state, viewMode: ViewModeCode.normal });
+					if (this.state.value.items.length > 0) this.setState({ ...this.state, viewMode: ViewModeCode.normal });
 				}}>
 				<div>
-					<i className="fa fa-shopping-basket"></i>Total: {sum}
+					<span className="context-menu-button">
+						<i className="fa fa-shopping-basket"></i>
+					</span>
+					Total: {sum}
 				</div>
 			</div>
 		);
@@ -91,19 +96,76 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 		const sum = this.state.value.items.reduce((prevVal, curItem) => prevVal + curItem.option.amount * curItem.count, 0);
 		return (
 			<div className="order-container">
-				<div onClick={event => this.setState({ ...this.state, viewMode: ViewModeCode.compact })} className="order-grid">
-					<div style={{ gridColumn: "span 5" }}>Your order</div>
+				<div className="order-grid">
+					<div className="context-menu" style={{ gridColumn: "span 5" }}>
+						Your order
+						<span
+							className="context-menu-button"
+							onClick={event => {
+								const nState = this.state;
+								nState.value.items.splice(0, nState.value.items.length);
+								this.save();
+								nState.viewMode = ViewModeCode.compact;
+								this.setState(nState);
+							}}>
+							⤬
+						</span>
+						<span className="context-menu-button" onClick={event => this.setState({ ...this.state, viewMode: ViewModeCode.compact })}>
+							⚊
+						</span>
+						<span className="context-menu-button" onClick={event => this.setState({ ...this.state, viewMode: ViewModeCode.compact })}>
+							✔
+						</span>
+					</div>
 					<div>#</div>
 					<div>Name</div>
 					<div>Price</div>
 					<div>Count</div>
-					<div>Cost</div>
+					<div>Cost, {this.toString(this.state.value.items?.at(0)?.option.currency)}</div>
 					{this.state.value.items.map((item, idx) => (
 						<Fragment key={idx}>
-							<div>{idx}</div>
+							<div>{idx + 1}</div>
 							<div key={idx}>{this.toString(item.name)}</div>
 							<div>{item.option.amount}</div>
-							<div>{item.count}</div>
+							<div className="context-menu">
+								<span
+									className="context-menu-button"
+									onClick={event => {
+										event.stopPropagation();
+										const nState = this.state;
+										nState.value.items.splice(idx, 1);
+										this.save();
+										this.setState(nState);
+									}}>
+									⤬
+								</span>
+								<span
+									className="context-menu-button"
+									onClick={event => {
+										event.stopPropagation();
+										const nState = this.state;
+										if (nState.value.items !== undefined && nState.value.items[idx] !== undefined) {
+											nState.value.items[idx].count -= 1;
+											if (nState.value.items[idx].count <= 0) nState.value.items.splice(idx, 1);
+										}
+										this.save();
+										this.setState(nState);
+									}}>
+									-
+								</span>
+								{item.count}
+								<span
+									className="context-menu-button"
+									onClick={event => {
+										event.stopPropagation();
+										const nState = this.state;
+										if (nState.value.items !== undefined && nState.value.items[idx] !== undefined) nState.value.items[idx].count += 1;
+										this.save();
+										this.setState(nState);
+									}}>
+									+
+								</span>
+							</div>
 							<div>{item.count * item.option.amount}</div>
 						</Fragment>
 					))}

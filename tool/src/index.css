@@ -99,7 +99,13 @@ body {
   gap: 2px;
 }
 
-.context-toolbar > span {
+.context-menu {
+  display: inline-flex;
+  gap: .2em;
+}
+
+.context-toolbar > span, .context-menu-button {
+  display: inline-block;
   background-color: var(--background-color);
   border: 1px solid var(--text-color);
   border-radius: 5px;
@@ -109,7 +115,7 @@ body {
   width: 1.25em;
 }
 
-.context-toolbar > span:hover {
+.context-toolbar > span:hover, .context-menu-button:hover {
   transition: all 0.5s;
   opacity: 1;
   background-color: var(--text-color);

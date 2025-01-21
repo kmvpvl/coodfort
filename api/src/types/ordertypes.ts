@@ -1,4 +1,4 @@
-import { IMeal, IMealOption } from './eaterytypes';
+import { IMeal, IMealOption, IMealRequisites } from './eaterytypes';
 import { IDocument, Types } from './prototypes';
 
 export enum OrderFunelStages {
@@ -11,7 +11,7 @@ export enum OrderFunelStages {
     feedback,
 }
 
-export interface IOrderItem extends IMeal {
+export interface IOrderItem extends IMealRequisites {
     option: IMealOption;
     count: number;
     comment?: string;

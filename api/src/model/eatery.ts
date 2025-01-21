@@ -100,10 +100,24 @@ export class Order extends Document<IOrder, IOrderDataSchema, IOrderyWFSchema> {
                 { name: `userId`, type: 'bigint(20)', required: false, comment: '' },
                 { name: `eateryId`, type: 'bigint(20)', comment: '' },
                 { name: 'tableId', type: 'bigint(20)', comment: '' },
-                { name: `items`, type: 'json', comment: '' },
                 { name: `discount`, type: 'float', comment: '' },
                 { name: `comment`, type: 'varchar(2048)', comment: '' },
-                { name: `esId`, type: 'varchar(256)', required: false },
+                { name: `esId`, type: 'varchar(1024)', required: false },
+            ],
+            related: [
+                {
+                    tableName: 'items',
+                    idFieldName: 'id',
+                    fields: [
+                        { name: `name`, type: 'json', required: true },
+                        { name: `description`, type: 'json', required: true },
+                        { name: `tags`, type: 'json' },
+                        { name: `option`, required: true, type: 'json' },
+                        { name: `count`, type: 'float' },
+                        { name: `comment`, type: 'varchar(1024)', required: false },
+                        { name: `esId`, type: 'varchar(256)', required: false },
+                    ],
+                },
             ],
         };
     }
@@ -124,6 +138,26 @@ export class Order extends Document<IOrder, IOrderDataSchema, IOrderyWFSchema> {
                 {
                     from: WorkflowStatusCode.approved,
                     to: WorkflowStatusCode.processing,
+                },
+            ],
+            related: [
+                {
+                    tableName: 'items',
+                    initialState: WorkflowStatusCode.draft,
+                    transfers: [
+                        {
+                            from: WorkflowStatusCode.draft,
+                            to: WorkflowStatusCode.registered,
+                        },
+                        {
+                            from: WorkflowStatusCode.registered,
+                            to: WorkflowStatusCode.approved,
+                        },
+                        {
+                            from: WorkflowStatusCode.approved,
+                            to: WorkflowStatusCode.processing,
+                        },
+                    ],
                 },
             ],
         };
