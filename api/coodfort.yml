@@ -286,6 +286,19 @@ components:
                 description: Unique id of the Eatery
                 type: number
                 example: 1
+    orderPointer:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - id
+            properties:
+              id:
+                description: Unique id of the Order
+                type: number
+                example: 1
 
   responses:
     errorResponse:
@@ -348,6 +361,28 @@ components:
                 type: boolean
               user:
                 $ref: "#/components/schemas/user"
+    orderSuccess:
+      description: |
+        Any success answer consists of flag `ok` and object of Order
+        Information about Order was collected successfully
+        ```javascript
+        {
+            ok: true, 
+            eatery: IUser
+        }
+        ```
+      content:
+        application/json:
+          schema: 
+            type: object
+            required:
+              - ok
+              - order
+            properties:
+              ok:
+                type: boolean
+              user:
+                $ref: "#/components/schemas/order"
   securitySchemes:
     COODFortTGUserId:
       type: apiKey
@@ -563,24 +598,89 @@ paths:
           description: OK
   /order/view:
     post:
+      description: View order by its uniq id
+      tags:
+        - order
+        - view
       operationId: viewOrder
+      requestBody:
+        $ref: "#/components/requestBodies/orderPointer"
       responses:
         '200':
-          description: OK
+          $ref: "#/components/responses/orderSuccess"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
   /order/update:
     post:
+      description: Creates of update order
+      tags:
+        - order
+        - create
+        - update
       operationId: updateOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/order"
       responses:
         '200':
-          description: OK
+          $ref: "#/components/responses/orderSuccess"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
 # 
   /order/itemWfNext:
     post:
+      description: Moves OrderItem to next workflow status
+      tags:
+        - order
+        - workflow
       operationId: wfNextOrderItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderItemIds
+              properties:
+                orderItemIds:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - id
+                      - nextWfStatus
+                    properties:
+                      id: 
+                        type: number
+                      nextWfStatus:
+                        type: number
       responses:
         '200':
           description: OK
-
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ok
+                  - orderItems
+                properties:
+                  ok:
+                    type: boolean
+                  orderItems:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/orderItem"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
 security:
   - COODFortTGUserId: []
     TGQueryCheckString: []

@@ -5,10 +5,11 @@ import { IEateryBrief, IMeal, IMenu } from "@betypes/eaterytypes";
 import Meal from "../menu/meal";
 import { Eatery } from "../eatery/eatery";
 import Menu from "../menu/menu";
-import { IUser } from "@betypes/prototypes";
+import { IUser, IWfNextRequest, WorkflowStatusCode } from "@betypes/prototypes";
 import { IOrder, IOrderItem, OrderFunelStages } from "@betypes/ordertypes";
 import "react-data-grid/lib/styles.css";
 import DataGrid, { SelectColumn } from "react-data-grid";
+import { ToastType } from "../toast";
 
 type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "orders";
 
@@ -221,9 +222,54 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 				})
 			);
 		}
+		//debugger
 		return (
 			<div className="employee-orders-container">
 				Approve waiting
+				<button
+					onClick={event => {
+						if (this.state.selectedOrderItemsToApprove !== undefined)
+							this.serverCommand(
+								"order/itemWfNext",
+								JSON.stringify({ orderItemIds: Array.from(this.state.selectedOrderItemsToApprove).map<IWfNextRequest>(v => ({ id: v, nextWfStatus: WorkflowStatusCode.approved })) }),
+								res => {
+									console.log(res);
+									if (!res.ok) return;
+									const nState = this.state;
+									const items: IOrderItem[] = res.orderItems;
+									this.updateOrdersList();
+								},
+								err => {
+									this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
+									console.log(err.json);
+								}
+							);
+						this.setState({ ...this.state, selectedOrderItemsToApprove: undefined });
+					}}>
+					Approve
+				</button>
+				<button
+					onClick={event => {
+						if (this.state.selectedOrderItemsToApprove !== undefined)
+							this.serverCommand(
+								"order/itemWfNext",
+								JSON.stringify({ orderItemIds: Array.from(this.state.selectedOrderItemsToApprove).map<IWfNextRequest>(v => ({ id: v, nextWfStatus: WorkflowStatusCode.canceledByEatery })) }),
+								res => {
+									console.log(res);
+									if (!res.ok) return;
+									const nState = this.state;
+									const items: IOrderItem[] = res.orderItems;
+									this.updateOrdersList();
+								},
+								err => {
+									this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
+									console.log(err.json);
+								}
+							);
+						this.setState({ ...this.state, selectedOrderItemsToApprove: undefined });
+					}}>
+					Reject
+				</button>
 				<DataGrid
 					isRowSelectionDisabled={row => false}
 					columns={[
@@ -231,7 +277,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 						{ key: "id", name: "Order#" },
 						{ key: "orderItemId", name: "OrderItem#" },
 						{ key: "stage", name: "Stage" },
-						{ key: "name", name: "Meal", resizable: true },
+						{ key: "name", name: "Meal", resizable: true, width: "20%" },
 						{ key: "optionName", name: "Option" },
 						{ key: "count", name: "Count" },
 						{ key: "created", name: "Created", sortable: true },

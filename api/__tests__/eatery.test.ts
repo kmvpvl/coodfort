@@ -303,13 +303,6 @@ describe('Meals editing', () => {
                         default: 'RUR',
                         values: [['ru', 'руб.']],
                     },
-                    includeOptions: [
-                        {
-                            name: 'Coconut Syrup 10ml',
-                            amount: 50,
-                            currency: 'RUR',
-                        },
-                    ],
                 },
                 {
                     name: {
@@ -321,13 +314,6 @@ describe('Meals editing', () => {
                         default: 'RUR',
                         values: [['ru', 'руб.']],
                     },
-                    includeOptions: [
-                        {
-                            name: 'Coconut Syrup 10ml',
-                            amount: 50,
-                            currency: 'RUR',
-                        },
-                    ],
                 },
             ],
         });

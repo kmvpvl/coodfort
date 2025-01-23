@@ -1,11 +1,11 @@
 import { Context } from 'openapi-backend';
 import { Request, Response } from 'express';
 import { DocumentError } from '../model/protodocument';
-import { DocumentErrorCode, Types } from '../types/prototypes';
+import { DocumentErrorCode, IWfNextRequest, Types, WorkflowStatusCode } from '../types/prototypes';
 import { User } from '../model/user';
-import { Eatery, Order } from '../model/eatery';
+import { Eatery, Order, OrderItem } from '../model/eatery';
 import { EateryRoleCode } from '../types/eaterytypes';
-import { IOrder } from '../types/ordertypes';
+import { IOrder, IOrderItem } from '../types/ordertypes';
 
 export async function updateOrder(c: Context, req: Request, res: Response, user: User) {
     try {
@@ -43,21 +43,20 @@ export async function viewOrder(c: Context, req: Request, res: Response, user: U
 
 export async function wfNextOrderItem(c: Context, req: Request, res: Response, user: User) {
     try {
-        if (req.body.orderId === undefined) {
-            throw new DocumentError(DocumentErrorCode.parameter_expected, `OrderItem id expected`);
+        if (req.body.orderItemIds === undefined) {
+            throw new DocumentError(DocumentErrorCode.parameter_expected, `Array of {orderItemId, nextWFStatus} expected`);
         }
-        if (req.body.itemIds === undefined) {
-            throw new DocumentError(DocumentErrorCode.parameter_expected, `OrderItem order_id expected`);
+        const ids: IWfNextRequest[] = req.body.orderItemIds;
+
+        const ret: IOrderItem[] = [];
+
+        for (let idx = 0; idx < ids.length; idx++) {
+            const item = new OrderItem(ids[idx].id);
+            await item.load();
+            await item.wfNext(user, ids[idx].nextWfStatus);
+            ret.push(item.data);
         }
-        const ids: (Types.ObjectId | undefined)[] = req.body.itemIds;
-
-        const order = new Order(req.body.orderId);
-        await order.load();
-
-        order.data.items.forEach((item, idx) => {
-            if (ids.includes(item.id)) order.wfRelatedNext('items', idx, user);
-        });
-        return res.status(200).json({ ok: true, order: order.data });
+        return res.status(200).json({ ok: true, orderItems: ret });
     } catch (e: any) {
         if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });
         else return res.status(400).json({ ok: false, error: { message: e.message } });

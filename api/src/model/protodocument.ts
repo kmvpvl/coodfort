@@ -422,6 +422,12 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
             case 2:
                 if (typeof arg[1] !== 'function') {
                     ret = arg[1];
+                    const isNextWfStatusCorrectArr = availableTransfers?.filter(transfer => transfer.to === ret);
+                    if (isNextWfStatusCorrectArr === undefined || isNextWfStatusCorrectArr.length === 0)
+                        throw new DocumentError(
+                            DocumentErrorCode.wf_suspense,
+                            `Couldn't process wfNext function because ambiguity in transfer table of '${this.constructor.name}' with id = '${this.id}'. Current wfStatus = '${this.data.wfStatus}'; availaible transfers are: ${JSON.stringify(availableTransfers)}; requested next status is: ${ret}`
+                        );
                 } else {
                     const predict = arg[1];
                     ret = predict(availableTransfers);

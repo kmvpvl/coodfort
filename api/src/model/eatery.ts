@@ -125,6 +125,10 @@ export class OrderItem extends Document<IOrderItem, IOrderItemDataSchema, IOrder
                     to: WorkflowStatusCode.approved,
                 },
                 {
+                    from: WorkflowStatusCode.registered,
+                    to: WorkflowStatusCode.canceledByEatery,
+                },
+                {
                     from: WorkflowStatusCode.approved,
                     to: WorkflowStatusCode.payed,
                 },

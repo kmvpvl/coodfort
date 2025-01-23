@@ -60,6 +60,8 @@ export enum WorkflowStatusCode {
     done,
     review,
     closed,
+    canceledByEatery,
+    canceledByGuest,
 }
 export interface IDocument {
     id?: Types.ObjectId;
@@ -111,4 +113,9 @@ export interface IDocumentError {
     code: DocumentErrorCode;
     shortName: string;
     message: string;
+}
+
+export interface IWfNextRequest {
+    id: Types.ObjectId;
+    nextWfStatus: WorkflowStatusCode;
 }

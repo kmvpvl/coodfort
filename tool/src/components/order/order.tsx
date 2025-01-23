@@ -2,7 +2,7 @@ import React, { Fragment, ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import { IOrder, IOrderItem } from "@betypes/ordertypes";
 import "./order.css";
-import { Types, WorkflowStatusCode } from "@betypes/prototypes";
+import { IWfNextRequest, Types, WorkflowStatusCode } from "@betypes/prototypes";
 import { ToastType } from "../toast";
 export interface IOrderProps extends IProtoProps {
 	defaultValue?: IOrder;
@@ -59,6 +59,7 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 	}
 
 	protected save() {
+		//debugger
 		this.serverCommand(
 			"order/update",
 			JSON.stringify(this.state.value),
@@ -75,15 +76,19 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 			}
 		);
 	}
-	protected itemWfNext(items: { orderId: Types.ObjectId; itemIds: (Types.ObjectId | undefined)[] }) {
+	protected itemWfNext(items: IWfNextRequest[]) {
 		this.serverCommand(
 			"order/itemWfNext",
-			JSON.stringify(items),
+			JSON.stringify({ orderItemIds: items }),
 			res => {
 				console.log(res);
 				if (!res.ok) return;
 				const nState = this.state;
-				nState.value = res.order;
+				const items: IOrderItem[] = res.orderItems;
+				for (const item of items) {
+					const idx = nState.value.items.findIndex(i => i.id === item.id);
+					if (idx !== -1) nState.value.items[idx] = item;
+				}
 				nState.changed = false;
 				this.setState(nState);
 			},
@@ -136,7 +141,14 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 							className="context-menu-button"
 							onClick={event => {
 								const nState = this.state;
-								if (nState.value.id !== undefined) this.itemWfNext({ orderId: nState.value.id, itemIds: nState.value.items.filter(item => item.wfStatus === WorkflowStatusCode.draft).map(item => item.id) });
+								if (nState.value.id !== undefined)
+									this.itemWfNext(
+										nState.value.items
+											.filter(item => item.wfStatus === WorkflowStatusCode.draft)
+											.map(item => {
+												return { id: item.id as Types.ObjectId, nextWfStatus: WorkflowStatusCode.registered };
+											})
+									);
 							}}>
 							✔
 						</span>
