@@ -4,6 +4,7 @@
     bottom: 0em;
     background-color: var(--background-color);
     padding: 1em;
+    font-size: 80%;
 }
 
 .order-grid {

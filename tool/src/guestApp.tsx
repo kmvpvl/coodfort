@@ -328,7 +328,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		return (
 			<div className="guest-app-choose-container">
 				<Menu menuId={this.state.choosenEatery?.id} onSelectMenuItem={this.onSelectMenuItem.bind(this)} />
-				{this.state.eateryId !== undefined ? <Order ref={this.orderRef} orderId={this.state.orders?.at(0)?.id} eateryId={this.state.eateryId} /> : <></>}
+				{this.state.eateryId !== undefined ? <Order ref={this.orderRef} orderId={this.state.orders?.at(0)?.id} eateryId={this.state.eateryId} toaster={this.toasterRef} /> : <></>}
 			</div>
 		);
 	}

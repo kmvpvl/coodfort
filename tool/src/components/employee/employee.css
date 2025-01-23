@@ -7,7 +7,7 @@
     overflow: hidden;
 }
 
-.employee-manus-and-meals-container {
+.employee-menus-and-meals-container {
     display: grid;
     grid-template-rows: 1fr 5px 1fr;
     padding: 5px;

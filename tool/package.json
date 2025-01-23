@@ -1,11 +1,12 @@
 {
   "name": "coodfort_tool",
-  "version": "1.0.38",
+  "version": "1.0.39",
   "private": true,
   "type": "module",
   "dependencies": {
     "html5-qrcode": "^2.2.7",
     "react": "^19.0.0",
+    "react-data-grid": "^7.0.0-beta.47",
     "react-dom": "^19.0.0",
     "react-qr-code": "^2.0.15"
   },

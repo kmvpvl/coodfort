@@ -6,6 +6,9 @@ import Meal from "../menu/meal";
 import { Eatery } from "../eatery/eatery";
 import Menu from "../menu/menu";
 import { IUser } from "@betypes/prototypes";
+import { IOrder, IOrderItem, OrderFunelStages } from "@betypes/ordertypes";
+import "react-data-grid/lib/styles.css";
+import DataGrid, { SelectColumn } from "react-data-grid";
 
 type EmployeeFocus = "none" | "profile" | "eateries" | "meals" | "bookings" | "orders";
 
@@ -18,6 +21,8 @@ export interface IEmployeeState extends IProtoState {
 	eateriesBrief: Array<IEateryBrief | undefined>;
 	meals: Array<IMeal | undefined>;
 	menus: Array<IMenu | undefined>;
+	orders: Array<IOrder>;
+	selectedOrderItemsToApprove?: Set<number>;
 }
 
 export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
@@ -26,6 +31,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		meals: [],
 		eateriesBrief: [],
 		menus: [],
+		orders: [],
 	};
 	getCurrentFocus(): EmployeeFocus {
 		const ls: any = localStorage.getItem("coodfort_employee_focus");
@@ -40,6 +46,9 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		const nState = this.state;
 		nState.focus = newFocus;
 		switch (nState.focus) {
+			case "orders":
+				this.updateOrdersList();
+				break;
 			case "eateries":
 				this.updateEateriesList();
 				this.updateMenusList();
@@ -103,6 +112,23 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 			}
 		);
 	}
+	updateOrdersList() {
+		this.serverCommand(
+			"eatery/ordersList",
+			JSON.stringify({ id: 1 }),
+			res => {
+				console.log(res);
+				if (res.ok) {
+					const nState = this.state;
+					nState.orders = res.orders;
+					this.setState(nState);
+				}
+			},
+			err => {
+				console.log(err.json);
+			}
+		);
+	}
 	renderEATERIESFocus(): ReactNode {
 		return (
 			<div className="employee-eateries-container">
@@ -131,7 +157,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 	}
 	renderMEALSFocus(): ReactNode {
 		return (
-			<div className="employee-manus-and-meals-container">
+			<div className="employee-menus-and-meals-container">
 				<div className="employee-meals-container has-caption">
 					<div className="caption">Meals</div>
 					<div className="toolbar">
@@ -178,6 +204,50 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 			</div>
 		);
 	}
+	renderORDERSFocus(): ReactNode {
+		const rows = [];
+		for (const order of this.state.orders) {
+			rows.push(
+				...order.items.map(item => {
+					return {
+						name: this.toString(item.name),
+						id: order.id,
+						orderItemId: item.id,
+						created: new Date(item.created as unknown as string).toLocaleTimeString(),
+						stage: item.wfStatus,
+						optionName: this.toString(item.option.name),
+						count: item.count,
+					};
+				})
+			);
+		}
+		return (
+			<div className="employee-orders-container">
+				Approve waiting
+				<DataGrid
+					isRowSelectionDisabled={row => false}
+					columns={[
+						SelectColumn,
+						{ key: "id", name: "Order#" },
+						{ key: "orderItemId", name: "OrderItem#" },
+						{ key: "stage", name: "Stage" },
+						{ key: "name", name: "Meal", resizable: true },
+						{ key: "optionName", name: "Option" },
+						{ key: "count", name: "Count" },
+						{ key: "created", name: "Created", sortable: true },
+					]}
+					rows={rows}
+					sortColumns={[{ columnKey: "created", direction: "DESC" }]}
+					onSelectedRowsChange={cells => {
+						console.log(cells);
+						this.setState({ ...this.state, selectedOrderItemsToApprove: cells });
+					}}
+					rowKeyGetter={row => row.orderItemId as number}
+					selectedRows={this.state.selectedOrderItemsToApprove}
+				/>
+			</div>
+		);
+	}
 	renderNONEFocus(): ReactNode {
 		return <div>Choose any tab</div>;
 	}
@@ -185,6 +255,9 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		const curFocus = this.state.focus;
 		let focusContent: ReactNode;
 		switch (curFocus) {
+			case "orders":
+				focusContent = this.renderORDERSFocus();
+				break;
 			case "eateries":
 				focusContent = this.renderEATERIESFocus();
 				break;

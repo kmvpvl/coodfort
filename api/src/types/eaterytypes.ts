@@ -8,6 +8,7 @@ export enum EateryRoleCode {
     'supervisor' = 'supervisor',
     'owner' = 'owner',
     'MDM' = 'MDM',
+    'sous-chef' = 'sous-chef',
 }
 export interface ITable extends IDocument {
     name: Types.IMLString;

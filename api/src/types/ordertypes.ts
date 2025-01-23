@@ -1,16 +1,7 @@
 import { IMeal, IMealOption, IMealRequisites } from './eaterytypes';
-import { IDocument, Types } from './prototypes';
+import { IDocument, Types, WorkflowStatusCode } from './prototypes';
 
-export enum OrderFunelStages {
-    booking,
-    collectMeals,
-    approveGuest,
-    approveEatery,
-    fulfillment,
-    payment,
-    feedback,
-}
-
+export interface IOrderItem extends IDocument {}
 export interface IOrderItem extends IMealRequisites {
     option: IMealOption;
     count: number;
@@ -25,4 +16,13 @@ export interface IOrder extends IDocument {
     discount: number;
     comment?: string;
     esId?: string;
+}
+export enum OrderFunelStages {
+    collectingMeal = WorkflowStatusCode.draft,
+    approvedGuest = WorkflowStatusCode.registered,
+    approvedEatery = WorkflowStatusCode.approved,
+    fulfilled = WorkflowStatusCode.done,
+    payed = WorkflowStatusCode.payed,
+    feedback = WorkflowStatusCode.review,
+    closed = WorkflowStatusCode.closed,
 }

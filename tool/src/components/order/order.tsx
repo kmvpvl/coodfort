@@ -1,8 +1,9 @@
-import { Fragment, ReactNode } from "react";
+import React, { Fragment, ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import { IOrder, IOrderItem } from "@betypes/ordertypes";
 import "./order.css";
-import { Types } from "@betypes/prototypes";
+import { Types, WorkflowStatusCode } from "@betypes/prototypes";
+import { ToastType } from "../toast";
 export interface IOrderProps extends IProtoProps {
 	defaultValue?: IOrder;
 	viewMode?: ViewModeCode;
@@ -74,6 +75,24 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 			}
 		);
 	}
+	protected itemWfNext(items: { orderId: Types.ObjectId; itemIds: (Types.ObjectId | undefined)[] }) {
+		this.serverCommand(
+			"order/itemWfNext",
+			JSON.stringify(items),
+			res => {
+				console.log(res);
+				if (!res.ok) return;
+				const nState = this.state;
+				nState.value = res.order;
+				nState.changed = false;
+				this.setState(nState);
+			},
+			err => {
+				this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
+				console.log(err.json);
+			}
+		);
+	}
 	renderCompact(): ReactNode {
 		const sum = this.state.value.items.reduce((prevVal, curItem) => prevVal + curItem.option.amount * curItem.count, 0);
 		return (
@@ -113,7 +132,12 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 						<span className="context-menu-button" onClick={event => this.setState({ ...this.state, viewMode: ViewModeCode.compact })}>
 							⚊
 						</span>
-						<span className="context-menu-button" onClick={event => this.setState({ ...this.state, viewMode: ViewModeCode.compact })}>
+						<span
+							className="context-menu-button"
+							onClick={event => {
+								const nState = this.state;
+								if (nState.value.id !== undefined) this.itemWfNext({ orderId: nState.value.id, itemIds: nState.value.items.filter(item => item.wfStatus === WorkflowStatusCode.draft).map(item => item.id) });
+							}}>
 							✔
 						</span>
 					</div>
@@ -125,7 +149,9 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 					{this.state.value.items.map((item, idx) => (
 						<Fragment key={idx}>
 							<div>{idx + 1}</div>
-							<div key={idx}>{this.toString(item.name)}</div>
+							<div key={idx}>
+								{this.toString(item.name)}({this.toString(item.option.name)})
+							</div>
 							<div>{item.option.amount}</div>
 							<div className="context-menu">
 								<span
@@ -176,5 +202,15 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 				</div>
 			</div>
 		);
+	}
+}
+
+export interface IOrderItemProgressProps {}
+
+export interface IOrderItemProgressState {}
+
+export class IOrderProgress extends React.Component<IOrderItemProgressProps, IOrderItemProgressState> {
+	render(): ReactNode {
+		return <div className="order-item-progress-container"></div>;
 	}
 }

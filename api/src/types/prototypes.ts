@@ -50,12 +50,13 @@ export enum DocumentErrorCode {
     parameter_expected,
     wf_suspense,
     redundant_value,
+    role_required,
 }
 export enum WorkflowStatusCode {
     draft,
     registered,
     approved,
-    processing,
+    payed,
     done,
     review,
     closed,
@@ -99,7 +100,7 @@ export interface IAward {
     url: string;
 }
 export interface IUser extends IDocument {
-    login: number | string /**Telegram ID or login or phone */;
+    login: string /**Telegram ID or login or phone */;
     hash: string /** */;
     name?: string;
     photos?: IPhoto[];

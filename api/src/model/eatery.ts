@@ -2,7 +2,7 @@ import { Document, IDocumentDataSchema, IDocumentWFSchema } from './protodocumen
 import { WorkflowStatusCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
 import { EateryRoleCode, IEatery } from '../types/eaterytypes';
-import { IOrder } from '../types/ordertypes';
+import { IOrder, IOrderItem } from '../types/ordertypes';
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
 interface IEateryWFSchema extends IDocumentWFSchema {}
@@ -87,11 +87,78 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
     }
 }
 
-interface IOrderDataSchema extends IDocumentDataSchema {}
-interface IOrderyWFSchema extends IDocumentWFSchema {}
+interface IOrderItemDataSchema extends IDocumentDataSchema {}
+interface IOrderItemWFSchema extends IDocumentWFSchema {}
 
-export class Order extends Document<IOrder, IOrderDataSchema, IOrderyWFSchema> {
-    get dataSchema(): IEateryDataSchema {
+interface IOrderDataSchema extends IDocumentDataSchema {}
+interface IOrderWFSchema extends IDocumentWFSchema {}
+
+export class OrderItem extends Document<IOrderItem, IOrderItemDataSchema, IOrderItemWFSchema> {
+    get dataSchema(): IOrderItemDataSchema {
+        return {
+            tableName: 'order_items',
+            idFieldName: 'id',
+            fields: [
+                { name: `name`, type: 'json', required: true },
+                { name: `order_id`, type: 'bigint(20)', required: true },
+                { name: `description`, type: 'json', required: true },
+                { name: `tags`, type: 'json' },
+                { name: `option`, required: true, type: 'json' },
+                { name: `count`, type: 'float' },
+                { name: `comment`, type: 'varchar(1024)', required: false },
+                { name: `esId`, type: 'varchar(256)', required: false },
+            ],
+        };
+    }
+
+    get wfSchema(): IOrderItemWFSchema {
+        return {
+            tableName: 'order_items',
+            initialState: WorkflowStatusCode.draft,
+            transfers: [
+                {
+                    from: WorkflowStatusCode.draft,
+                    to: WorkflowStatusCode.registered,
+                },
+                {
+                    from: WorkflowStatusCode.registered,
+                    to: WorkflowStatusCode.approved,
+                },
+                {
+                    from: WorkflowStatusCode.approved,
+                    to: WorkflowStatusCode.payed,
+                },
+                {
+                    from: WorkflowStatusCode.approved,
+                    to: WorkflowStatusCode.done,
+                },
+                {
+                    from: WorkflowStatusCode.done,
+                    to: WorkflowStatusCode.payed,
+                },
+                {
+                    from: WorkflowStatusCode.payed,
+                    to: WorkflowStatusCode.done,
+                },
+                {
+                    from: WorkflowStatusCode.payed,
+                    to: WorkflowStatusCode.review,
+                },
+                {
+                    from: WorkflowStatusCode.done,
+                    to: WorkflowStatusCode.review,
+                },
+                {
+                    from: WorkflowStatusCode.review,
+                    to: WorkflowStatusCode.closed,
+                },
+            ],
+        };
+    }
+}
+
+export class Order extends Document<IOrder, IOrderDataSchema, IOrderWFSchema> {
+    get dataSchema(): IOrderDataSchema {
         return {
             idFieldName: 'id',
             tableName: 'orders',
@@ -122,7 +189,7 @@ export class Order extends Document<IOrder, IOrderDataSchema, IOrderyWFSchema> {
         };
     }
 
-    get wfSchema(): IEateryWFSchema {
+    get wfSchema(): IOrderWFSchema {
         return {
             tableName: 'orders',
             initialState: WorkflowStatusCode.draft,
@@ -137,7 +204,31 @@ export class Order extends Document<IOrder, IOrderDataSchema, IOrderyWFSchema> {
                 },
                 {
                     from: WorkflowStatusCode.approved,
-                    to: WorkflowStatusCode.processing,
+                    to: WorkflowStatusCode.payed,
+                },
+                {
+                    from: WorkflowStatusCode.approved,
+                    to: WorkflowStatusCode.done,
+                },
+                {
+                    from: WorkflowStatusCode.done,
+                    to: WorkflowStatusCode.payed,
+                },
+                {
+                    from: WorkflowStatusCode.payed,
+                    to: WorkflowStatusCode.done,
+                },
+                {
+                    from: WorkflowStatusCode.payed,
+                    to: WorkflowStatusCode.review,
+                },
+                {
+                    from: WorkflowStatusCode.done,
+                    to: WorkflowStatusCode.review,
+                },
+                {
+                    from: WorkflowStatusCode.review,
+                    to: WorkflowStatusCode.closed,
                 },
             ],
             related: [
@@ -155,7 +246,31 @@ export class Order extends Document<IOrder, IOrderDataSchema, IOrderyWFSchema> {
                         },
                         {
                             from: WorkflowStatusCode.approved,
-                            to: WorkflowStatusCode.processing,
+                            to: WorkflowStatusCode.payed,
+                        },
+                        {
+                            from: WorkflowStatusCode.approved,
+                            to: WorkflowStatusCode.done,
+                        },
+                        {
+                            from: WorkflowStatusCode.done,
+                            to: WorkflowStatusCode.payed,
+                        },
+                        {
+                            from: WorkflowStatusCode.payed,
+                            to: WorkflowStatusCode.done,
+                        },
+                        {
+                            from: WorkflowStatusCode.payed,
+                            to: WorkflowStatusCode.review,
+                        },
+                        {
+                            from: WorkflowStatusCode.done,
+                            to: WorkflowStatusCode.review,
+                        },
+                        {
+                            from: WorkflowStatusCode.review,
+                            to: WorkflowStatusCode.closed,
                         },
                     ],
                 },

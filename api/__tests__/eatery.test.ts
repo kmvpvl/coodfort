@@ -55,27 +55,27 @@ describe('user -> eatery', () => {
      */
     test('Creating new Eatery with wrong credentials of user', async () => {
         let newEatery = await request(app)
-            .post('/eatery/new')
+            .post('/eatery/update')
             .set('content-type', 'application/json')
             .set('coodfort-login', 'wrong_login')
             .set('coodfort-password', 'password_of_new_employee')
             .send({
                 name: 'Name of new Eatery',
                 description: 'Long-long-too-long description',
-                url: 'https://test.te',
+                urls: [{ url: 'https://test.te1', caption: 'Main url' }],
                 tags: ['tag1', 'tag2', 'tag3'],
             });
         expect(newEatery.statusCode).toBe(401);
 
         newEatery = await request(app)
-            .post('/eatery/new')
+            .post('/eatery/update')
             .set('content-type', 'application/json')
             .set('coodfort-login', 'new_employee')
             .set('coodfort-password', 'wrong_password')
             .send({
                 name: 'Name of new Eatery',
                 description: 'Long-long-too-long description',
-                url: 'https://test.te',
+                urls: [{ url: 'https://test.te1', caption: 'Main url' }],
                 tags: ['tag1', 'tag2', 'tag3'],
             });
         expect(newEatery.statusCode).toBe(401);
@@ -87,7 +87,7 @@ describe('user -> eatery', () => {
      */
     test('Creating new Eatery without mandatory property Name', async () => {
         const newEatery = await request(app)
-            .post('/eatery/new')
+            .post('/eatery/update')
             .set('content-type', 'application/json')
             .set('coodfort-login', 'new_employee')
             .set('coodfort-password', 'password_of_new_employee')
@@ -107,7 +107,7 @@ describe('user -> eatery', () => {
 
     test('Creating new Eatery Korchma', async () => {
         const corchma = require('./corchma.json');
-        const newEatery = await request(app).post('/eatery/new').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(corchma);
+        const newEatery = await request(app).post('/eatery/update').set('content-type', 'application/json').set('coodfort-login', 'new_employee').set('coodfort-password', 'password_of_new_employee').send(corchma);
         expect(newEatery.statusCode).toBe(200);
     });
 
@@ -117,7 +117,7 @@ describe('user -> eatery', () => {
      */
     test('Creating new Eatery without tables', async () => {
         const newEatery = await request(app)
-            .post('/eatery/new')
+            .post('/eatery/update')
             .set('content-type', 'application/json')
             .set('coodfort-login', 'new_employee')
             .set('coodfort-password', 'password_of_new_employee')
@@ -133,7 +133,7 @@ describe('user -> eatery', () => {
 
     test('Creating new Eatery with tables', async () => {
         const newEatery = await request(app)
-            .post('/eatery/new')
+            .post('/eatery/update')
             .set('content-type', 'application/json')
             .set('coodfort-login', 'new_employee')
             .set('coodfort-password', 'password_of_new_employee')
@@ -185,7 +185,7 @@ describe('user -> eatery', () => {
 
 describe('Checking Employee security', () => {
     test('Attempt to create Eatery with blank login and password', async () => {
-        const a = await request(app).post('/eatery/new');
+        const a = await request(app).post('/eatery/update');
         expect(a.statusCode).toBe(401);
     });
     test('Attempt to create Employee with the same login', async () => {

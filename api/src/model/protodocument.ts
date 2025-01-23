@@ -485,9 +485,13 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     }
 
     async getCollection(whereTense: string, params: any[], orderTense: string, limit: number = 100): Promise<void> {
-        const sql = `SELECT \`${this.dataSchema.idFieldName}\` FROM \`${this.dataSchema.tableName}\` WHERE (${whereTense}) AND \`blocked\` = 0 ORDER ${orderTense} LIMIT ${limit}`;
+        const sql = `SELECT \`${this.dataSchema.idFieldName}\` FROM \`${this.dataSchema.tableName}\` WHERE (${whereTense}) AND \`blocked\` = 0 ORDER BY ${orderTense} LIMIT ${limit}`;
         mconsole.sqlq(sql, params);
         const [rows, fields] = await this.sqlConnection.query<[]>(sql, params);
         this._collection = rows;
+    }
+    get collection() {
+        if (this._collection === undefined) throw new DocumentError(DocumentErrorCode.abstract_method, `getCollection MUST be called in await mode before this call`);
+        return this._collection;
     }
 }

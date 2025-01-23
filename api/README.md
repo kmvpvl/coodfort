@@ -21,7 +21,7 @@ Owner role has all permission in one or more Eateries. Every Eatery has at least
 ### `MDM` role
 ## Security schemas
 ## Paths
-[User](#working-with-user-class) | [Eatery](#working-with-eatery-class) | [Meal](#working-with-meal-class) | [Menu](#working-with-menu-class) | [Guest](#working-with-guest-class)
+[User](#working-with-user-class) | [Eatery](#working-with-eatery-class) | [Meal](#working-with-meal-class) | [Menu](#working-with-menu-class) | [Guest](#working-with-guest-class) | [Order]
 Name|Description
 -|-
 [eatery/edit](#post-eateryedit)|Changes existing eatery object
@@ -411,6 +411,22 @@ Response body if error
     } 
 }
 ```
+### Working with ORDER class
+Order funel stages
+    
+    collectingMeal = WorkflowStatusCode.draft,
+    approvedGuest = WorkflowStatusCode.registered,
+    approvedEatery = WorkflowStatusCode.approved,
+    fulfilled = WorkflowStatusCode.done,
+    payed = WorkflowStatusCode.payed,
+    feedback = WorkflowStatusCode.review,
+    closed = WorkflowStatusCode.closed
+
+
+Working with|Methods
+-|-
+Creating, updating and view|order/update, order/view
+Routing order items|order/itemWfNext
 
 ### Working with GUEST class
 Working with|Methods
