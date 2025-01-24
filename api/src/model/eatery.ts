@@ -130,23 +130,7 @@ export class OrderItem extends Document<IOrderItem, IOrderItemDataSchema, IOrder
                 },
                 {
                     from: WorkflowStatusCode.approved,
-                    to: WorkflowStatusCode.payed,
-                },
-                {
-                    from: WorkflowStatusCode.approved,
                     to: WorkflowStatusCode.done,
-                },
-                {
-                    from: WorkflowStatusCode.done,
-                    to: WorkflowStatusCode.payed,
-                },
-                {
-                    from: WorkflowStatusCode.payed,
-                    to: WorkflowStatusCode.done,
-                },
-                {
-                    from: WorkflowStatusCode.payed,
-                    to: WorkflowStatusCode.review,
                 },
                 {
                     from: WorkflowStatusCode.done,
@@ -204,27 +188,15 @@ export class Order extends Document<IOrder, IOrderDataSchema, IOrderWFSchema> {
                 },
                 {
                     from: WorkflowStatusCode.registered,
-                    to: WorkflowStatusCode.approved,
-                },
-                {
-                    from: WorkflowStatusCode.approved,
                     to: WorkflowStatusCode.payed,
                 },
                 {
-                    from: WorkflowStatusCode.approved,
-                    to: WorkflowStatusCode.done,
-                },
-                {
-                    from: WorkflowStatusCode.done,
-                    to: WorkflowStatusCode.payed,
+                    from: WorkflowStatusCode.registered,
+                    to: WorkflowStatusCode.canceledByEatery,
                 },
                 {
                     from: WorkflowStatusCode.payed,
                     to: WorkflowStatusCode.done,
-                },
-                {
-                    from: WorkflowStatusCode.payed,
-                    to: WorkflowStatusCode.review,
                 },
                 {
                     from: WorkflowStatusCode.done,
@@ -249,24 +221,12 @@ export class Order extends Document<IOrder, IOrderDataSchema, IOrderWFSchema> {
                             to: WorkflowStatusCode.approved,
                         },
                         {
-                            from: WorkflowStatusCode.approved,
-                            to: WorkflowStatusCode.payed,
+                            from: WorkflowStatusCode.registered,
+                            to: WorkflowStatusCode.canceledByEatery,
                         },
                         {
                             from: WorkflowStatusCode.approved,
                             to: WorkflowStatusCode.done,
-                        },
-                        {
-                            from: WorkflowStatusCode.done,
-                            to: WorkflowStatusCode.payed,
-                        },
-                        {
-                            from: WorkflowStatusCode.payed,
-                            to: WorkflowStatusCode.done,
-                        },
-                        {
-                            from: WorkflowStatusCode.payed,
-                            to: WorkflowStatusCode.review,
                         },
                         {
                             from: WorkflowStatusCode.done,

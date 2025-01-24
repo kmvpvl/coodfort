@@ -17,12 +17,10 @@ export interface IOrder extends IDocument {
     comment?: string;
     esId?: string;
 }
-export enum OrderFunelStages {
-    collectingMeal = WorkflowStatusCode.draft,
-    approvedGuest = WorkflowStatusCode.registered,
-    approvedEatery = WorkflowStatusCode.approved,
-    fulfilled = WorkflowStatusCode.done,
-    payed = WorkflowStatusCode.payed,
-    feedback = WorkflowStatusCode.review,
-    closed = WorkflowStatusCode.closed,
+export interface IOrderSumBalance {
+    payed: number;
+    draftSum: number;
+    registeredSum: number;
+    approvedByEaterySum: number;
+    fulfilledSum: number;
 }

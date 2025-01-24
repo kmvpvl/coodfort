@@ -73,6 +73,7 @@ export interface IDocument {
     createdByUser?: string;
     changedByUser?: string;
     wfStatus?: WorkflowStatusCode;
+    wfHistory?: IWfHistoryItem[];
 }
 export interface IPhoto {
     url: string;
@@ -118,4 +119,10 @@ export interface IDocumentError {
 export interface IWfNextRequest {
     id: Types.ObjectId;
     nextWfStatus: WorkflowStatusCode;
+}
+
+export interface IWfHistoryItem {
+    wfStatus: WorkflowStatusCode;
+    created: Date;
+    createdByUser?: string;
 }

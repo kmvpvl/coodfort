@@ -112,7 +112,10 @@ body {
   opacity: 0.7;
   text-align: center;
   cursor: pointer;
-  width: 1.25em;
+  --max-width: fit-content;
+  min-width: fit-content;
+  width: 1.2em;
+  height: min-content;
 }
 
 .context-toolbar > span:hover, .context-menu-button:hover {

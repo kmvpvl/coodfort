@@ -94,6 +94,9 @@ components:
         wfStatus:
           description: Current workflow status of document
           type: number
+        wfHistory:
+          description: Workflow status change history
+          type: array
     ###
     # The User object
     user:

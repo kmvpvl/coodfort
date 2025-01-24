@@ -6,7 +6,7 @@ import Meal from "../menu/meal";
 import { Eatery } from "../eatery/eatery";
 import Menu from "../menu/menu";
 import { IUser, IWfNextRequest, WorkflowStatusCode } from "@betypes/prototypes";
-import { IOrder, IOrderItem, OrderFunelStages } from "@betypes/ordertypes";
+import { IOrder, IOrderItem } from "@betypes/ordertypes";
 import "react-data-grid/lib/styles.css";
 import DataGrid, { SelectColumn } from "react-data-grid";
 import { ToastType } from "../toast";
@@ -24,6 +24,7 @@ export interface IEmployeeState extends IProtoState {
 	menus: Array<IMenu | undefined>;
 	orders: Array<IOrder>;
 	selectedOrderItemsToApprove?: Set<number>;
+	selectedOrderItemsToFulfill?: Set<number>;
 }
 
 export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
@@ -127,6 +128,12 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 			},
 			err => {
 				console.log(err.json);
+				if (err.json.httpCode !== undefined) {
+					switch (err.json.httpCode) {
+						case 403:
+							this.props.toaster?.current?.addToast({ type: ToastType.error, message: "Call the owner. Role 'sous-chief' expected" });
+					}
+				}
 			}
 		);
 	}
@@ -206,20 +213,39 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 		);
 	}
 	renderORDERSFocus(): ReactNode {
-		const rows = [];
+		const toApproveRows = [];
+		const toFulfillRows = [];
+		const allRows = [];
 		for (const order of this.state.orders) {
-			rows.push(
-				...order.items.map(item => {
-					return {
-						name: this.toString(item.name),
-						id: order.id,
-						orderItemId: item.id,
-						created: new Date(item.created as unknown as string).toLocaleTimeString(),
-						stage: item.wfStatus,
-						optionName: this.toString(item.option.name),
-						count: item.count,
-					};
-				})
+			toApproveRows.push(
+				...order.items
+					.filter(item => item.wfStatus === WorkflowStatusCode.registered)
+					.map(item => {
+						return {
+							name: this.toString(item.name),
+							id: order.id,
+							orderItemId: item.id,
+							created: new Date(item.created as unknown as string).toLocaleTimeString(),
+							stage: item.wfStatus,
+							optionName: this.toString(item.option.name),
+							count: item.count,
+						};
+					})
+			);
+			toFulfillRows.push(
+				...order.items
+					.filter(item => item.wfStatus === WorkflowStatusCode.approved)
+					.map(item => {
+						return {
+							name: this.toString(item.name),
+							id: order.id,
+							orderItemId: item.id,
+							created: new Date(item.created as unknown as string).toLocaleTimeString(),
+							stage: item.wfStatus,
+							optionName: this.toString(item.option.name),
+							count: item.count,
+						};
+					})
 			);
 		}
 		//debugger
@@ -282,7 +308,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 						{ key: "count", name: "Count" },
 						{ key: "created", name: "Created", sortable: true },
 					]}
-					rows={rows}
+					rows={toApproveRows}
 					sortColumns={[{ columnKey: "created", direction: "DESC" }]}
 					onSelectedRowsChange={cells => {
 						console.log(cells);
@@ -290,6 +316,50 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 					}}
 					rowKeyGetter={row => row.orderItemId as number}
 					selectedRows={this.state.selectedOrderItemsToApprove}
+				/>
+				Fulfilling orders
+				<button
+					onClick={event => {
+						if (this.state.selectedOrderItemsToFulfill !== undefined)
+							this.serverCommand(
+								"order/itemWfNext",
+								JSON.stringify({ orderItemIds: Array.from(this.state.selectedOrderItemsToFulfill).map<IWfNextRequest>(v => ({ id: v, nextWfStatus: WorkflowStatusCode.done })) }),
+								res => {
+									console.log(res);
+									if (!res.ok) return;
+									const nState = this.state;
+									const items: IOrderItem[] = res.orderItems;
+									this.updateOrdersList();
+								},
+								err => {
+									this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
+									console.log(err.json);
+								}
+							);
+						this.setState({ ...this.state, selectedOrderItemsToFulfill: undefined });
+					}}>
+					Ready
+				</button>
+				<DataGrid
+					isRowSelectionDisabled={row => false}
+					columns={[
+						SelectColumn,
+						{ key: "id", name: "Order#" },
+						{ key: "orderItemId", name: "OrderItem#" },
+						{ key: "stage", name: "Stage" },
+						{ key: "name", name: "Meal", resizable: true, width: "20%" },
+						{ key: "optionName", name: "Option" },
+						{ key: "count", name: "Count" },
+						{ key: "created", name: "Created", sortable: true },
+					]}
+					rows={toFulfillRows}
+					sortColumns={[{ columnKey: "created", direction: "DESC" }]}
+					onSelectedRowsChange={cells => {
+						console.log(cells);
+						this.setState({ ...this.state, selectedOrderItemsToFulfill: cells });
+					}}
+					rowKeyGetter={row => row.orderItemId as number}
+					selectedRows={this.state.selectedOrderItemsToFulfill}
 				/>
 			</div>
 		);

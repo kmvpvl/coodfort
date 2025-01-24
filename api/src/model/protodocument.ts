@@ -24,6 +24,7 @@ export const DocumentBaseSchema: ITableFieldSchema[] = [
     { name: `lockedByUser`, type: 'varchar(128)', comment: 'User name who locked Document the last' },
     { name: `blocked`, type: 'tinyint(1)', required: true, default: '0', comment: 'Is Document blocked' },
     { name: `wfStatus`, type: 'INT(11)', comment: 'Workflow status of Document' },
+    { name: `wfHistory`, type: 'json', comment: 'Workflow history of Document' },
     { name: `createdByUser`, type: 'varchar(128)', comment: 'User login who created the Document' },
     { name: `changedByUser`, type: 'varchar(128)', comment: 'User login who changed the Document the last' },
     { name: `created`, type: 'timestamp', required: true, default: 'current_timestamp()', comment: 'Time when the document created' },
@@ -85,7 +86,6 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
                     if (arg[0].id !== undefined) this._id = arg[0].id;
                     else this._id = undefined;
                     this._data = arg[0];
-                    if (this._id === undefined && this._data !== undefined) this._data.wfStatus = this.wfSchema.initialState;
                 } else {
                     this._id = arg[0];
                 }
@@ -123,6 +123,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
                 user: db_user,
                 password: db_pwd,
                 port: db_port,
+                timezone: 'Z',
             });
         }
         if (Document._sqlConnection === undefined) throw new DocumentError(DocumentErrorCode.sql_connection_error, 'Unable to connect database');
@@ -143,6 +144,11 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     async save(username?: string): Promise<DataType> {
         await Document.createSQLConnection();
 
+        if (this._id === undefined && this._data !== undefined) {
+            this._data.wfHistory = [{ wfStatus: this.wfSchema.initialState, created: new Date(), createdByUser: username }];
+            this._data.wfStatus = this.wfSchema.initialState;
+        }
+
         let schemaDefinedFields: ITableFieldSchema[] = this.dataSchema.fields;
         let wfSchemaDefinedFields: ITableFieldSchema[] = DocumentBaseSchema.filter(field => field.name !== 'created' && field.name !== 'changed');
         this.data.changedByUser = username;
@@ -150,6 +156,13 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
             this.data.createdByUser = username;
             schemaDefinedFields = this.dataSchema.fields.filter(field => (this.data as any)[field.name] !== undefined);
             wfSchemaDefinedFields = DocumentBaseSchema.filter(field => (this.data as any)[field.name] !== undefined);
+        } else {
+            if (this.data.wfHistory !== undefined && this.data.wfStatus !== undefined) {
+                const lastWfStatus = this.data.wfHistory[this.data.wfHistory.length - 1].wfStatus;
+                if (this.data.wfStatus !== lastWfStatus) {
+                    this.data.wfHistory.push({ wfStatus: this.data.wfStatus, created: new Date(), createdByUser: username });
+                }
+            }
         }
         let sql: string;
         if (this._id === undefined)
@@ -214,7 +227,10 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
                     for (const element of arrProp) {
                         //calc initial state for child record
                         const initialState = this.wfSchema.related?.filter(el => el.tableName === relObj.tableName)?.at(0)?.initialState;
-                        if (element.wfStatus === undefined) element.wfStatus = initialState;
+                        if (element.wfStatus === undefined) {
+                            element.wfStatus = initialState;
+                            element.wfHistory = [{ wfStatus: initialState, created: new Date(), createdByUser: username }];
+                        }
 
                         let schemaDefinedFields = relObj.fields;
                         let wfSchemaDefinedFields = DocumentBaseSchema.filter(field => field.name !== 'created' && field.name !== 'changed');
@@ -274,7 +290,6 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         if (data !== undefined) {
             this._data = data;
             this._id = this._data.id;
-            if (this._id === undefined && this._data !== undefined) this._data.wfStatus = this.wfSchema.initialState;
         } else {
             const ou: DataType = await this.loadFromDB();
             this.load(ou);

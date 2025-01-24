@@ -17,13 +17,18 @@
     --max-width: 67%;
 }
 
-.order-grid div {
+.order-grid > div {
     border-right: 1px solid;
     border-bottom: 1px solid;
     padding: 5px;
+    position: relative;
 }
 
-.order-grid div:nth-child(-n+6) {
+.order-grid > div.canceled {
+    text-decoration: line-through;
+}
+
+.order-grid > div:nth-child(-n+6) {
     font-weight: bold;
     text-align: center;
 }
@@ -31,4 +36,36 @@
 .order-grid div:nth-child(1) {
     text-align: left;
     font-weight: normal;
+}
+.order-item-progress-compact-container {
+    display: inline-flex;
+    flex-wrap: wrap;
+    border: none;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    gap: 1px;
+}
+.order-item-progress-compact-container > span {
+    border-width: 1px;
+    border-radius: 50%;
+    width: 1.5em;
+    height: 1.5em;
+    display: inline-block;
+    text-align: center;
+    border-style: dotted;
+    font-size: 70%;
+}
+.order-item-progress-compact-container > span.done {
+    border-color: darkgreen;
+    background-color: green ;
+    color: white;
+    border-style: solid;
+}
+
+.order-item-progress-compact-container > span.canceled {
+    border-color: darkred;
+    background-color: red;
+    color: white;
+    border-style: solid;
 }

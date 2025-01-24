@@ -172,6 +172,7 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 		) : (
 			<>
 				<Employee employee={this.state.user} toaster={this.toasterRef} />
+				<Toaster ref={this.toasterRef} placesCount={3} />
 				<Pinger />
 			</>
 		);

@@ -1,8 +1,8 @@
 import React, { Fragment, ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
-import { IOrder, IOrderItem } from "@betypes/ordertypes";
+import { IOrder, IOrderItem, IOrderSumBalance } from "@betypes/ordertypes";
 import "./order.css";
-import { IWfNextRequest, Types, WorkflowStatusCode } from "@betypes/prototypes";
+import { IWfHistoryItem, IWfNextRequest, Types, WorkflowStatusCode } from "@betypes/prototypes";
 import { ToastType } from "../toast";
 export interface IOrderProps extends IProtoProps {
 	defaultValue?: IOrder;
@@ -98,8 +98,26 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 			}
 		);
 	}
+	calcSum(): IOrderSumBalance {
+		return this.state.value.items.reduce<IOrderSumBalance>(
+			(prevVal, curItem) => ({
+				payed: 0,
+				draftSum: curItem.wfStatus === WorkflowStatusCode.draft ? prevVal.draftSum + curItem.option.amount * curItem.count : prevVal.draftSum,
+				registeredSum: curItem.wfStatus === WorkflowStatusCode.registered ? prevVal.registeredSum + curItem.option.amount * curItem.count : prevVal.registeredSum,
+				approvedByEaterySum: curItem.wfStatus === WorkflowStatusCode.approved ? prevVal.approvedByEaterySum + curItem.option.amount * curItem.count : prevVal.approvedByEaterySum,
+				fulfilledSum: curItem.wfStatus === WorkflowStatusCode.done ? prevVal.fulfilledSum + curItem.option.amount * curItem.count : prevVal.fulfilledSum,
+			}),
+			{
+				payed: 0,
+				draftSum: 0,
+				registeredSum: 0,
+				approvedByEaterySum: 0,
+				fulfilledSum: 0,
+			}
+		);
+	}
 	renderCompact(): ReactNode {
-		const sum = this.state.value.items.reduce((prevVal, curItem) => prevVal + curItem.option.amount * curItem.count, 0);
+		const total = this.calcSum();
 		return (
 			<div
 				className="order-compact-container"
@@ -110,14 +128,13 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 					<span className="context-menu-button">
 						<i className="fa fa-shopping-basket"></i>
 					</span>
-					Total: {sum}
+					Total: {total.approvedByEaterySum + total.registeredSum + total.fulfilledSum} {this.toString(this.state.value.items.at(0)?.option.currency)}
 				</div>
 			</div>
 		);
 	}
 	render(): ReactNode {
 		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
-		const sum = this.state.value.items.reduce((prevVal, curItem) => prevVal + curItem.option.amount * curItem.count, 0);
 		return (
 			<div className="order-container">
 				<div className="order-grid">
@@ -153,76 +170,119 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 							✔
 						</span>
 					</div>
-					<div>#</div>
+					<div>WF</div>
 					<div>Name</div>
 					<div>Price</div>
 					<div>Count</div>
 					<div>Cost, {this.toString(this.state.value.items?.at(0)?.option.currency)}</div>
 					{this.state.value.items.map((item, idx) => (
 						<Fragment key={idx}>
-							<div>{idx + 1}</div>
-							<div key={idx}>
+							{item.wfHistory !== undefined ? <OrderItemProgress wfHistory={item.wfHistory} toaster={this.props.toaster} /> : <></>}
+							<div key={idx} className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>
 								{this.toString(item.name)}({this.toString(item.option.name)})
 							</div>
-							<div>{item.option.amount}</div>
-							<div className="context-menu">
-								<span
-									className="context-menu-button"
-									onClick={event => {
-										event.stopPropagation();
-										const nState = this.state;
-										nState.value.items.splice(idx, 1);
-										this.save();
-										this.setState(nState);
-									}}>
-									⤬
-								</span>
-								<span
-									className="context-menu-button"
-									onClick={event => {
-										event.stopPropagation();
-										const nState = this.state;
-										if (nState.value.items !== undefined && nState.value.items[idx] !== undefined) {
-											nState.value.items[idx].count -= 1;
-											if (nState.value.items[idx].count <= 0) nState.value.items.splice(idx, 1);
-										}
-										this.save();
-										this.setState(nState);
-									}}>
-									-
-								</span>
+							<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>{item.option.amount}</div>
+							<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : "context-menu"}>
+								{item.wfStatus === WorkflowStatusCode.draft ? (
+									<span
+										className="context-menu-button"
+										onClick={event => {
+											event.stopPropagation();
+											const nState = this.state;
+											nState.value.items.splice(idx, 1);
+											this.save();
+											this.setState(nState);
+										}}>
+										⤬
+									</span>
+								) : (
+									<></>
+								)}
+								{item.wfStatus === WorkflowStatusCode.draft ? (
+									<span
+										className="context-menu-button"
+										onClick={event => {
+											event.stopPropagation();
+											const nState = this.state;
+											if (nState.value.items !== undefined && nState.value.items[idx] !== undefined) {
+												nState.value.items[idx].count -= 1;
+												if (nState.value.items[idx].count <= 0) nState.value.items.splice(idx, 1);
+											}
+											this.save();
+											this.setState(nState);
+										}}>
+										-
+									</span>
+								) : (
+									<></>
+								)}
 								{item.count}
-								<span
-									className="context-menu-button"
-									onClick={event => {
-										event.stopPropagation();
-										const nState = this.state;
-										if (nState.value.items !== undefined && nState.value.items[idx] !== undefined) nState.value.items[idx].count += 1;
-										this.save();
-										this.setState(nState);
-									}}>
-									+
-								</span>
+								{item.wfStatus === WorkflowStatusCode.draft ? (
+									<span
+										className="context-menu-button"
+										onClick={event => {
+											event.stopPropagation();
+											const nState = this.state;
+											if (nState.value.items !== undefined && nState.value.items[idx] !== undefined) nState.value.items[idx].count += 1;
+											this.save();
+											this.setState(nState);
+										}}>
+										+
+									</span>
+								) : (
+									<></>
+								)}
 							</div>
-							<div>{item.count * item.option.amount}</div>
+							<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>{item.count * item.option.amount}</div>
 						</Fragment>
 					))}
-					<div style={{ gridColumn: "span 4" }}>
-						<i className="fa fa-shopping-basket"></i>Total:
-					</div>
-					<div>{sum}</div>
 				</div>
 			</div>
 		);
 	}
 }
 
-export interface IOrderItemProgressProps {}
+export interface IOrderItemProgressProps extends IProtoProps {
+	viewMode?: ViewModeCode;
+	wfHistory: IWfHistoryItem[];
+}
 
-export interface IOrderItemProgressState {}
+export interface IOrderItemProgressState extends IProtoState {
+	viewMode: ViewModeCode;
+}
 
-export class IOrderProgress extends React.Component<IOrderItemProgressProps, IOrderItemProgressState> {
+export class OrderItemProgress extends Proto<IOrderItemProgressProps, IOrderItemProgressState> {
+	state: Readonly<IOrderItemProgressState> = {
+		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.compact,
+	};
+	renderCompact(): ReactNode {
+		const isRegistered = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.registered).length === 1;
+		const isApproved = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.approved).length === 1;
+		const isCanceledByEatery = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.canceledByEatery).length === 1;
+		const isFulfilled = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.done).length === 1;
+		return (
+			<div
+				className="order-item-progress-compact-container"
+				onClick={event => {
+					this.props.toaster?.current?.addToast({ type: ToastType.info, message: JSON.stringify(this.props.wfHistory), modal: false });
+				}}>
+				<span className={isRegistered ? "done" : ""}>✎</span>
+				{isCanceledByEatery ? <span className="canceled">✖</span> : <span className={isApproved ? "done" : ""}>✔</span>}
+				<span className={isFulfilled ? "done" : ""}>⚗</span>
+				<span>⟴</span>
+			</div>
+		);
+	}
 	render(): ReactNode {
-		return <div className="order-item-progress-container"></div>;
+		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
+		return (
+			<div className="order-item-progress-container">
+				<span>registered</span>
+				<span>approved</span>
+				<span>fullfilled</span>
+				<span>payed</span>
+				<span>review</span>
+			</div>
+		);
 	}
 }
