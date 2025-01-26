@@ -63,7 +63,13 @@ body {
   gap: 0.25em;
 }
 
-.toolbar > span, .toolbar > label {
+.standalone-toolbar {
+  display: flex;
+  gap: .1em;
+  align-items: end;
+}
+
+.toolbar > span, .toolbar > label, .standalone-toolbar > span{
   cursor: pointer;
   --font-size: 110%;
   text-align: center;
@@ -74,7 +80,7 @@ body {
   background-color: var(--background-color);
 }
 
-.toolbar > span:hover, .toolbar > label:hover {
+.toolbar > span:hover, .toolbar > label:hover, .standalone-toolbar > span:hover{
   transition: all 0.5s;
   background-color: var(--text-color);
   color: var(--background-color);
@@ -177,4 +183,15 @@ body {
 }
 .ready-to-drop {
   animation: ready-to-drop-animation 2s infinite;
+}
+
+.badge {
+  background-color: navy;
+  color: white;
+  border-radius: 1.5vh;
+  display: inline-block;
+  text-align: center;
+  min-width: 3vh;
+  width: auto;
+  border: 2px solid white;
 }

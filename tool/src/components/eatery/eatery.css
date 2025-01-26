@@ -2,13 +2,21 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 5px;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    scrollbar-width: thin;
 }
 
 .eatery-admin-photos, .eatery-admin-description {
     grid-column: span 2;
 }
 .eatery-admin-container {
-    max-width: 100%;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
 }
 
 .eatery-admin-tables-container {
@@ -50,6 +58,7 @@
     align-items: center;
     gap: .5em;
     --font-size: 170%;
+    width: min-content;
 }
 .eatery-compact-photos {
     width: 5em;

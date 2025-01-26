@@ -1,0 +1,124 @@
+.dispatcher-container {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+}
+
+.dispatcher-header-container {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+}
+
+.dispatcher-logo-container, .dispatcher-user-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid;
+}
+
+.dispatcher-eateries-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    border-top: 1px solid;
+    border-left: 1px solid;
+    border-right: 1px solid;
+}
+
+.dispatcher-eateries-eatery-container {
+    border-bottom: 1px solid var(--text-color);
+    border-right: 1px solid var(--text-color);
+    padding: .5em;
+    cursor: pointer;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.dispatcher-eateries-eatery-container.selected {
+    color: var(--background-color);
+    background-color: var(--text-color);
+}
+
+.dispatcher-content-container {
+    display: grid;
+    grid-template-columns: auto .5em 1fr .5em auto;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.dispatcher-menu-separator {
+    padding-top: 1em;
+    border-bottom: 1px solid;
+    padding-bottom: .5em;
+    font-weight: bold;
+}
+
+.dispatcher-menu-item {
+    padding: .2em;
+    cursor: pointer;
+}
+.dispatcher-menu-item.selected{
+    color: var(--background-color);
+    background-color: var(--text-color);
+    font-weight: bold;
+}
+
+.dispatcher-menu-item:hover {
+    text-decoration:underline
+}
+
+.dispatcher-content-leftmenu {
+    border-right: 1px solid;
+    padding: .1em;
+}
+
+.dispatcher-content-middle {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.dispatcher-menus-list, .dispatcher-meals-list {
+    display: flex;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    flex-wrap: wrap;
+}
+
+.dispatcher-menus-container, .dispatcher-meals-container {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+}
+
+.dispatcher-content-rightmenu {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    border-left: 1px solid;
+}
+
+.dispatcher-right-meals-container {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+}
+
+.dispatcher-right-meals-container > div {
+    overflow-y: auto;
+}
+
+.dispatcher-content-left-sizer, .dispatcher-content-right-sizer {
+    cursor: col-resize;
+}

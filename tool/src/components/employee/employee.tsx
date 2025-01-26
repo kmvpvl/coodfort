@@ -225,7 +225,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 							name: this.toString(item.name),
 							id: order.id,
 							orderItemId: item.id,
-							created: new Date(item.created as unknown as string).toLocaleTimeString(),
+							time: Math.round((-new Date(item.changed as unknown as string).getTime() + new Date().getTime()) / 1000 / 60),
 							stage: item.wfStatus,
 							optionName: this.toString(item.option.name),
 							count: item.count,
@@ -302,14 +302,14 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 						SelectColumn,
 						{ key: "id", name: "Order#" },
 						{ key: "orderItemId", name: "OrderItem#" },
-						{ key: "stage", name: "Stage" },
+						//{ key: "stage", name: "Stage" },
 						{ key: "name", name: "Meal", resizable: true, width: "20%" },
 						{ key: "optionName", name: "Option" },
 						{ key: "count", name: "Count" },
-						{ key: "created", name: "Created", sortable: true },
+						{ key: "time", name: "Minutes elps", sortable: true },
 					]}
 					rows={toApproveRows}
-					sortColumns={[{ columnKey: "created", direction: "DESC" }]}
+					sortColumns={[{ columnKey: "time", direction: "DESC" }]}
 					onSelectedRowsChange={cells => {
 						console.log(cells);
 						this.setState({ ...this.state, selectedOrderItemsToApprove: cells });

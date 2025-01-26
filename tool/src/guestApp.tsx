@@ -9,7 +9,7 @@ import React from "react";
 import Logo from "./components/logo/logo";
 import Pinger from "./components/pinger/pinger";
 import { Html5Qrcode } from "html5-qrcode";
-import { IEatery, IMenuItem, ITable } from "@betypes/eaterytypes";
+import { IEatery, ITable } from "@betypes/eaterytypes";
 import { Eatery } from "./components/eatery/eatery";
 import { ViewModeCode } from "./components/proto";
 import { revealTelegramStartAppParams } from "./model/tools";
@@ -327,7 +327,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	renderChoose(): ReactNode {
 		return (
 			<div className="guest-app-choose-container">
-				<Menu menuId={this.state.choosenEatery?.id} onSelectMenuItem={this.onSelectMenuItem.bind(this)} />
+				<Menu menuId={this.state.choosenEatery?.menuId} onSelectMenuItem={this.onSelectMenuItem.bind(this)} />
 				{this.state.eateryId !== undefined ? <Order ref={this.orderRef} orderId={this.state.orders?.at(0)?.id} eateryId={this.state.eateryId} toaster={this.toasterRef} /> : <></>}
 			</div>
 		);

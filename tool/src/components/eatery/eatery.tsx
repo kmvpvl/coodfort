@@ -13,8 +13,11 @@ type EateryFocus = "none" | "profile" | "tables" | "menu" | "entertainments";
 export interface IEateryProps extends IProtoProps {
 	defaultValue?: IEatery;
 	admin?: boolean;
+	editMode?: boolean;
 	onSave?: (eatery: IEatery) => void;
 	viewMode?: ViewModeCode;
+	className?: string;
+	onClick?: (eatery: IEatery) => void;
 }
 
 export interface IEateryState extends IProtoState {
@@ -29,7 +32,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 	photosRef: React.RefObject<Photos | null> = React.createRef();
 	state: IEateryState = {
 		value: this.props.defaultValue ? this.props.defaultValue : this.new(),
-		editMode: false,
+		editMode: this.props.editMode !== undefined ? this.props.editMode : false,
 		changed: false,
 		viewMode: this.props.viewMode === undefined ? ViewModeCode.normal : this.props.viewMode,
 	};
@@ -90,12 +93,12 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 	renderEditMode(): ReactNode {
 		return (
 			<div
-				className="eatery-admin-container has-caption"
+				className="eatery-admin-container"
 				onKeyUp={event => {
 					console.log(event);
 				}}>
-				<div className="caption">EATERY: {this.toString(this.state.value.name)}</div>
-				<div className="toolbar">
+				<div className="standalone-toolbar">
+					EATERY: {this.toString(this.state.value.name)}
 					<span onClick={this.save.bind(this)}>
 						<i className="fa fa-save" style={this.state.changed ? { color: "red" } : {}} />
 					</span>
@@ -297,7 +300,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 	}
 	renderCompact(): ReactNode {
 		return (
-			<div className="eatery-compact-container">
+			<div className={`eatery-compact-container ${this.props.className !== undefined ? this.props.className : ""}`} onClick={event => this.props.onClick?.call(this, this.state.value)}>
 				<Photos className="eatery-compact-photos" defaultValue={this.state.value.photos} />
 				<div>{this.toString(this.state.value.name)}</div>
 			</div>

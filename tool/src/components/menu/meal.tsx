@@ -1,6 +1,6 @@
 import "./meal.css";
 import { ReactNode } from "react";
-import Proto, { IProtoProps, IProtoState } from "../proto";
+import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 
 import { IMeal } from "@betypes/eaterytypes";
 import MLStringEditor from "../mlstring/mlstring";
@@ -13,6 +13,7 @@ export interface IMealProps extends IProtoProps {
 	defaultValue?: IMeal;
 	admin?: boolean;
 	maximized?: boolean;
+	viewMode?: ViewModeCode;
 	onSave?: (newValue: IMeal) => void;
 	onChange?: (newValue: IMeal) => void;
 }

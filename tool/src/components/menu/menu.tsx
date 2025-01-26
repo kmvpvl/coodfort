@@ -245,7 +245,9 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 				onDragStart={event => {
 					event.dataTransfer.setData("coodfort/menu", JSON.stringify(this.state.value));
 				}}>
-				MENU: {this.state.value.name}-{new Date(this.state.value.changed ? this.state.value.changed : new Date()).toLocaleString()}
+				<div>{this.state.value.name}</div>
+				<div>{new Date(this.state.value.changed ? this.state.value.changed : new Date()).toLocaleDateString()}</div>
+				<div>{new Date(this.state.value.changed ? this.state.value.changed : new Date()).toLocaleTimeString()}</div>
 			</div>
 		);
 	}
