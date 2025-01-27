@@ -6,6 +6,7 @@ import { Eatery, Order } from './eatery';
 import { EateryRoleCode, IEatery, IEateryBrief, IMealRow, IMenuRow, IOrderRow } from '../types/eaterytypes';
 import { mconsole } from './console';
 import { Meal, Menu } from './meal';
+import { IOrder } from '../types/ordertypes';
 
 interface ITGSecurity extends IDocument {
     tguserid: number;
@@ -133,15 +134,20 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
         return rows;
     }
 
-    async ordersList(eateryId?: Types.ObjectId): Promise<IOrderRow[]> {
-        const sql = `select \`orders\`.* from \`orders\` where \`userId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ?' : ''}`;
-        const params = [this.id];
+    async ordersList(eateryId?: Types.ObjectId, tableId?: Types.ObjectId, wfStatuses?: WorkflowStatusCode[]): Promise<IOrder[]> {
+        const sql = `select \`orders\`.* from \`orders\` where \`userId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ? ' : ''} ${tableId !== undefined ? 'AND `tableId` = ? ' : ''} ${wfStatuses !== undefined && wfStatuses.length > 0 ? `AND ( ${wfStatuses.map(status => '`wfStatus` = ? ').join(' OR ')} )` : ''}`;
+        const params: any[] = [this.id];
         if (eateryId !== undefined) params.push(eateryId);
+        if (tableId !== undefined) params.push(tableId);
+        if (wfStatuses !== undefined) params.push(...wfStatuses);
         mconsole.sqlq(sql, params);
-        const [rows, fields] = await this.sqlConnection.query<IOrderRow[]>(sql, [this.id]);
-        const schema = new Order().dataSchema;
-        rows.forEach(row => this.jsonTranslate(row, schema));
-        mconsole.sqlinfo(rows, fields);
-        return rows;
+        const [rows, fields] = await this.sqlConnection.query<IOrderRow[]>(sql, params);
+        const ret: IOrder[] = [];
+        for (const row of rows) {
+            const o = new Order(row.id as Types.ObjectId);
+            await o.load();
+            ret.push(o.data);
+        }
+        return ret;
     }
 }

@@ -122,3 +122,12 @@
 .dispatcher-content-left-sizer, .dispatcher-content-right-sizer {
     cursor: col-resize;
 }
+
+.dispatcher-calls-container {
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+}

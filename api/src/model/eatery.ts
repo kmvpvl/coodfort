@@ -2,7 +2,7 @@ import { Document, IDocumentDataSchema, IDocumentWFSchema } from './protodocumen
 import { WorkflowStatusCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
 import { EateryRoleCode, IEatery } from '../types/eaterytypes';
-import { IOrder, IOrderItem } from '../types/ordertypes';
+import { IOrder, IOrderItem, ITableCallWaiterSignal } from '../types/ordertypes';
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
 interface IEateryWFSchema extends IDocumentWFSchema {}
@@ -84,6 +84,27 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
 
     checkRoles(roleToCheck: EateryRoleCode, userId: Types.ObjectId): boolean {
         return this.data.employees.some(empl => empl.userId === userId && (empl.roles === roleToCheck || empl.roles === EateryRoleCode.owner));
+    }
+}
+interface ITableCallWaiterSignalDataSchema extends IDocumentDataSchema {}
+interface ITableCallWaiterSignalWFSchema extends IDocumentWFSchema {}
+export class TableCallWaiterSignal extends Document<ITableCallWaiterSignal, ITableCallWaiterSignalDataSchema, ITableCallWaiterSignalWFSchema> {
+    get dataSchema(): ITableCallWaiterSignalDataSchema {
+        return {
+            tableName: 'tableCallWaiter',
+            idFieldName: 'id',
+            fields: [
+                { name: `tableId`, type: 'bigint(20)', required: true },
+                { name: `on`, type: 'tinyint(1)', required: true },
+                { name: `userId`, type: 'bigint(20)', required: true },
+            ],
+        };
+    }
+    get wfSchema(): ITableCallWaiterSignalWFSchema {
+        return {
+            tableName: 'tableCallWaiter',
+            initialState: WorkflowStatusCode.draft,
+        };
     }
 }
 

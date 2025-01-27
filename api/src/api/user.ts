@@ -84,9 +84,9 @@ export async function userMenusList(c: Context, req: Request, res: Response, use
 
 export async function userOrdersList(c: Context, req: Request, res: Response, user: User) {
     try {
-        return res.status(200).json({ ok: true, orders: await user.ordersList() });
+        return res.status(200).json({ ok: true, orders: await user.ordersList(req.body.eateryId, req.body.tableId, req.body.wfStatuses) });
     } catch (e: any) {
         if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: (e as DocumentError).json });
-        return res.status(400).json({ ok: false, error: { message: e.message } });
+        return res.status(400).json({ ok: false, error: e });
     }
 }

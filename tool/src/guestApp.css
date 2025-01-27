@@ -91,16 +91,17 @@
 }
 
 .guest-app-nav-bottom span.stage {
-  flex-basis: 15%;
+  --flex-basis: 15%;
   border: 1px solid;
   padding: 0.5em;
   border-radius: 0.5em;
+  cursor: pointer;
 }
 .guest-app-nav-bottom span.stage.current {
     background-color: var(--text-color);
     color: var(--background-color);
 }
-.guest-app-nav-bottom span:not(.stage) {
+.guest-app-nav-bottom > span:not(.stage) {
   font-size: 200%;
 }
 

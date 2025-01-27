@@ -1,4 +1,4 @@
-import { Types } from "@betypes/prototypes";
+import { Types, WorkflowStatusCode } from "@betypes/prototypes";
 
 import { Fragment, ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/proto";
@@ -24,7 +24,7 @@ export interface IGuestAppProps extends IProtoProps {
 	itemMenuId?: Types.ObjectId;
 }
 
-const OrderStages = ["CheckIn", "Choose", "Pay", "Enjoy"];
+const OrderStages = ["CheckIn", "Choose", "Pay"];
 
 export interface IGuestAppState extends IProtoState {
 	eateryId?: Types.ObjectId;
@@ -36,7 +36,7 @@ export interface IGuestAppState extends IProtoState {
 	connected?: boolean;
 	scanner?: Html5Qrcode;
 	stage?: string;
-	orders?: IOrder[];
+	order?: IOrder;
 }
 
 export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
@@ -52,7 +52,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			undefined,
 			res => {
 				const nState = this.state;
-				if (this.state.eateryId === undefined) {
+				if (this.state.eateryId === undefined && this.state.tableId === undefined) {
 					nState.stage = "checkin";
 				} else {
 					//nState.stage = "choose";
@@ -88,12 +88,19 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	updateOrdersList() {
 		this.serverCommand(
 			"user/ordersList",
-			undefined,
+			JSON.stringify({
+				eateryId: this.state.eateryId,
+				tableId: this.state.tableId,
+				wfStatuses: [WorkflowStatusCode.draft, WorkflowStatusCode.registered],
+			}),
 			res => {
 				console.log(res);
 				if (res.ok) {
 					const nState = this.state;
-					nState.orders = res.orders;
+					if (res.orders.length !== 1) {
+					} else {
+						nState.order = res.orders[0];
+					}
 
 					this.setState(nState);
 				}
@@ -328,15 +335,26 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		return (
 			<div className="guest-app-choose-container">
 				<Menu menuId={this.state.choosenEatery?.menuId} onSelectMenuItem={this.onSelectMenuItem.bind(this)} />
-				{this.state.eateryId !== undefined ? <Order ref={this.orderRef} orderId={this.state.orders?.at(0)?.id} eateryId={this.state.eateryId} toaster={this.toasterRef} /> : <></>}
 			</div>
 		);
 	}
 	renderPay(): ReactNode {
-		return <div>Pay</div>;
-	}
-	renderEnjoy(): ReactNode {
-		return <div>Enjoy</div>;
+		return this.state.eateryId !== undefined && this.state.tableId !== undefined && this.state.order !== undefined ? (
+			<Order
+				viewMode={ViewModeCode.normal}
+				orderId={this.state.order.id}
+				eateryId={this.state.eateryId}
+				tableId={this.state.tableId}
+				toaster={this.toasterRef}
+				onChange={order => {
+					const nState = this.state;
+					nState.order = order;
+					this.setState(nState);
+				}}
+			/>
+		) : (
+			<></>
+		);
 	}
 	renderNavTop(): ReactNode {
 		return (
@@ -357,7 +375,34 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 						const curStage = this.state.stage?.toLowerCase() === OrderStages[idx].toLowerCase();
 						return (
 							<Fragment key={idx}>
-								<span className={`stage ${curStage ? "current" : ""}`}>{stage}</span>
+								<span
+									data-stage={stage}
+									onClick={event => {
+										const choosenStage = event.currentTarget.attributes.getNamedItem("data-stage")?.value.toLowerCase();
+										if (choosenStage !== this.state.stage && choosenStage !== undefined) {
+											const nState = this.state;
+											nState.stage = choosenStage;
+											this.setState(nState);
+										}
+									}}
+									className={`stage ${curStage ? "current" : ""}`}>
+									{stage === "Pay" && this.state.eateryId !== undefined && this.state.tableId !== undefined ? (
+										<Order
+											ref={this.orderRef}
+											defaultValue={this.state.order}
+											eateryId={this.state.eateryId}
+											tableId={this.state.tableId}
+											toaster={this.toasterRef}
+											onChange={order => {
+												const nState = this.state;
+												nState.order = order;
+												this.setState(nState);
+											}}
+										/>
+									) : (
+										stage
+									)}
+								</span>
 								{idx + 1 < arr.length ? <span>→</span> : <></>}{" "}
 							</Fragment>
 						);
@@ -389,9 +434,6 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 						break;
 					case "pay":
 						content = this.renderPay();
-						break;
-					case "enjoy":
-						content = this.renderEnjoy();
 						break;
 					default:
 						content = <div>Something went wrong!</div>;

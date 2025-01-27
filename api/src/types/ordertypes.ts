@@ -20,7 +20,14 @@ export interface IOrder extends IDocument {
 export interface IOrderSumBalance {
     payed: number;
     draftSum: number;
+    draftCount: number;
     registeredSum: number;
     approvedByEaterySum: number;
     fulfilledSum: number;
+}
+
+export interface ITableCallWaiterSignal extends IDocument {
+    tableId: Types.ObjectId;
+    on: boolean;
+    userId?: Types.ObjectId;
 }

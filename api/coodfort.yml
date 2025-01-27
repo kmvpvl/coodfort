@@ -226,6 +226,26 @@ components:
               type: boolean
         - $ref: "#/components/schemas/proto"
     ###
+    # The TableCallWaiterSignal object
+    tableCallWaiterSignal:
+      description: Signal of either turn on or turn off call waiter
+      allOf:
+        - type: object
+          required:
+            - tableId
+            - on
+          properties:
+            tableId:
+              description: Table uniq id
+              type: number
+            on:
+              type: boolean
+              description: Turn on or turn off
+            userId:
+              type: number
+              description: User who does the action
+        - $ref: "#/components/schemas/proto"
+    ###
     # The Orderitem object
     orderItem:
       description: |
@@ -253,6 +273,8 @@ components:
           required:
             - items
             - discount
+            - eateryId
+            - tableId
           properties:
             userId: 
               type: number
@@ -478,6 +500,46 @@ paths:
           $ref: "#/components/responses/errorResponse"
         '400':
           $ref: "#/components/responses/errorResponse"
+  /eatery/tableCallWaiterSignals:
+    post:
+      operationId: tableCallWaiterSignalsList
+      description: Reads actual statuses of calling waiter
+      tags:
+        - eatery
+        - waiter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tableIds
+              properties:
+                tableIds:
+                  type: array
+                  items:
+                    type: number
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - tableCallWaiterSignals
+                  - ok
+                properties:
+                  ok:
+                    type: boolean
+                  tableCallWaiterSignals:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/tableCallWaiterSignal"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
   /eatery/ordersList:
     post:
       operationId: eateryOrderList
@@ -545,6 +607,35 @@ paths:
           $ref: "#/components/responses/userSuccess"
         '400':
           $ref: "#/components/responses/errorResponse"
+  /user/callWaiter:
+    post:
+      description: Calling an waiter or turn off the call
+      tags:
+        - user
+        - waiter
+      operationId: callWaiter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/tableCallWaiterSignal"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ok
+                  - tableCallWaiterSignal
+                properties:
+                  ok:
+                    type: boolean
+                  tableCallWaiterSignal:
+                    $ref: "#/components/schemas/tableCallWaiterSignal"
+        '400':
+          $ref: "#/components/responses/errorResponse"
   /user/eateriesList:
     post:
       operationId: userEateriesList
@@ -565,10 +656,41 @@ paths:
           description: OK
   /user/ordersList:
     post:
+      description: "Returns array of Orders by filters: userId, eateryId, tableId, wfStatus"
       operationId: userOrdersList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eateryId:
+                  type: number
+                tableId:
+                  type: number
+                wfStatuses:
+                  type: array
+                  items:
+                    type: number
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ok
+                  - orders
+                properties:
+                  ok:
+                    type: boolean
+                  orders:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/order"
+        '400':
+          $ref: "#/components/responses/errorResponse"
   /meal/new:
     post:
       operationId: newMeal

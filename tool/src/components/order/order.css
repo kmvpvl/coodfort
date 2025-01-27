@@ -1,20 +1,24 @@
-.order-container, .order-compact-container {
-    position: absolute;
-    right: 0em;
-    bottom: 0em;
-    background-color: var(--background-color);
-    padding: 1em;
-    font-size: 80%;
+.order-container {
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-rows: auto auto 1fr;
+    grid-template-columns: 1fr;
+    overflow: hidden;
+}
+
+.order-compact-container {
+    --:0;
 }
 
 .order-grid {
     display: grid;
-    grid-template-columns: auto 1fr auto auto auto;
+    grid-template-columns: auto 1fr auto auto min-content;
     border-left: 1px solid;
     border-top: 1px solid;
-    max-height: 50%;
     overflow: auto;
-    --max-width: 67%;
+    max-height: 100%;
+    height: min-content;
 }
 
 .order-grid > div {
@@ -28,23 +32,23 @@
     text-decoration: line-through;
 }
 
-.order-grid > div:nth-child(-n+6) {
+.order-grid > div:nth-child(-n+5) {
     font-weight: bold;
     text-align: center;
+    position:sticky;
+    top: 0;
+    background-color: var(--text-color);
+    color: var(--background-color);
 }
 
-.order-grid div:nth-child(1) {
-    text-align: left;
-    font-weight: normal;
-}
 .order-item-progress-compact-container {
     display: inline-flex;
     flex-wrap: wrap;
     border: none;
-    position: absolute;
     right: 0;
     bottom: 0;
     gap: 1px;
+    align-items: center;
 }
 .order-item-progress-compact-container > span {
     border-width: 1px;
@@ -54,13 +58,17 @@
     display: inline-block;
     text-align: center;
     border-style: dotted;
-    font-size: 70%;
+    font-size: 65%;
 }
 .order-item-progress-compact-container > span.done {
     border-color: darkgreen;
     background-color: green ;
     color: white;
     border-style: solid;
+}
+
+.order-item-progress-compact-container > span:not(.done) {
+    cursor: pointer;
 }
 
 .order-item-progress-compact-container > span.canceled {

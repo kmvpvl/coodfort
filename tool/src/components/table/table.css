@@ -1,0 +1,25 @@
+.table-container {
+    border: 1px solid;
+    display: grid;
+    grid-template-rows: auto auto;
+    text-align: center;
+    width: min-content;
+    height: min-content;
+}
+.table-container > span:last-child {
+    color: red;
+    font-weight: bold;
+    cursor: pointer;
+}
+.table-container > span:last-child {
+    animation: call-lamp-animation 1s infinite;
+}
+
+@keyframes call-lamp-animation {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}

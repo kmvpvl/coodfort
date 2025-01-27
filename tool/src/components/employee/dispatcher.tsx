@@ -5,13 +5,14 @@ import "./dispatcher.css";
 import { IEatery, IEateryBrief, IMeal, IMenu } from "@betypes/eaterytypes";
 import Logo from "../logo/logo";
 import { Eatery } from "../eatery/eatery";
-import { IOrder, IOrderItem } from "@betypes/ordertypes";
+import { IOrder, IOrderItem, ITableCallWaiterSignal } from "@betypes/ordertypes";
 import { ToastType } from "../toast";
 import Pending from "../pending";
 import Menu from "../menu/menu";
 import Meal from "../menu/meal";
 import ApproveOrderItems from "./approveOrderItems";
 import ProcessingOrderItems from "./processingOrderItems";
+import Table from "../table/table";
 
 export interface IDispatcherProps extends IProtoProps {
 	employee: IUser;
@@ -26,13 +27,15 @@ export interface IDispatcherState extends IProtoState {
 	orders: Array<IOrder>;
 	selectedOrderItemsToApprove?: Set<number>;
 	selectedOrderItemsToFulfill?: Set<number>;
+	tableCallWaiterSignals?: ITableCallWaiterSignal[];
 }
 
 enum LeftMenuItemIdCode {
 	orderApprove,
 	orderProcessing,
 	orderReview,
-	tableBalance,
+	waiterCalls,
+	orderBalance,
 	eateryData,
 	meals,
 	menus,
@@ -41,7 +44,8 @@ enum LeftMenuItemIdCode {
 
 const leftMenu = [
 	{ name: "OPERATIONS" },
-	{ id: LeftMenuItemIdCode.tableBalance, name: "Tables balance" },
+	{ id: LeftMenuItemIdCode.waiterCalls, name: "Waiter calls" },
+	{ id: LeftMenuItemIdCode.orderBalance, name: "Orders balance" },
 	{ id: LeftMenuItemIdCode.orderApprove, name: "Orders approve" },
 	{ id: LeftMenuItemIdCode.orderProcessing, name: "Orders processing" },
 	{ id: LeftMenuItemIdCode.orderReview, name: "Orders review" },
@@ -134,6 +138,25 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 		);
 	}
 
+	loadTableCallWaiterSignals() {
+		if (this.state.eaterySelected !== undefined) {
+			this.serverCommand(
+				"eatery/tableCallWaiterSignals",
+				JSON.stringify({ tableIds: this.state.eaterySelected.tables.map(table => table.id) }),
+				res => {
+					console.log(res);
+					const nState = this.state;
+					nState.tableCallWaiterSignals = res.tableCallWaiterSignals;
+					this.setState(nState);
+				},
+				err => {
+					console.log(err);
+				}
+			);
+		} else {
+		}
+	}
+
 	loadEatery(id: Types.ObjectId) {
 		this.serverCommand(
 			"eatery/view",
@@ -144,6 +167,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 					const nState = this.state;
 					nState.eaterySelected = res.eatery;
 					this.setState(nState);
+					this.loadTableCallWaiterSignals();
 				}
 			},
 			err => {
@@ -172,6 +196,9 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	calcBadge(item?: LeftMenuItemIdCode): ReactNode {
 		let ret;
 		switch (item) {
+			case LeftMenuItemIdCode.waiterCalls:
+				ret = this.state.tableCallWaiterSignals?.filter(signal => signal.on).length;
+				break;
 			case LeftMenuItemIdCode.orderApprove:
 				ret = this.state.orders.reduce((prev, order) => prev + order.items.filter(item => item.wfStatus === WorkflowStatusCode.registered).length, 0);
 				break;
@@ -193,6 +220,8 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	renderMiddle(): ReactNode {
 		let ret: ReactNode;
 		switch (this.state.mode) {
+			case LeftMenuItemIdCode.waiterCalls:
+				return <div className="dispatcher-calls-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={idx} defaultValue={table} />)}</div>;
 			case LeftMenuItemIdCode.orderApprove:
 				return (
 					<ApproveOrderItems
