@@ -2,7 +2,7 @@ import { Document, IDocumentDataSchema, IDocumentWFSchema } from './protodocumen
 import { WorkflowStatusCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
 import { EateryRoleCode, IEatery } from '../types/eaterytypes';
-import { IOrder, IOrderItem, ITableCallWaiterSignal } from '../types/ordertypes';
+import { IOrder, IOrderItem, IPayment, ITableCallWaiterSignal } from '../types/ordertypes';
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
 interface IEateryWFSchema extends IDocumentWFSchema {}
@@ -114,6 +114,60 @@ interface IOrderItemWFSchema extends IDocumentWFSchema {}
 interface IOrderDataSchema extends IDocumentDataSchema {}
 interface IOrderWFSchema extends IDocumentWFSchema {}
 
+interface IPaymentDataSchema extends IDocumentDataSchema {}
+interface IPaymentWFSchema extends IDocumentWFSchema {}
+
+const paymentDataSchemaFields = [
+    { name: `amount`, type: 'float', required: true },
+    { name: `currency`, type: 'varchar(256)', required: false },
+    { name: `paymentMethod`, type: 'int(11)', required: true },
+    { name: `comment`, type: 'varchar(1024)', required: false },
+    { name: `esId`, type: 'varchar(256)', required: false },
+];
+
+const paymentWFSchemaTransfers = [
+    {
+        from: WorkflowStatusCode.draft,
+        to: WorkflowStatusCode.registered,
+    },
+    {
+        from: WorkflowStatusCode.registered,
+        to: WorkflowStatusCode.approved,
+    },
+    {
+        from: WorkflowStatusCode.registered,
+        to: WorkflowStatusCode.canceledByEatery,
+    },
+    {
+        from: WorkflowStatusCode.approved,
+        to: WorkflowStatusCode.done,
+    },
+    {
+        from: WorkflowStatusCode.done,
+        to: WorkflowStatusCode.review,
+    },
+    {
+        from: WorkflowStatusCode.review,
+        to: WorkflowStatusCode.closed,
+    },
+];
+export class Payment extends Document<IPayment, IPaymentDataSchema, IPaymentWFSchema> {
+    get dataSchema(): IPaymentDataSchema {
+        return {
+            tableName: 'order_payments',
+            idFieldName: 'id',
+            fields: [...paymentDataSchemaFields, { name: `order_id`, type: 'bigint(20)', required: true }],
+        };
+    }
+
+    get wfSchema(): IPaymentWFSchema {
+        return {
+            tableName: 'order_payments',
+            initialState: WorkflowStatusCode.draft,
+            transfers: paymentWFSchemaTransfers,
+        };
+    }
+}
 export class OrderItem extends Document<IOrderItem, IOrderItemDataSchema, IOrderItemWFSchema> {
     get dataSchema(): IOrderItemDataSchema {
         return {
@@ -194,6 +248,11 @@ export class Order extends Document<IOrder, IOrderDataSchema, IOrderWFSchema> {
                         { name: `esId`, type: 'varchar(256)', required: false },
                     ],
                 },
+                {
+                    tableName: 'payments',
+                    idFieldName: 'id',
+                    fields: paymentDataSchemaFields,
+                },
             ],
         };
     }
@@ -258,6 +317,11 @@ export class Order extends Document<IOrder, IOrderDataSchema, IOrderWFSchema> {
                             to: WorkflowStatusCode.closed,
                         },
                     ],
+                },
+                {
+                    tableName: 'payments',
+                    initialState: WorkflowStatusCode.draft,
+                    transfers: paymentWFSchemaTransfers,
                 },
             ],
         };

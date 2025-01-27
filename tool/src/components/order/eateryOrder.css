@@ -1,0 +1,14 @@
+.order-eatery-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    border: 1px solid;
+    border-radius: .5em;
+    gap: .5em;
+    padding: .5em;
+}
+
+.order-eatery-balance {
+    font-size: 200%;
+    grid-row: span 2;
+}

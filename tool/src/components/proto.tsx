@@ -201,6 +201,10 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		const ret = Array.from(doc.body.childNodes).some(node => node.nodeType === 1);
 		return ret;
 	}
+
+	protected toCurrency(x: number): string {
+		return Intl.NumberFormat(this.getLanguage(), { minimumFractionDigits: 2 }).format(x);
+	}
 }
 
 export enum ViewModeCode {

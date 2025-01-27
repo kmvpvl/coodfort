@@ -1,10 +1,10 @@
 import { Fragment, ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import { IOrder, IOrderItem, IOrderSumBalance } from "@betypes/ordertypes";
-import "./order.css";
+import "./guestOrder.css";
 import { IWfHistoryItem, IWfNextRequest, Types, WorkflowStatusCode } from "@betypes/prototypes";
 import { ToastType } from "../toast";
-export interface IOrderProps extends IProtoProps {
+export interface IGuestOrderProps extends IProtoProps {
 	defaultValue?: IOrder;
 	viewMode?: ViewModeCode;
 	orderId?: Types.ObjectId;
@@ -12,15 +12,15 @@ export interface IOrderProps extends IProtoProps {
 	tableId: Types.ObjectId;
 	onChange?: (order: IOrder) => void;
 }
-export interface IOrderState extends IProtoState {
+export interface IGuestOrderState extends IProtoState {
 	value: IOrder;
 	viewMode: ViewModeCode;
 	changed?: boolean;
 	hideCanceledOrderItems: boolean;
 }
 
-export default class Order extends Proto<IOrderProps, IOrderState> {
-	state: IOrderState = {
+export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState> {
+	state: IGuestOrderState = {
 		value: this.props.defaultValue !== undefined ? this.props.defaultValue : this.new(),
 		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.compact,
 		hideCanceledOrderItems: true,
@@ -31,7 +31,7 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 	componentDidMount(): void {
 		if (this.props.orderId !== undefined || this.state.value.id !== undefined) this.load();
 	}
-	componentDidUpdate(prevProps: Readonly<IOrderProps>, prevState: Readonly<IOrderState>, snapshot?: any): void {
+	componentDidUpdate(prevProps: Readonly<IGuestOrderProps>, prevState: Readonly<IGuestOrderState>, snapshot?: any): void {
 		if (this.props.defaultValue !== undefined && this.props.defaultValue.id !== this.state.value.id) {
 			const nState = this.state;
 			nState.value = this.props.defaultValue;
@@ -49,6 +49,7 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 			eateryId: this.props.eateryId,
 			tableId: this.props.tableId,
 			items: [],
+			payments: [],
 			discount: 1,
 		};
 	}
@@ -112,43 +113,24 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 			}
 		);
 	}
-	calcSum(): IOrderSumBalance {
-		return this.state.value.items.reduce<IOrderSumBalance>(
-			(prevVal, curItem) => ({
-				payed: 0,
-				draftCount: curItem.wfStatus === WorkflowStatusCode.draft ? prevVal.draftCount + 1 : prevVal.draftCount,
-				draftSum: curItem.wfStatus === WorkflowStatusCode.draft ? prevVal.draftSum + curItem.option.amount * curItem.count : prevVal.draftSum,
-				registeredSum: curItem.wfStatus === WorkflowStatusCode.registered ? prevVal.registeredSum + curItem.option.amount * curItem.count : prevVal.registeredSum,
-				approvedByEaterySum: curItem.wfStatus === WorkflowStatusCode.approved ? prevVal.approvedByEaterySum + curItem.option.amount * curItem.count : prevVal.approvedByEaterySum,
-				fulfilledSum: curItem.wfStatus === WorkflowStatusCode.done || curItem.wfStatus === WorkflowStatusCode.review ? prevVal.fulfilledSum + curItem.option.amount * curItem.count : prevVal.fulfilledSum,
-			}),
-			{
-				payed: 0,
-				draftCount: 0,
-				draftSum: 0,
-				registeredSum: 0,
-				approvedByEaterySum: 0,
-				fulfilledSum: 0,
-			}
-		);
-	}
+
 	renderCompact(): ReactNode {
-		const total = this.calcSum();
+		const total = calcSum(this.state.value);
 		return (
 			<div>
-				<i className="fa fa-shopping-basket"></i> {total.approvedByEaterySum + total.registeredSum + total.fulfilledSum} {this.toString(this.state.value.items.at(0)?.option.currency)}
+				<i className="fa fa-shopping-basket"></i> {this.toCurrency(total.approvedByEaterySum + total.registeredSum + total.fulfilledSum)} {this.toString(this.state.value.items.at(0)?.option.currency)}
 				{total.draftCount > 0 ? <span className="badge">{total.draftCount}</span> : <></>}
 			</div>
 		);
 	}
 	render(): ReactNode {
 		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
-		const total = this.calcSum();
+		const total = calcSum(this.state.value);
 		return (
-			<div className="order-container">
+			<div className="guest-order-container">
 				<div>
 					<div>
-						Order#{this.state.value.id}. Balance: {total.payed - (total.registeredSum + total.approvedByEaterySum + total.fulfilledSum)}
+						Order#{this.state.value.id}. Balance: {this.toCurrency(total.payed - (total.registeredSum + total.approvedByEaterySum + total.fulfilledSum))}
 					</div>
 					<span>Payed: {total.payed}</span>
 					<span>Ordered: {total.registeredSum + total.approvedByEaterySum + total.fulfilledSum}</span>
@@ -205,7 +187,7 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 						Call waiter
 					</span>
 				</div>
-				<div className="order-grid">
+				<div className="guest-order-grid">
 					<div>WF</div>
 					<div>Name</div>
 					<div>Price</div>
@@ -216,7 +198,7 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 						.map((item, idx) => (
 							<Fragment key={idx}>
 								{item.wfHistory !== undefined && item.id !== undefined ? (
-									<OrderItemProgress
+									<GuestOrderItemProgress
 										wfHistory={item.wfHistory}
 										toaster={this.props.toaster}
 										orderItemId={item.id}
@@ -230,7 +212,7 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 								<div key={idx} className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>
 									{this.toString(item.name)}({this.toString(item.option.name)})
 								</div>
-								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>{item.option.amount}</div>
+								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>{this.toCurrency(item.option.amount)}</div>
 								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : "context-menu"}>
 									{item.wfStatus === WorkflowStatusCode.draft ? (
 										<span
@@ -282,7 +264,7 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 										<></>
 									)}
 								</div>
-								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>{item.count * item.option.amount}</div>
+								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>{this.toCurrency(item.count * item.option.amount)}</div>
 							</Fragment>
 						))}
 				</div>
@@ -291,7 +273,7 @@ export default class Order extends Proto<IOrderProps, IOrderState> {
 	}
 }
 
-export interface IOrderItemProgressProps extends IProtoProps {
+export interface IGuestOrderItemProgressProps extends IProtoProps {
 	orderItemId: Types.ObjectId;
 	viewMode?: ViewModeCode;
 	wfHistory: IWfHistoryItem[];
@@ -299,12 +281,12 @@ export interface IOrderItemProgressProps extends IProtoProps {
 	onReview?: () => void;
 }
 
-export interface IOrderItemProgressState extends IProtoState {
+export interface IGuestOrderItemProgressState extends IProtoState {
 	viewMode: ViewModeCode;
 }
 
-export class OrderItemProgress extends Proto<IOrderItemProgressProps, IOrderItemProgressState> {
-	state: Readonly<IOrderItemProgressState> = {
+export class GuestOrderItemProgress extends Proto<IGuestOrderItemProgressProps, IGuestOrderItemProgressState> {
+	state: Readonly<IGuestOrderItemProgressState> = {
 		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.compact,
 	};
 	renderCompact(): ReactNode {
@@ -314,7 +296,7 @@ export class OrderItemProgress extends Proto<IOrderItemProgressProps, IOrderItem
 		const isFulfilled = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.done).length === 1;
 		return (
 			<div
-				className="order-item-progress-compact-container"
+				className="guest-order-item-progress-compact-container"
 				onClick={event => {
 					this.props.toaster?.current?.addToast({ type: ToastType.info, message: JSON.stringify(this.props.wfHistory), modal: false });
 				}}>
@@ -330,14 +312,14 @@ export class OrderItemProgress extends Proto<IOrderItemProgressProps, IOrderItem
 				</span>
 				{isCanceledByEatery ? <span className="canceled">✖</span> : <span className={isApproved ? "done" : ""}>✔</span>}
 				<span className={isFulfilled ? "done" : ""}>⚗</span>
-				<span>⟴</span>
+				<span>☆</span>
 			</div>
 		);
 	}
 	render(): ReactNode {
 		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
 		return (
-			<div className="order-item-progress-container">
+			<div className="guest-order-item-progress-container">
 				<span>registered</span>
 				<span>approved</span>
 				<span>fullfilled</span>
@@ -346,4 +328,25 @@ export class OrderItemProgress extends Proto<IOrderItemProgressProps, IOrderItem
 			</div>
 		);
 	}
+}
+
+export function calcSum(order: IOrder): IOrderSumBalance {
+	return order.items.reduce<IOrderSumBalance>(
+		(prevVal, curItem) => ({
+			payed: 0,
+			draftCount: curItem.wfStatus === WorkflowStatusCode.draft ? prevVal.draftCount + 1 : prevVal.draftCount,
+			draftSum: curItem.wfStatus === WorkflowStatusCode.draft ? prevVal.draftSum + curItem.option.amount * curItem.count : prevVal.draftSum,
+			registeredSum: curItem.wfStatus === WorkflowStatusCode.registered ? prevVal.registeredSum + curItem.option.amount * curItem.count : prevVal.registeredSum,
+			approvedByEaterySum: curItem.wfStatus === WorkflowStatusCode.approved ? prevVal.approvedByEaterySum + curItem.option.amount * curItem.count : prevVal.approvedByEaterySum,
+			fulfilledSum: curItem.wfStatus === WorkflowStatusCode.done || curItem.wfStatus === WorkflowStatusCode.review ? prevVal.fulfilledSum + curItem.option.amount * curItem.count : prevVal.fulfilledSum,
+		}),
+		{
+			payed: 0,
+			draftCount: 0,
+			draftSum: 0,
+			registeredSum: 0,
+			approvedByEaterySum: 0,
+			fulfilledSum: 0,
+		}
+	);
 }

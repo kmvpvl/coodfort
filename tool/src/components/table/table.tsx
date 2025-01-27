@@ -2,10 +2,13 @@ import { ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import "./table.css";
 import { ITable } from "@betypes/eaterytypes";
+import EateryOrder from "../order/eateryOrder";
+import { IOrder } from "@betypes/ordertypes";
 
 export interface ITableProps extends IProtoProps {
 	defaultValue?: ITable;
 	viewMode?: ViewModeCode;
+	orders?: IOrder[];
 }
 export interface ITableState extends IProtoState {
 	value: ITable;
@@ -71,7 +74,8 @@ export default class Table extends Proto<ITableProps, ITableState> {
 		return (
 			<div className="table-container">
 				<span>{this.toString(this.state.value.name)}</span>
-				{this.state.callingWaiter ? <span onClick={this.off.bind(this)}>On</span> : <span></span>}
+				<span>{this.props.orders?.map((order, idx) => (order.id !== undefined ? <EateryOrder key={order.id} orderId={order.id} /> : <></>))}</span>
+				{this.state.callingWaiter ? <span onClick={this.off.bind(this)}>☉</span> : <span></span>}
 			</div>
 		);
 	}

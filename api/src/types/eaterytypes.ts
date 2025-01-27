@@ -70,8 +70,6 @@ interface IBooking extends IDocument {
 }
 interface IEntertainment extends IDocument {}
 interface IDeliveryPartner extends IDocument {}
-interface IInvoice extends IDocument {}
-interface IPayment extends IDocument {}
 export interface IMealOption {
     name: Types.IMLString;
     amount: number;

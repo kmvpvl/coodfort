@@ -125,7 +125,7 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 							<span style={{ gridRow: "1 / 3" }}>{this.state.currentOptionSelected === idx ? "☑" : "☐"}</span>
 							<span className="menu-item-option-volume">{this.toString(option.name)}</span>
 							<span className="menu-item-option-price">
-								{option.amount} {this.toString(option.currency)}
+								{this.toCurrency(option.amount)} {this.toString(option.currency)}
 							</span>
 						</span>
 					))}

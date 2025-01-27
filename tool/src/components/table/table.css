@@ -3,13 +3,24 @@
     display: grid;
     grid-template-rows: auto auto;
     text-align: center;
-    width: min-content;
-    height: min-content;
+    --width: min-content;
+    --height: min-content;
+    width: fit-content;
+    height: fit-content;
+    border-radius: .5em;
+    border: 1px solid;
+    position: relative;
+    min-height: 8em;
+    min-width: 8em;
+    padding: .5em;
 }
 .table-container > span:last-child {
     color: red;
     font-weight: bold;
     cursor: pointer;
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 .table-container > span:last-child {
     animation: call-lamp-animation 1s infinite;

@@ -119,7 +119,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	loadOrdersList(eateryId: Types.ObjectId) {
 		this.serverCommand(
 			"eatery/ordersList",
-			JSON.stringify({ id: eateryId }),
+			JSON.stringify({ eateryId: eateryId, wfStatuses: [WorkflowStatusCode.draft, WorkflowStatusCode.registered] }),
 			res => {
 				console.log(res);
 				if (res.ok) {
@@ -199,6 +199,9 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 			case LeftMenuItemIdCode.waiterCalls:
 				ret = this.state.tableCallWaiterSignals?.filter(signal => signal.on).length;
 				break;
+			case LeftMenuItemIdCode.orderBalance:
+				ret = this.state.orders.length;
+				break;
 			case LeftMenuItemIdCode.orderApprove:
 				ret = this.state.orders.reduce((prev, order) => prev + order.items.filter(item => item.wfStatus === WorkflowStatusCode.registered).length, 0);
 				break;
@@ -222,6 +225,8 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 		switch (this.state.mode) {
 			case LeftMenuItemIdCode.waiterCalls:
 				return <div className="dispatcher-calls-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={idx} defaultValue={table} />)}</div>;
+			case LeftMenuItemIdCode.orderBalance:
+				return <div className="dispatcher-order-balance-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={idx} defaultValue={table} orders={this.state.orders.filter(order => order.tableId === table.id)} />)}</div>;
 			case LeftMenuItemIdCode.orderApprove:
 				return (
 					<ApproveOrderItems

@@ -14,7 +14,7 @@ import { Eatery } from "./components/eatery/eatery";
 import { ViewModeCode } from "./components/proto";
 import { revealTelegramStartAppParams } from "./model/tools";
 import Menu from "./components/menu/menu";
-import Order from "./components/order/order";
+import GuestOrder from "./components/order/guestOrder";
 import { IOrder, IOrderItem } from "@betypes/ordertypes";
 
 export interface IGuestAppProps extends IProtoProps {
@@ -41,7 +41,7 @@ export interface IGuestAppState extends IProtoState {
 
 export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	protected toasterRef = React.createRef<Toaster>();
-	protected orderRef = React.createRef<Order>();
+	protected orderRef = React.createRef<GuestOrder>();
 	state: IGuestAppState = {
 		eateryId: this.props.eateryId,
 		tableId: this.props.tableId,
@@ -340,7 +340,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	}
 	renderPay(): ReactNode {
 		return this.state.eateryId !== undefined && this.state.tableId !== undefined && this.state.order !== undefined ? (
-			<Order
+			<GuestOrder
 				viewMode={ViewModeCode.normal}
 				orderId={this.state.order.id}
 				eateryId={this.state.eateryId}
@@ -387,7 +387,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 									}}
 									className={`stage ${curStage ? "current" : ""}`}>
 									{stage === "Pay" && this.state.eateryId !== undefined && this.state.tableId !== undefined ? (
-										<Order
+										<GuestOrder
 											ref={this.orderRef}
 											defaultValue={this.state.order}
 											eateryId={this.state.eateryId}

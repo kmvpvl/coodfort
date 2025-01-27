@@ -1,4 +1,4 @@
-.order-container {
+.guest-order-container {
     height: 100%;
     width: 100%;
     display: grid;
@@ -7,11 +7,11 @@
     overflow: hidden;
 }
 
-.order-compact-container {
+.guest-order-compact-container {
     --:0;
 }
 
-.order-grid {
+.guest-order-grid {
     display: grid;
     grid-template-columns: auto 1fr auto auto min-content;
     border-left: 1px solid;
@@ -21,18 +21,18 @@
     height: min-content;
 }
 
-.order-grid > div {
+.guest-order-grid > div {
     border-right: 1px solid;
     border-bottom: 1px solid;
     padding: 5px;
     position: relative;
 }
 
-.order-grid > div.canceled {
+.guest-order-grid > div.canceled {
     text-decoration: line-through;
 }
 
-.order-grid > div:nth-child(-n+5) {
+.guest-order-grid > div:nth-child(-n+5) {
     font-weight: bold;
     text-align: center;
     position:sticky;
@@ -41,7 +41,7 @@
     color: var(--background-color);
 }
 
-.order-item-progress-compact-container {
+.guest-order-item-progress-compact-container {
     display: inline-flex;
     flex-wrap: wrap;
     border: none;
@@ -50,7 +50,7 @@
     gap: 1px;
     align-items: center;
 }
-.order-item-progress-compact-container > span {
+.guest-order-item-progress-compact-container > span {
     border-width: 1px;
     border-radius: 50%;
     width: 1.5em;
@@ -60,18 +60,18 @@
     border-style: dotted;
     font-size: 65%;
 }
-.order-item-progress-compact-container > span.done {
+.guest-order-item-progress-compact-container > span.done {
     border-color: darkgreen;
     background-color: green ;
     color: white;
     border-style: solid;
 }
 
-.order-item-progress-compact-container > span:not(.done) {
+.guest-order-item-progress-compact-container > span:not(.done) {
     cursor: pointer;
 }
 
-.order-item-progress-compact-container > span.canceled {
+.guest-order-item-progress-compact-container > span.canceled {
     border-color: darkred;
     background-color: red;
     color: white;

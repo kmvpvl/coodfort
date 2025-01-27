@@ -65,16 +65,17 @@ export async function wfNextOrderItem(c: Context, req: Request, res: Response, u
 
 export async function eateryOrderList(c: Context, req: Request, res: Response, user: User) {
     try {
-        if (req.body.id === undefined) {
+        if (req.body.eateryId === undefined) {
             throw new DocumentError(DocumentErrorCode.parameter_expected, `Eatery id expected`);
         }
 
-        const eatery = new Eatery(req.body.id);
+        const eatery = new Eatery(req.body.eateryId);
+        const wfStatuses: WorkflowStatusCode[] = req.body.wfStatuses;
         await eatery.load();
         if (!eatery.checkRoles(EateryRoleCode['sous-chef'], user.id)) return res.status(403).json({ ok: false, code: DocumentErrorCode.role_required, message: `Role 'sous-chef' is required` });
 
         const order = new Order();
-        await order.getCollection('`eateryId`=?', [req.body.id], '`created` DESC');
+        await order.getCollection(`\`eateryId\` = ? ${wfStatuses !== undefined && wfStatuses.length > 0 ? `AND ( ${wfStatuses.map(status => '`wfStatus` = ? ').join(' OR ')} )` : ''}`, [req.body.eateryId, ...wfStatuses], '`created` DESC');
         const ret: IOrder[] = [];
         for (const orderId of order.collection) {
             const order = new Order(orderId);

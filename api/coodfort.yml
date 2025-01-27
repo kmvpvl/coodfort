@@ -246,6 +246,27 @@ components:
               description: User who does the action
         - $ref: "#/components/schemas/proto"
     ###
+    # The Payment object
+    payment:
+      description: Common Payment object
+      allOf:
+        - type: object
+          required:
+            - amount
+            - paymentMethod
+          properties:
+            amount:
+              type: number
+            currency:
+              type: string
+            paymentMethod:
+              type: number
+            comment:
+              type: string
+            esId:
+              type: string
+        - $ref: "#/components/schemas/proto"
+    ###
     # The Orderitem object
     orderItem:
       description: |
@@ -275,6 +296,7 @@ components:
             - discount
             - eateryId
             - tableId
+            - payments
           properties:
             userId: 
               type: number
@@ -289,6 +311,10 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/orderItem"
+            payments:
+              type: array
+              items:
+                $ref: "#/components/schemas/payment"
             discount:
               type: number
               description: "1 or markup and discount applied to all order positions"
@@ -550,7 +576,19 @@ paths:
         - order
         - view
       requestBody:
-        $ref: "#/components/requestBodies/eateryPointer"
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - eateryId
+              properties:
+                eateryId: 
+                  type: number
+                wfStatuses:
+                  type: array
+                  items:
+                    type: number
       responses:
         '200':
           description: OK
@@ -802,6 +840,35 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/orderItem"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
+  /order/payment/get:
+    post:
+      description: Registers the income payment by order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/payment"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ok
+                  - payments
+                properties:
+                  ok:
+                    type: boolean
+                  orderItems:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/payment"
         '403':
           $ref: "#/components/responses/errorResponse"
         '400':
