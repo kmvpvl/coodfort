@@ -11,7 +11,7 @@ export interface IOrderItem extends IMealRequisites {
 
 export interface IOrder extends IDocument {
     userId?: Types.ObjectId;
-    eateryId?: Types.ObjectId;
+    eateryId: Types.ObjectId;
     tableId?: Types.ObjectId;
     items: IOrderItem[];
     payments: IPayment[];

@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { DocumentError } from '../model/protodocument';
 import { DocumentErrorCode, IWfNextRequest, Types, WorkflowStatusCode } from '../types/prototypes';
 import { User } from '../model/user';
-import { Eatery, Order, OrderItem } from '../model/eatery';
+import { Eatery, Order, OrderItem, Payment } from '../model/eatery';
 import { EateryRoleCode } from '../types/eaterytypes';
 import { IOrder, IOrderItem } from '../types/ordertypes';
 
@@ -83,6 +83,30 @@ export async function eateryOrderList(c: Context, req: Request, res: Response, u
             ret.push(order.data);
         }
         return res.status(200).json({ ok: true, orders: ret });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });
+        else return res.status(400).json({ ok: false, error: { message: e.message } });
+    }
+}
+
+export async function newPayment(c: Context, req: Request, res: Response, user: User) {
+    try {
+        if (req.body.order_id === undefined) {
+            throw new DocumentError(DocumentErrorCode.parameter_expected, `order_id expected`);
+        }
+        const order = new Order(req.body.order_id);
+        await order.load();
+        if (order.data.eateryId !== undefined) {
+            const eatery = new Eatery(order.data.eateryId);
+            await eatery.load();
+            if (!eatery.checkRoles(EateryRoleCode['payment-get'], user.id)) return res.status(403).json({ ok: false, code: DocumentErrorCode.role_required, message: `Role 'payment-get' is required` });
+
+            const payment = new Payment(req.body);
+            await payment.save();
+
+            await order.load();
+        }
+        return res.status(200).json({ ok: true, order: order.data });
     } catch (e: any) {
         if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });
         else return res.status(400).json({ ok: false, error: { message: e.message } });

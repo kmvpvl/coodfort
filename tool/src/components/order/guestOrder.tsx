@@ -331,7 +331,7 @@ export class GuestOrderItemProgress extends Proto<IGuestOrderItemProgressProps, 
 }
 
 export function calcSum(order: IOrder): IOrderSumBalance {
-	return order.items.reduce<IOrderSumBalance>(
+	const ret = order.items.reduce<IOrderSumBalance>(
 		(prevVal, curItem) => ({
 			payed: 0,
 			draftCount: curItem.wfStatus === WorkflowStatusCode.draft ? prevVal.draftCount + 1 : prevVal.draftCount,
@@ -349,4 +349,7 @@ export function calcSum(order: IOrder): IOrderSumBalance {
 			fulfilledSum: 0,
 		}
 	);
+	const payed = order.payments.reduce<number>((prvVal, curItem) => prvVal + curItem.amount, 0);
+	ret.payed = payed;
+	return ret;
 }

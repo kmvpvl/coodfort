@@ -1,14 +1,84 @@
 .order-eatery-container {
     display: grid;
     grid-template-columns: auto auto;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     border: 1px solid;
     border-radius: .5em;
     gap: .5em;
     padding: .5em;
+    position: relative;
 }
 
 .order-eatery-balance {
     font-size: 200%;
     grid-row: span 2;
+}
+
+.order-eatery-details {
+    grid-column: span 2;
+    text-align: left;
+}
+
+.order-eatery-details-fragment {
+    display: grid;
+    grid-template-columns: auto 1fr auto ;
+    border-top: 1px solid;
+    border-left: 1px solid;
+}
+
+.order-eatery-details-fragment > span {
+    padding-left: .1em;
+    padding-right: .1em;
+    text-align: left;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+}
+
+.order-status-container{
+    display: inline-flex;
+    flex-wrap: wrap;
+    border: none;
+    right: 0;
+    bottom: 0;
+    gap: 1px;
+    align-items: center;
+}
+.order-status-container > span{
+    border-width: 1px;
+    border-radius: 50%;
+    width: 1.5em;
+    height: 1.5em;
+    display: inline-block;
+    text-align: center;
+    border-style: dotted;
+    --font-size: 65%;
+}
+.order-status-container > span.done {
+    border-color: darkgreen;
+    background-color: green ;
+    color: white;
+    border-style: solid;
+}
+
+.order-status-container > span:not(.done) {
+    cursor: pointer;
+}
+
+.order-status-container > span.canceled {
+    border-color: darkred;
+    background-color: red;
+    color: white;
+    border-style: solid;
+}
+
+.order-eatery-payments-list {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.order-eatery-payments-list input {
+    border: 1px solid;
+    width: 6em;
+    display: inline-block;
 }
