@@ -166,6 +166,28 @@ components:
         excludeOptions:
           $ref: "#/components/schemas/mealOption"
     ###
+    # The Employee object
+    ###
+    employee:
+      description: An employee is a user who has one and more roles in the one and more eateries
+      allOf:
+        - type: object
+          required:
+            - userId
+            - roles
+          properties:
+            userId:
+              type: number
+              description: User's uniq id
+            eatery_id:
+              type: number
+              description: Eatery's uniq id
+            roles:
+              description: Array of strings which represents the list of Employee's roles
+              type: array
+              items:
+                type: string
+        - $ref: "#/components/schemas/proto"
     # The EATERY object
     eatery:
       description: |
@@ -180,6 +202,8 @@ components:
             employees: 
               type: array
               description: List of employees in eatery. It could not be changed by updating eatery object
+              items:
+                $ref: "#/components/schemas/employee"
             tables: 
               type: array
               description: List of tables of Eatery
@@ -611,7 +635,28 @@ paths:
         '400':
           $ref: "#/components/responses/errorResponse"
         '403':
-          $ref: "#/components/responses/errorResponse"                 
+          $ref: "#/components/responses/errorResponse"
+  /eatery/employee/update:
+    post:
+      description: Adds an existing user as employee of the the Eatery
+      tags:
+        - eatery
+        - user
+        - update
+        - role
+      operationId: addEateryEmployee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/employee"
+      responses:
+        '200':
+          $ref: "#/components/responses/eaterySuccess"
+        '400':
+          $ref: "#/components/responses/errorResponse"
+        '403':
+          $ref: "#/components/responses/errorResponse"
   /user/new:
     post:
       description: Creates new User. It may be an employee or a guest
@@ -637,14 +682,48 @@ paths:
         '400':
           $ref: "#/components/responses/errorResponse"
   /user/view:
+    description: Shows user details. If called without parameters then returns caller details. If parameter 'id' is present then reveals information about user with that uniq id
     post:
       tags:
         - user
         - view
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: number
+                  description: User's uniq id whose details get about
       operationId: viewUser
       responses:
         '200':
           $ref: "#/components/responses/userSuccess"
+        '400':
+          $ref: "#/components/responses/errorResponse"
+  /user/find:
+    description: Finds user by first letters (min 3) in its login or name and returns its details if only one user found. If more then one user found then returns 200 and ok field will be false
+    post:
+      tags:
+        - user
+        - view
+      operationId: findUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - firstLetters
+              properties:
+                firstLetters:
+                  type: string
+      responses:
+        '200':
+          $ref: "#/components/responses/userSuccess"
+        '404':
+          $ref: "#/components/responses/errorResponse"
         '400':
           $ref: "#/components/responses/errorResponse"
   /user/callWaiter:

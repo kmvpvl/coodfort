@@ -1,9 +1,16 @@
 import { RowDataPacket } from 'mysql2/promise';
 import { ICoords, IDocument, IPhoto, ITag, ITimeSlot, Types } from './prototypes';
-import { IUser } from './prototypes';
 import { IOrder } from './ordertypes';
 
-export interface IEmployee extends IUser {}
+export interface IEmployee extends IDocument {
+    userId: Types.ObjectId;
+    eatery_id?: Types.ObjectId;
+    roles: EateryRoleCode[];
+    objects?: {
+        type: string;
+        id: Types.ObjectId;
+    }[];
+}
 export enum EateryRoleCode {
     'supervisor' = 'supervisor',
     'owner' = 'owner',
@@ -23,14 +30,7 @@ export interface ITable extends IDocument {
 }
 export interface IEatery extends IDocument {
     name: Types.IMLString;
-    employees: {
-        userId: Types.ObjectId;
-        roles: EateryRoleCode;
-        objects?: {
-            type: string;
-            id: Types.ObjectId;
-        }[];
-    }[];
+    employees: IEmployee[];
     tables: ITable[];
     deliveryPartnerIds: Types.ObjectId[];
     entertainmentIds: Types.ObjectId[];
@@ -48,7 +48,7 @@ export interface IEatery extends IDocument {
 }
 export interface IEateryBrief extends RowDataPacket {}
 export interface IEateryBrief extends IEatery {
-    roles: string;
+    role: string;
 }
 
 export interface IMealRow extends RowDataPacket {}

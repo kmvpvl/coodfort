@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import { IUser, IWfNextRequest, Types, WorkflowStatusCode } from "@betypes/prototypes";
 import "./dispatcher.css";
-import { IEatery, IEateryBrief, IMeal, IMenu } from "@betypes/eaterytypes";
+import { EateryRoleCode, IEatery, IEateryBrief, IMeal, IMenu } from "@betypes/eaterytypes";
 import Logo from "../logo/logo";
 import { Eatery } from "../eatery/eatery";
 import { IOrder, IOrderItem, ITableCallWaiterSignal } from "@betypes/ordertypes";
@@ -13,6 +13,7 @@ import Meal from "../menu/meal";
 import ApproveOrderItems from "./approveOrderItems";
 import ProcessingOrderItems from "./processingOrderItems";
 import Table from "../table/table";
+import Employees from "./employees";
 
 export interface IDispatcherProps extends IProtoProps {
 	employee: IUser;
@@ -39,6 +40,7 @@ enum LeftMenuItemIdCode {
 	eateryData,
 	meals,
 	menus,
+	employees,
 	guests,
 }
 
@@ -53,6 +55,7 @@ const leftMenu = [
 	{ id: LeftMenuItemIdCode.eateryData, name: "Eatery data" },
 	{ id: LeftMenuItemIdCode.meals, name: "Meals" },
 	{ id: LeftMenuItemIdCode.menus, name: "Menus" },
+	{ id: LeftMenuItemIdCode.employees, name: "Employees" },
 	{ id: LeftMenuItemIdCode.guests, name: "Guests" },
 ];
 
@@ -216,6 +219,10 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 				break;
 			case LeftMenuItemIdCode.menus:
 				ret = this.state.menus.length;
+				break;
+			case LeftMenuItemIdCode.employees:
+				ret = this.state.eaterySelected?.employees.length;
+				break;
 		}
 		return ret === undefined || ret === 0 ? <></> : <span className="badge">{ret}</span>;
 	}
@@ -343,6 +350,9 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 				//if (this.state.eaterySelected !== undefined)
 				return <Eatery key={this.state.eaterySelected?.id} defaultValue={this.state.eaterySelected} admin={true} editMode={true} />;
 				break;
+			case LeftMenuItemIdCode.employees:
+				return this.state.eaterySelected !== undefined ? <Employees eatery={this.state.eaterySelected} /> : <></>;
+				break;
 			default:
 				ret = <></>;
 		}
@@ -352,6 +362,23 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	renderRight(): ReactNode {
 		let ret: ReactNode;
 		switch (this.state.mode) {
+			case LeftMenuItemIdCode.employees:
+				return (
+					<div className="roles-picker-container">
+						{Object.keys(EateryRoleCode).map((role, idx) => (
+							<div
+								className="role-container"
+								key={idx}
+								draggable={true}
+								onDragStart={event => {
+									event.dataTransfer.setData("coodfort/role", JSON.stringify({ role: role }));
+									console.log("dragstart", event);
+								}}>
+								{role}
+							</div>
+						))}
+					</div>
+				);
 			case LeftMenuItemIdCode.menus:
 				if (this.state.eaterySelected !== undefined)
 					return (

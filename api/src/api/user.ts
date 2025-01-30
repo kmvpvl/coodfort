@@ -39,6 +39,24 @@ export async function newUser(c: Context, req: Request, res: Response, user: Use
     }
 }
 
+export async function findUser(c: Context, req: Request, res: Response, user: User) {
+    const fl: string = req.body.firstLetters;
+    try {
+        const collectionUser = new User();
+        await collectionUser.getCollection(`\`name\` like ? OR \`login\` like ?`, [`${fl}%`, `${fl}%`], '`login` DESC', 2);
+        if (collectionUser.collection.length === 1) {
+            const anUser = new User(collectionUser.collection[0]);
+            await anUser.load();
+            return res.status(200).json({ ok: true, user: anUser.data });
+        } else {
+            return res.status(200).json({ ok: false, count: collectionUser.collection.length });
+        }
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: (e as DocumentError).json });
+        return res.status(400).json({ ok: false, error: { message: e.message } });
+    }
+}
+
 export async function viewUser(c: Context, req: Request, res: Response, user: User) {
     const id = req.body.id;
     if (id === undefined) {

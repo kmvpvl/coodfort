@@ -8,8 +8,8 @@ import { createHmac, randomUUID } from 'crypto';
 import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
 import { startCommand } from './model/tgEvents';
-import { userEateriesList, userMealsList, userMenusList, newUser, viewUser, userOrdersList } from './api/user';
-import { updateEatery, newEatery, viewEatery, publishEatery, tableCallWaiterSignalsList, callWaiter } from './api/eatery';
+import { userEateriesList, userMealsList, userMenusList, newUser, viewUser, userOrdersList, findUser } from './api/user';
+import { updateEatery, newEatery, viewEatery, publishEatery, tableCallWaiterSignalsList, callWaiter, addEateryEmployee } from './api/eatery';
 import { updateMeal, updateMenu, viewMeal, viewMenu } from './api/meal';
 import cors from 'cors';
 import { Telegraf } from 'telegraf';
@@ -101,6 +101,8 @@ api.register({
     tableCallWaiterSignalsList: tableCallWaiterSignalsList,
     callWaiter: callWaiter,
     newPayment: newPayment,
+    addEateryEmployee: addEateryEmployee,
+    findUser: findUser,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {

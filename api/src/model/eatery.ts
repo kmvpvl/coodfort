@@ -1,11 +1,35 @@
 import { Document, IDocumentDataSchema, IDocumentWFSchema } from './protodocument';
 import { WorkflowStatusCode } from '../types/prototypes';
 import { Types } from '../types/prototypes';
-import { EateryRoleCode, IEatery } from '../types/eaterytypes';
+import { EateryRoleCode, IEatery, IEmployee } from '../types/eaterytypes';
 import { IOrder, IOrderItem, IPayment, ITableCallWaiterSignal } from '../types/ordertypes';
+
+interface IEmployeeDataSchema extends IDocumentDataSchema {}
+interface IEmployeeWFSchema extends IDocumentWFSchema {}
 
 interface IEateryDataSchema extends IDocumentDataSchema {}
 interface IEateryWFSchema extends IDocumentWFSchema {}
+
+export class Employee extends Document<IEmployee, IEmployeeDataSchema, IEmployeeWFSchema> {
+    get dataSchema(): IEmployeeDataSchema {
+        return {
+            idFieldName: 'id',
+            tableName: 'eatery_employees',
+            fields: [
+                { name: `eatery_id`, type: 'bigint(20)', required: true },
+                { name: `userId`, type: 'bigint(20)', required: true },
+                { name: `roles`, type: 'json' },
+            ],
+        };
+    }
+
+    get wfSchema(): IEmployeeWFSchema {
+        return {
+            tableName: 'eatery_employees',
+            initialState: WorkflowStatusCode.approved,
+        };
+    }
+}
 
 export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema> {
     get dataSchema(): IEateryDataSchema {
@@ -46,7 +70,7 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
                     idFieldName: 'id',
                     fields: [
                         { name: `userId`, type: 'bigint(20)', required: true },
-                        { name: `roles`, type: 'varchar(2048)' },
+                        { name: `roles`, type: 'json' },
                     ],
                 },
             ],
@@ -83,7 +107,7 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
     }
 
     checkRoles(roleToCheck: EateryRoleCode, userId: Types.ObjectId): boolean {
-        return this.data.employees.some(empl => empl.userId === userId && (empl.roles === roleToCheck || empl.roles === EateryRoleCode.owner));
+        return this.data.employees.some(empl => !empl.blocked && empl.userId === userId && (empl.roles.includes(roleToCheck) || empl.roles.includes(EateryRoleCode.owner)));
     }
 }
 interface ITableCallWaiterSignalDataSchema extends IDocumentDataSchema {}

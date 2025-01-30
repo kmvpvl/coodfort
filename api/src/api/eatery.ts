@@ -1,6 +1,6 @@
 import { Context } from 'openapi-backend';
 import { Request, Response } from 'express';
-import { Eatery, TableCallWaiterSignal } from '../model/eatery';
+import { Eatery, Employee, TableCallWaiterSignal } from '../model/eatery';
 import { IEatery } from '../types/eaterytypes';
 import { EateryRoleCode } from '../types/eaterytypes';
 import { DocumentError } from '../model/protodocument';
@@ -27,6 +27,23 @@ export async function newEatery(c: Context, req: Request, res: Response, user: U
     }
 }
 
+export async function addEateryEmployee(c: Context, req: Request, res: Response, user: User) {
+    try {
+        const eateryId = req.body.eatery_id as Types.ObjectId;
+        const eatery = new Eatery(eateryId);
+        await eatery.load();
+
+        if (!eatery.checkRoles(EateryRoleCode.owner, user.id)) return res.status(403).json({ ok: false, error: { message: 'Unauthorized user' } });
+        const empl = new Employee(req.body);
+        await empl.save(user.data.login);
+        await eatery.load();
+        return res.status(200).json({ ok: true, eatery: eatery.data });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });
+        else return res.status(400).json({ ok: false, error: { message: e.message } });
+    }
+}
+
 export async function updateEatery(c: Context, req: Request, res: Response, user: User) {
     try {
         if (req.body.id === undefined) return newEatery(c, req, res, user);
@@ -39,7 +56,7 @@ export async function updateEatery(c: Context, req: Request, res: Response, user
         for (const [prop, val] of Object.entries(ed)) {
             if (prop !== 'employees') (eatery.data as any)[prop] = val;
         }
-        await eatery.save(user.data.login.toString());
+        await eatery.save(user.data.login);
         return res.status(200).json({ ok: true, eatery: eatery.data });
     } catch (e: any) {
         if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });

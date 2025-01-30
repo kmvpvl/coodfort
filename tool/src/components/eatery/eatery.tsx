@@ -339,7 +339,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 					)}
 					<span
 						onClick={event => {
-							this.photosRef.current?.qr(`${process.env.QR_BASE_URL}?startapp=eateryId_${this.state.value.id}`);
+							this.photosRef.current?.qr(`${process.env.QR_BASE_URL}?startapp=eateryId_${this.state.value.id}__tableId_${this.state.value.tables.at(0)?.id}`);
 						}}>
 						<i className="fa fa-qrcode"></i>
 					</span>

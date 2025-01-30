@@ -83,7 +83,7 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
     async createEatery(eateryData: IEatery): Promise<Eatery> {
         eateryData.employees.push({
             userId: this.id,
-            roles: EateryRoleCode.owner,
+            roles: [EateryRoleCode.owner],
         });
         const eatery = new Eatery(eateryData);
 
@@ -101,7 +101,7 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
 
     async eateriesList(): Promise<IEateryBrief[]> {
         const sql =
-            'select `eateries`.*, `linkedEateries`.`roles` from (SELECT `eatery_employees`.`eatery_id` as `id`, `roles` FROM `eatery_employees` WHERE `eatery_employees`.`userId` = ?) as `linkedEateries` INNER join `eateries` on `linkedEateries`.`id` = `eateries`.`id`';
+            'select `eateries`.*, `linkedEateries`.`roles` from (SELECT `eatery_employees`.`eatery_id` as `id`, `roles` FROM `eatery_employees` WHERE `eatery_employees`.`blocked` = 0 and `eatery_employees`.`userId` = ?) as `linkedEateries` INNER join `eateries` on `linkedEateries`.`id` = `eateries`.`id`';
         mconsole.sqlq(sql, [this.id]);
         const [rows, fields] = await this.sqlConnection.query<IEateryBrief[]>(sql, [this.id]);
         const schema = new Eatery().dataSchema;

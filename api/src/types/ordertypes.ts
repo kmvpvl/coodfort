@@ -3,7 +3,7 @@ import { IDocument, Types, WorkflowStatusCode } from './prototypes';
 
 export interface IOrderItem extends IDocument {}
 export interface IOrderItem extends IMealRequisites {
-    order_id: Types.ObjectId;
+    order_id?: Types.ObjectId;
     option: IMealOption;
     count: number;
     comment?: string;
