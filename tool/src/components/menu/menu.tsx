@@ -44,7 +44,6 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 			"menu/view",
 			JSON.stringify({ id: this.props.menuId }),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				const nState = this.state;
 				nState.changed = false;
@@ -52,9 +51,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 				nState.currentChapterIndex = nState.value.chapters.length > 0 ? 0 : undefined;
 				this.setState(nState);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -72,7 +69,6 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 			"menu/update",
 			JSON.stringify(this.state.value),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				if (this.props.onSave !== undefined) this.props.onSave(res.menu);
 				const nState = this.state;
@@ -80,9 +76,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 				nState.changed = false;
 				this.setState(nState);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 	renderEditMode(): ReactNode {

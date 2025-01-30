@@ -26,14 +26,11 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 			"user/view",
 			JSON.stringify({ id: this.state.value.userId }),
 			res => {
-				console.log(res);
 				if (res.ok) {
 					this.setState({ ...this.state, user: res.user });
 				}
 			},
-			err => {
-				console.log(err);
-			}
+			err => {}
 		);
 	}
 	updateEmployeeCapabilities(roles?: EateryRoleCode[], block?: boolean) {
@@ -44,13 +41,10 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 			"eatery/employee/update",
 			JSON.stringify(res),
 			res => {
-				console.log(res);
 				if (res.ok) {
 				}
 			},
-			err => {
-				console.log(err);
-			}
+			err => {}
 		);
 	}
 	render(): ReactNode {

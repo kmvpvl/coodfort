@@ -49,16 +49,13 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 			"meal/view",
 			JSON.stringify({ id: this.props.mealId }),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				const nState = this.state;
 				nState.changed = false;
 				nState.value = res.meal;
 				this.setState(nState);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -67,7 +64,6 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 			"meal/update",
 			JSON.stringify(this.state.value),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				if (this.props.onSave !== undefined) this.props.onSave(res.meal);
 				const nState = this.state;
@@ -75,9 +71,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 				nState.changed = false;
 				this.setState(nState);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 

@@ -29,7 +29,6 @@ export default class Employees extends Proto<IEmployeesProps, IEmployeesState> {
 				firstLetters: event.currentTarget.value,
 			}),
 			res => {
-				console.log(res);
 				if (res.ok) {
 					const nState = this.state;
 					nState.foundUser = res.user;
@@ -42,7 +41,6 @@ export default class Employees extends Proto<IEmployeesProps, IEmployeesState> {
 			},
 			err => {
 				this.setState({ ...this.state, foundUser: undefined });
-				console.log(err);
 			}
 		);
 	}
@@ -64,7 +62,6 @@ export default class Employees extends Proto<IEmployeesProps, IEmployeesState> {
 									roles: [],
 								}),
 								res => {
-									console.log(res);
 									if (res.ok) {
 										if (this.props.onChange !== undefined) this.props.onChange(res.eatery);
 										const nState = this.state;
@@ -72,9 +69,7 @@ export default class Employees extends Proto<IEmployeesProps, IEmployeesState> {
 										this.setState(nState);
 									}
 								},
-								err => {
-									console.log(err);
-								}
+								err => {}
 							);
 						}}>
 						invite

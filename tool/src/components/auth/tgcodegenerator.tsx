@@ -31,11 +31,8 @@ export default class TGCodeGenerator extends Proto<ITGCodeGeneratorProps, ITGCod
 			"POST",
 			undefined,
 			JSON.stringify({ code: this.state.uniqString, gentime: this.state.generationTime }),
-			res => {
-				console.log(res);
-			},
+			res => {},
 			err => {
-				console.log(err);
 				if (err.json.code !== ProtoErrorCode.serverNotAvailable && this.state.generationTime !== undefined) {
 					const nState = this.state;
 					nState.spentTime = (new Date().getTime() - this.state.generationTime.getTime()) / 1000;

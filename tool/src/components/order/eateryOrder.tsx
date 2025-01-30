@@ -29,15 +29,12 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 			"order/view",
 			JSON.stringify({ id: this.props.orderId === undefined ? this.state.value?.id : this.props.orderId }),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				const nState = this.state;
 				nState.value = res.order;
 				this.setState(nState);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -47,16 +44,13 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 			"order/update",
 			JSON.stringify(this.state.value),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				const nState = this.state;
 				nState.value = res.order;
 				this.setState(nState);
 				if (this.props.onChange && this.state.value !== undefined) this.props.onChange(this.state.value);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -118,16 +112,13 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 														amount: payment,
 													}),
 													res => {
-														console.log(res);
 														if (res.ok) {
 															const nState = this.state;
 															nState.value = res.order;
 															this.setState(nState);
 														}
 													},
-													err => {
-														console.log(err);
-													}
+													err => {}
 												);
 											}
 										}

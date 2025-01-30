@@ -74,7 +74,6 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 			"user/view",
 			undefined,
 			res => {
-				console.log(res);
 				if (res.ok) {
 					const nState: IState = this.state;
 					nState.user = res.user;
@@ -85,7 +84,6 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 				if (sucesscb !== undefined) sucesscb(res);
 			},
 			err => {
-				console.log(err.json);
 				if (this.props.onSignError !== undefined) this.props.onSignError(err);
 				if (failcb !== undefined) failcb(err);
 			}
@@ -146,31 +144,42 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 			})
 			.then(v => {
 				this.pendingRef.current?.decUse();
-				const nStatus: IState = this.state;
-				nStatus.serverStatus = ServerStatusCode.connected;
-				this.setState(nStatus);
+				if (process.env.MODE === "development") console.log(v);
+				if (this.state.serverStatus !== ServerStatusCode.connected) {
+					const nStatus: IState = this.state;
+					nStatus.serverStatus = ServerStatusCode.connected;
+					this.setState(nStatus);
+				}
 
 				if (successcb) successcb(v);
 			})
 			.catch(v => {
 				this.pendingRef.current?.decUse();
 				if (v instanceof Error) {
-					const nStatus: IState = this.state;
-					nStatus.serverStatus = ServerStatusCode.notAvailable;
-					this.setState(nStatus);
+					if (this.state.serverStatus !== ServerStatusCode.notAvailable) {
+						const nStatus: IState = this.state;
+						nStatus.serverStatus = ServerStatusCode.notAvailable;
+						this.setState(nStatus);
+					}
 					if (failcb) {
+						const err = new ProtoError(ProtoErrorCode.serverNotAvailable, v.message);
+						if (process.env.MODE === "development") console.log(err.json);
 						failcb(new ProtoError(ProtoErrorCode.serverNotAvailable, v.message));
 					}
 				} else {
 					v.json()
 						.then((j: any) => {
 							const err = new ProtoError(ProtoErrorCode.httpError, v.statusText, v.status, j);
-							const nStatus: IState = this.state;
-							nStatus.serverStatus = ServerStatusCode.connected;
-							this.setState(nStatus);
+							if (process.env.MODE === "development") console.log(err.json);
+							if (this.state.serverStatus !== ServerStatusCode.connected) {
+								const nStatus: IState = this.state;
+								nStatus.serverStatus = ServerStatusCode.connected;
+								this.setState(nStatus);
+							}
 							if (failcb) failcb(err);
 						})
 						.catch((err: any) => {
+							if (process.env.MODE === "development") console.log(err.json);
 							debugger;
 						});
 				}

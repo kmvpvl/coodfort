@@ -37,7 +37,6 @@ export default class Table extends Proto<ITableProps, ITableState> {
 			"eatery/tableCallWaiterSignals",
 			JSON.stringify({ tableIds: [this.state.value.id] }),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				const nState = this.state;
 				if (res.tableCallWaiterSignals.length === 1 && res.tableCallWaiterSignals[0].on) {
@@ -47,9 +46,7 @@ export default class Table extends Proto<ITableProps, ITableState> {
 				}
 				this.setState(nState);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -58,15 +55,12 @@ export default class Table extends Proto<ITableProps, ITableState> {
 			"user/callWaiter",
 			JSON.stringify({ tableId: this.state.value.id, on: false }),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				const nState = this.state;
 				nState.callingWaiter = res.tableCallWaiterSignal.on;
 				this.setState(nState);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 

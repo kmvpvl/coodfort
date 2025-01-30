@@ -58,16 +58,13 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 			"order/view",
 			JSON.stringify({ id: this.props.orderId === undefined ? this.state.value.id : this.props.orderId }),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				const nState = this.state;
 				nState.changed = false;
 				nState.value = res.order;
 				this.setState(nState);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -77,7 +74,6 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 			"order/update",
 			JSON.stringify(this.state.value),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				const nState = this.state;
 				nState.value = res.order;
@@ -85,9 +81,7 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 				this.setState(nState);
 				if (this.props.onChange) this.props.onChange(this.state.value);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 	protected itemWfNext(items: IWfNextRequest[]) {
@@ -95,7 +89,6 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 			"order/itemWfNext",
 			JSON.stringify({ orderItemIds: items }),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				const nState = this.state;
 				const items: IOrderItem[] = res.orderItems;
@@ -109,7 +102,6 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 			},
 			err => {
 				this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
-				console.log(err.json);
 			}
 		);
 	}
@@ -174,14 +166,11 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 								"user/callWaiter",
 								JSON.stringify({ tableId: this.state.value.tableId, on: true }),
 								res => {
-									console.log(res);
 									if (!res.ok) return;
 									const nState = this.state;
 									//this.setState(nState);
 								},
-								err => {
-									console.log(err.json);
-								}
+								err => {}
 							);
 						}}>
 						Call waiter

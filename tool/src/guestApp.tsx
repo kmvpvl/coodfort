@@ -94,7 +94,6 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 				wfStatuses: [WorkflowStatusCode.draft, WorkflowStatusCode.registered],
 			}),
 			res => {
-				console.log(res);
 				if (res.ok) {
 					const nState = this.state;
 					if (res.orders.length !== 1) {
@@ -105,9 +104,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 					this.setState(nState);
 				}
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -142,7 +139,6 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			"eatery/view",
 			JSON.stringify({ id: this.state.eateryId }),
 			res => {
-				console.log(res);
 				const nState = this.state;
 				nState.choosenEatery = res.eatery;
 				if (this.state.tableId !== undefined) {
@@ -156,7 +152,6 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 				this.updateOrdersList();
 			},
 			err => {
-				console.log(err.json);
 				const nState = this.state;
 				nState.eateryId = undefined;
 				nState.tableId = undefined;
@@ -227,15 +222,12 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 									bio: document.getElementById("bio")?.attributes.getNamedItem("value")?.value,
 								}),
 								res => {
-									console.log(res);
 									const nState = this.state;
 									nState.user = res.user;
 									this.setState(nState);
 									this.checkEateryId();
 								},
-								err => {
-									console.log(err.json);
-								}
+								err => {}
 							);
 						}}>
 						Everything is correct. Let's move on

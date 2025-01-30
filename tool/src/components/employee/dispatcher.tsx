@@ -76,14 +76,11 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 			"user/eateriesList",
 			undefined,
 			res => {
-				console.log(res);
 				if (res.ok) {
 					this.setState({ ...this.state, eateriesBrief: res.eateries });
 				}
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -92,14 +89,11 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 			"user/mealsList",
 			undefined,
 			res => {
-				console.log(res);
 				if (res.ok) {
 					this.setState({ ...this.state, meals: res.meals });
 				}
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -108,14 +102,11 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 			"user/menusList",
 			undefined,
 			res => {
-				console.log(res);
 				if (res.ok) {
 					this.setState({ ...this.state, menus: res.menus });
 				}
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -124,13 +115,11 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 			"eatery/ordersList",
 			JSON.stringify({ eateryId: eateryId, wfStatuses: [WorkflowStatusCode.draft, WorkflowStatusCode.registered] }),
 			res => {
-				console.log(res);
 				if (res.ok) {
 					this.setState({ ...this.state, orders: res.orders });
 				}
 			},
 			err => {
-				console.log(err.json);
 				if (err.json.httpCode !== undefined) {
 					switch (err.json.httpCode) {
 						case 403:
@@ -147,14 +136,11 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 				"eatery/tableCallWaiterSignals",
 				JSON.stringify({ tableIds: this.state.eaterySelected.tables.map(table => table.id) }),
 				res => {
-					console.log(res);
 					const nState = this.state;
 					nState.tableCallWaiterSignals = res.tableCallWaiterSignals;
 					this.setState(nState);
 				},
-				err => {
-					console.log(err);
-				}
+				err => {}
 			);
 		} else {
 		}
@@ -165,7 +151,6 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 			"eatery/view",
 			JSON.stringify({ id: id }),
 			res => {
-				console.log(res);
 				if (res.ok) {
 					const nState = this.state;
 					nState.eaterySelected = res.eatery;
@@ -173,9 +158,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 					this.loadTableCallWaiterSignals();
 				}
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
@@ -242,7 +225,6 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 								"order/itemWfNext",
 								JSON.stringify({ orderItemIds: items }),
 								res => {
-									console.log(res);
 									if (!res.ok) return;
 									const nState = this.state;
 									const items: IOrderItem[] = res.orderItems;
@@ -250,7 +232,6 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 								},
 								err => {
 									this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
-									console.log(err.json);
 								}
 							);
 						}}
@@ -259,7 +240,6 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 								"order/itemWfNext",
 								JSON.stringify({ orderItemIds: items }),
 								res => {
-									console.log(res);
 									if (!res.ok) return;
 									const nState = this.state;
 									const items: IOrderItem[] = res.orderItems;
@@ -267,7 +247,6 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 								},
 								err => {
 									this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
-									console.log(err.json);
 								}
 							);
 						}}
@@ -285,7 +264,6 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 								"order/itemWfNext",
 								JSON.stringify({ orderItemIds: items }),
 								res => {
-									console.log(res);
 									if (!res.ok) return;
 									const nState = this.state;
 									const items: IOrderItem[] = res.orderItems;
@@ -293,7 +271,6 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 								},
 								err => {
 									this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
-									console.log(err.json);
 								}
 							);
 						}}

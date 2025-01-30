@@ -43,7 +43,6 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 			"eatery/update",
 			JSON.stringify(this.state.value),
 			res => {
-				console.log(res);
 				if (!res.ok) return;
 				if (this.props.onSave !== undefined) this.props.onSave(res.eatery);
 				const nState = this.state;
@@ -51,9 +50,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 				nState.value = res.eatery;
 				this.setState(nState);
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 		//	}
 	}
@@ -64,7 +61,6 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 			"eatery/view",
 			JSON.stringify({ id: this.state.value.id }),
 			res => {
-				console.log(res);
 				if (res.ok) {
 					const nState = this.state;
 					nState.value = res.eatery;
@@ -72,9 +68,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 					this.setState(nState);
 				}
 			},
-			err => {
-				console.log(err.json);
-			}
+			err => {}
 		);
 	}
 
