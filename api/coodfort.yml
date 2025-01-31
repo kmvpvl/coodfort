@@ -242,12 +242,16 @@ components:
             esId: 
               description: Reference to executive system of kitchen
               type: string
-            tableRequiredToInhouseOrder:
+            tableRequiredToOnPremiseOrder:
               description: Whether tableId is required to make order or booking
-              type: boolean
+              oneOf:
+                - type: boolean
+                - type: number
             approveRequiredToReserve:
               description: Whether approving of eatery's sous-chef is required to start cooking
-              type: boolean
+              oneOf:
+                - type: boolean
+                - type: number
         - $ref: "#/components/schemas/proto"
     ###
     # The TableCallWaiterSignal object
@@ -876,7 +880,33 @@ paths:
           $ref: "#/components/responses/errorResponse"
         '400':
           $ref: "#/components/responses/errorResponse"
-# 
+  /order/wfNext:
+    post:
+      description: Moves Order to next workflow status
+      tags:
+        - order
+        - workflow
+      operationId: wfNextOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - nextWfStatus
+              properties:
+                id: 
+                  type: number
+                nextWfStatus:
+                  type: number
+      responses:
+        '200':
+          $ref: "#/components/responses/orderSuccess"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
   /order/itemWfNext:
     post:
       description: Moves OrderItem to next workflow status

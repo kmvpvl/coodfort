@@ -4,10 +4,12 @@ import { IOrder, IOrderItem, IOrderSumBalance } from "@betypes/ordertypes";
 import "./guestOrder.css";
 import { IWfHistoryItem, IWfNextRequest, Types, WorkflowStatusCode } from "@betypes/prototypes";
 import { ToastType } from "../toast";
+import { IEatery } from "@betypes/eaterytypes";
 export interface IGuestOrderProps extends IProtoProps {
 	defaultValue?: IOrder;
 	viewMode?: ViewModeCode;
 	orderId?: Types.ObjectId;
+	eatery: IEatery;
 	eateryId: Types.ObjectId;
 	tableId: Types.ObjectId;
 	onChange?: (order: IOrder) => void;
@@ -85,6 +87,13 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 		);
 	}
 	protected itemWfNext(items: IWfNextRequest[]) {
+		if (this.props.eatery.approveRequiredToReserve && this.state.value.wfStatus == WorkflowStatusCode.draft) {
+			this.props.toaster?.current?.addToast({
+				type: ToastType.info,
+				message: `Unable register the order 'cause order not approved by ${this.toString(this.props.eatery.name)}. Pls wait or call waiter`,
+			});
+			return;
+		}
 		this.serverCommand(
 			"order/itemWfNext",
 			JSON.stringify({ orderItemIds: items }),

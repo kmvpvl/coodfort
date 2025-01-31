@@ -68,7 +68,7 @@ export default class Table extends Proto<ITableProps, ITableState> {
 		return (
 			<div className="table-container">
 				<span>{this.toString(this.state.value.name)}</span>
-				<span>{this.props.orders?.map((order, idx) => (order.id !== undefined ? <EateryOrder key={order.id} orderId={order.id} /> : <></>))}</span>
+				<span>{this.props.orders?.map((order, idx) => (order.id !== undefined ? <EateryOrder key={order.id} orderId={order.id} toaster={this.props.toaster} /> : <></>))}</span>
 				{this.state.callingWaiter ? <span onClick={this.off.bind(this)}>☉</span> : <span></span>}
 			</div>
 		);

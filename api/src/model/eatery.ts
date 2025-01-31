@@ -47,8 +47,8 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
                 { name: `cuisines`, type: 'json' },
                 { name: `averageBills`, type: 'json' },
                 { name: `menuId`, type: 'bigint(20)', required: false },
-                { name: `tableRequiredToInhouseOrder`, type: 'tinyint(1)', required: false },
-                { name: `approveRequiredToReserve`, type: 'tinyint(1)', required: false },
+                { name: `tableRequiredToOnPremiseOrder`, type: 'tinyint(1)', required: false, default: '1' },
+                { name: `approveRequiredToReserve`, type: 'tinyint(1)', required: false, default: '1' },
                 { name: `esId`, type: 'varchar(256)', required: false },
             ],
             related: [
@@ -61,7 +61,7 @@ export class Eatery extends Document<IEatery, IEateryDataSchema, IEateryWFSchema
                         { name: `photos`, type: 'json' },
                         { name: `guestCountMin`, type: 'int(11)' },
                         { name: `guestCountMax`, type: 'int(11)' },
-                        { name: `approveRequiredToReserve`, type: 'tinyint(1)', required: false },
+                        { name: `approveRequiredToReserve`, type: 'tinyint(1)', required: false, default: '1' },
                         { name: `esId`, type: 'varchar(256)', required: false },
                     ],
                 },
@@ -288,14 +288,14 @@ export class Order extends Document<IOrder, IOrderDataSchema, IOrderWFSchema> {
             transfers: [
                 {
                     from: WorkflowStatusCode.draft,
-                    to: WorkflowStatusCode.registered,
+                    to: WorkflowStatusCode.approved,
                 },
                 {
-                    from: WorkflowStatusCode.registered,
+                    from: WorkflowStatusCode.approved,
                     to: WorkflowStatusCode.payed,
                 },
                 {
-                    from: WorkflowStatusCode.registered,
+                    from: WorkflowStatusCode.draft,
                     to: WorkflowStatusCode.canceledByEatery,
                 },
                 {

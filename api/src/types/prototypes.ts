@@ -102,6 +102,13 @@ export interface IAward {
     };
     url: string;
 }
+export interface IFeedback {
+    userId: Types.ObjectId;
+    rating: number;
+    comment?: string;
+    objectType: string;
+    objectId: Types.ObjectId;
+}
 export interface IUser extends IDocument {
     login: string /**Telegram ID or login or phone */;
     hash: string /** */;

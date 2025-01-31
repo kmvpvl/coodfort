@@ -4,6 +4,7 @@ import "./eateryOrder.css";
 import { IOrder, PaymentMethod } from "@betypes/ordertypes";
 import { Types, WorkflowStatusCode } from "@betypes/prototypes";
 import { calcSum } from "./guestOrder";
+import { ToastType } from "../toast";
 
 export interface IEateryOrderProps extends IProtoProps {
 	defaultValue?: IOrder;
@@ -54,10 +55,38 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 		);
 	}
 
+	cancelOrderByEatery() {
+		this.serverCommand(
+			"order/wfNext",
+			JSON.stringify({ id: this.state.value?.id, nextWfStatus: WorkflowStatusCode.canceledByEatery }),
+			res => {
+				if (res.ok) {
+					const nState = this.state;
+					nState.value = res.order;
+					this.setState(nState);
+				}
+			},
+			err => {}
+		);
+	}
+
+	approveOrder() {
+		this.serverCommand(
+			"order/wfNext",
+			JSON.stringify({ id: this.state.value?.id, nextWfStatus: WorkflowStatusCode.approved }),
+			res => {
+				if (res.ok) {
+					const nState = this.state;
+					nState.value = res.order;
+					this.setState(nState);
+				}
+			},
+			err => {}
+		);
+	}
 	render(): ReactNode {
 		if (this.state.value === undefined) return <></>;
 		const total = calcSum(this.state.value);
-		const isRegistered = this.state.value.wfHistory?.filter(item => item.wfStatus === WorkflowStatusCode.registered).length === 1;
 		const isApproved = this.state.value.wfHistory?.filter(item => item.wfStatus === WorkflowStatusCode.approved).length === 1;
 		const isCanceledByEatery = this.state.value.wfHistory?.filter(item => item.wfStatus === WorkflowStatusCode.canceledByEatery).length === 1;
 		return (
@@ -69,10 +98,30 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 						}}>
 						{this.state.viewMode === ViewModeCode.maximized ? "⚊" : "⤢"}
 					</span>
+					{this.state.viewMode === ViewModeCode.maximized ? (
+						<span
+							onClick={event => {
+								this.props.toaster?.current?.addToast({
+									type: ToastType.info,
+									modal: true,
+									message: <span>Are you sure?</span>,
+									buttons: [{ text: "OK", callback: this.cancelOrderByEatery.bind(this) }],
+								});
+							}}>
+							✖
+						</span>
+					) : (
+						<></>
+					)}
 				</div>
 				<div className="order-status-container">
-					<span className={isRegistered ? "done" : ""}>✎</span>
-					{isCanceledByEatery ? <span className="canceled">✖</span> : <span className={isApproved ? "done" : ""}>✔</span>}
+					{isCanceledByEatery ? (
+						<span className="canceled">✖</span>
+					) : (
+						<span className={isApproved ? "done" : ""} onClick={this.approveOrder.bind(this)}>
+							✔
+						</span>
+					)}
 					<span>$</span>
 					<span>☆</span>
 				</div>

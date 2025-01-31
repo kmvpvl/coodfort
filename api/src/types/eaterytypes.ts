@@ -43,7 +43,7 @@ export interface IEatery extends IDocument {
     averageBills?: { cuisine: Types.IMLString; withAlcohol: number; withoutAlcohol: number }[];
     menuId?: Types.ObjectId;
     esId?: string;
-    tableRequiredToInhouseOrder?: boolean;
+    tableRequiredToOnPremiseOrder?: boolean;
     approveRequiredToReserve?: boolean;
 }
 export interface IEateryBrief extends RowDataPacket {}

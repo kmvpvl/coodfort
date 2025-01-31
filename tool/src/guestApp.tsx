@@ -91,7 +91,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			JSON.stringify({
 				eateryId: this.state.eateryId,
 				tableId: this.state.tableId,
-				wfStatuses: [WorkflowStatusCode.draft, WorkflowStatusCode.registered],
+				wfStatuses: [WorkflowStatusCode.draft, WorkflowStatusCode.approved],
 			}),
 			res => {
 				if (res.ok) {
@@ -331,8 +331,9 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		);
 	}
 	renderPay(): ReactNode {
-		return this.state.eateryId !== undefined && this.state.tableId !== undefined && this.state.order !== undefined ? (
+		return this.state.choosenEatery !== undefined && this.state.eateryId !== undefined && this.state.tableId !== undefined && this.state.order !== undefined ? (
 			<GuestOrder
+				eatery={this.state.choosenEatery}
 				viewMode={ViewModeCode.normal}
 				orderId={this.state.order.id}
 				eateryId={this.state.eateryId}
@@ -378,9 +379,10 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 										}
 									}}
 									className={`stage ${curStage ? "current" : ""}`}>
-									{stage === "Pay" && this.state.eateryId !== undefined && this.state.tableId !== undefined ? (
+									{stage === "Pay" && this.state.eateryId !== undefined && this.state.tableId !== undefined && this.state.choosenEatery !== undefined ? (
 										<GuestOrder
 											ref={this.orderRef}
+											eatery={this.state.choosenEatery}
 											defaultValue={this.state.order}
 											eateryId={this.state.eateryId}
 											tableId={this.state.tableId}

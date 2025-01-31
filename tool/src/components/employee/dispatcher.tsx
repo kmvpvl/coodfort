@@ -113,7 +113,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	loadOrdersList(eateryId: Types.ObjectId) {
 		this.serverCommand(
 			"eatery/ordersList",
-			JSON.stringify({ eateryId: eateryId, wfStatuses: [WorkflowStatusCode.draft, WorkflowStatusCode.registered] }),
+			JSON.stringify({ eateryId: eateryId, wfStatuses: [WorkflowStatusCode.draft, WorkflowStatusCode.approved] }),
 			res => {
 				if (res.ok) {
 					this.setState({ ...this.state, orders: res.orders });
@@ -175,7 +175,6 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	}
 
 	onLeftMenuSelected(item: LeftMenuItemIdCode) {
-		console.log(item);
 		this.setState({ ...this.state, mode: item });
 	}
 
@@ -214,9 +213,13 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 		let ret: ReactNode;
 		switch (this.state.mode) {
 			case LeftMenuItemIdCode.waiterCalls:
-				return <div className="dispatcher-calls-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={idx} defaultValue={table} />)}</div>;
+				return <div className="dispatcher-calls-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={idx} defaultValue={table} toaster={this.props.toaster} />)}</div>;
 			case LeftMenuItemIdCode.orderBalance:
-				return <div className="dispatcher-order-balance-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={idx} defaultValue={table} orders={this.state.orders.filter(order => order.tableId === table.id)} />)}</div>;
+				return (
+					<div className="dispatcher-order-balance-container">
+						{this.state.eaterySelected?.tables.map((table, idx) => <Table key={idx} defaultValue={table} orders={this.state.orders.filter(order => order.tableId === table.id)} toaster={this.props.toaster} />)}
+					</div>
+				);
 			case LeftMenuItemIdCode.orderApprove:
 				return (
 					<ApproveOrderItems

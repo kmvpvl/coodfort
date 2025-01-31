@@ -144,7 +144,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 			})
 			.then(v => {
 				this.pendingRef.current?.decUse();
-				if (process.env.MODE === "development") console.log(v);
+				if (process.env.MODE === "development") console.log(`command = '${command}', body = '${body}', response = `, v);
 				if (this.state.serverStatus !== ServerStatusCode.connected) {
 					const nStatus: IState = this.state;
 					nStatus.serverStatus = ServerStatusCode.connected;
@@ -163,14 +163,14 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 					}
 					if (failcb) {
 						const err = new ProtoError(ProtoErrorCode.serverNotAvailable, v.message);
-						if (process.env.MODE === "development") console.log(err.json);
+						if (process.env.MODE === "development") console.log(`command = '${command}', body = '${body}', response = `, err.json);
 						failcb(new ProtoError(ProtoErrorCode.serverNotAvailable, v.message));
 					}
 				} else {
 					v.json()
 						.then((j: any) => {
 							const err = new ProtoError(ProtoErrorCode.httpError, v.statusText, v.status, j);
-							if (process.env.MODE === "development") console.log(err.json);
+							if (process.env.MODE === "development") console.log(`command = '${command}', body = '${body}', response = `, err.json);
 							if (this.state.serverStatus !== ServerStatusCode.connected) {
 								const nStatus: IState = this.state;
 								nStatus.serverStatus = ServerStatusCode.connected;
@@ -179,7 +179,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 							if (failcb) failcb(err);
 						})
 						.catch((err: any) => {
-							if (process.env.MODE === "development") console.log(err.json);
+							if (process.env.MODE === "development") console.log(`command = '${command}', body = '${body}', response = `, err.json);
 							debugger;
 						});
 				}

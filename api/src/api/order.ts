@@ -41,6 +41,23 @@ export async function viewOrder(c: Context, req: Request, res: Response, user: U
     }
 }
 
+export async function wfNextOrder(c: Context, req: Request, res: Response, user: User) {
+    try {
+        if (req.body.id === undefined) {
+            throw new DocumentError(DocumentErrorCode.parameter_expected, `Order id expected`);
+        }
+        const order = new Order(req.body.id);
+        await order.load();
+        const eatery = new Eatery(order.data.eateryId);
+        await eatery.load();
+        if (order.data.wfStatus === WorkflowStatusCode.draft && eatery.checkRoles(EateryRoleCode['payment-get'], user.id)) order.wfNext(user, req.body.nextWfStatus);
+        return res.status(200).json({ ok: true, order: order.data });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });
+        else return res.status(400).json({ ok: false, error: { message: e.message } });
+    }
+}
+
 export async function wfNextOrderItem(c: Context, req: Request, res: Response, user: User) {
     try {
         if (req.body.orderItemIds === undefined) {
@@ -49,12 +66,39 @@ export async function wfNextOrderItem(c: Context, req: Request, res: Response, u
         const ids: IWfNextRequest[] = req.body.orderItemIds;
 
         const ret: IOrderItem[] = [];
+        let eatery: Eatery | undefined;
+        let order: Order | undefined;
 
         for (let idx = 0; idx < ids.length; idx++) {
             const item = new OrderItem(ids[idx].id);
             await item.load();
-            await item.wfNext(user, ids[idx].nextWfStatus);
-            ret.push(item.data);
+            if (item.data.order_id !== undefined) {
+                if (order === undefined || order.id !== item.data.order_id) {
+                    order = new Order(item.data.order_id);
+                    await order.load();
+                }
+                if (eatery === undefined || eatery.id !== order.data.eateryId) {
+                    eatery = new Eatery(order.data.eateryId);
+                    await eatery.load();
+                }
+                if (order.data.wfStatus === WorkflowStatusCode.draft) {
+                    if (eatery.data.approveRequiredToReserve) {
+                        ret.push(item.data);
+                        continue;
+                    }
+                }
+                if (
+                    //guest rights check
+                    ((item.data.wfStatus === WorkflowStatusCode.draft || item.data.wfStatus === WorkflowStatusCode.done) && order.data.userId === user.id) ||
+                    // eatery staff rights check
+                    ((item.data.wfStatus === WorkflowStatusCode.registered || item.data.wfStatus === WorkflowStatusCode.approved) && eatery?.checkRoles(EateryRoleCode['sous-chef'], user.id))
+                )
+                    await item.wfNext(user, ids[idx].nextWfStatus);
+                //???else res.status(403).json();
+                ret.push(item.data);
+            } else {
+                throw new DocumentError(DocumentErrorCode.wf_suspense, `Order item id = '${item.id}' MUST have non-null order_id`);
+            }
         }
         return res.status(200).json({ ok: true, orderItems: ret });
     } catch (e: any) {

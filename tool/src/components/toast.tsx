@@ -8,6 +8,10 @@ export interface IToasterProps {
 	/** The count of places to arrange the toasts. This property is the count of toasts which are visible simultaneously*/
 	placesCount: number;
 }
+interface IToastButton {
+	text: string;
+	callback: () => void;
+}
 /**Interface for new toast creation */
 interface IToast {
 	/** One of three types: info, warning, or error*/
@@ -24,6 +28,7 @@ interface IToast {
 	saveInHistory?: boolean;
 	/**If Toaster has at least one not shown modal Toast then Toaster covers all accessible area and prohibit interaction with other elements on page. Use modal parameter if you want stop user interaction while user reads the message and close the Toast */
 	modal?: boolean;
+	buttons?: IToastButton[];
 }
 /** Added extra properties for queue in Toaster */
 interface IToastExtProps extends IToast {
@@ -107,6 +112,10 @@ export class Toast extends React.Component<IToastProps, IToastState> {
 		nState.showDescription = this.props.description !== undefined ? nState.showDescription : false;
 		this.setState(nState);
 	}
+	onButtonClick(button: IToastButton) {
+		if (this.props.onHide) this.props.onHide(this.props.uid);
+		button.callback();
+	}
 	render(): React.ReactNode {
 		return (
 			<div className={`toast-container-${this.props.type}`}>
@@ -127,6 +136,17 @@ export class Toast extends React.Component<IToastProps, IToastState> {
 				)}
 				<div className="toast-message">{this.props.message}</div>
 				{this.state.showDescription ? <div className="toast-description">{this.props.description}</div> : <></>}
+				{this.props.buttons !== undefined ? (
+					<div>
+						{this.props.buttons.map((button, idx) => (
+							<button key={idx} onClick={this.onButtonClick.bind(this, button)}>
+								{button.text}
+							</button>
+						))}
+					</div>
+				) : (
+					<></>
+				)}
 			</div>
 		);
 	}
