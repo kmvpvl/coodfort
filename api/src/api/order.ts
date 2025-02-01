@@ -6,21 +6,48 @@ import { User } from '../model/user';
 import { Eatery, Order, OrderItem, Payment } from '../model/eatery';
 import { EateryRoleCode } from '../types/eaterytypes';
 import { IOrder, IOrderItem } from '../types/ordertypes';
+import { error } from 'console';
 
-export async function updateOrder(c: Context, req: Request, res: Response, user: User) {
+export async function newOrder(c: Context, req: Request, res: Response, user: User) {
     try {
         const order = new Order();
         if (req.body.id === undefined) {
             req.body.userId = user.id;
-        } else {
-            const tempOrder = new Order(req.body.id);
-            await tempOrder.load();
-            if (tempOrder.data.userId !== user.id) return res.status(403).json({ ok: false, error: `` });
         }
         order.checkMandatory(req.body);
         await order.load(req.body);
-        await order.save(user.data.login.toString());
+        await order.save(user.data.login);
         return res.status(200).json({ ok: true, order: order.data });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });
+        else return res.status(400).json({ ok: false, error: { message: e.message } });
+    }
+}
+
+export async function updateOrderItem(c: Context, req: Request, res: Response, user: User) {
+    try {
+        const orderItem = new OrderItem();
+        if (req.body.order_id === undefined) throw new DocumentError(DocumentErrorCode.parameter_expected, `Order item MUST get filled order_id field`);
+        const parentOrder = new Order(req.body.order_id);
+        await parentOrder.load();
+        const eatery = new Eatery(parentOrder.data.eateryId);
+        await eatery.load();
+        orderItem.checkMandatory(req.body);
+        await orderItem.load(req.body);
+        if (req.body.id === undefined) {
+            if (user.id !== parentOrder.data.userId && !eatery.checkRoles(EateryRoleCode['sous-chef'], user.id)) return res.status(403).json({ ok: false, error: { message: `Order item must create guest or eatery staff with role 'sous-chef'` } });
+        } else {
+            const oldItem = parentOrder.data.items.filter(item => item.id == req.body.id);
+            if (oldItem.length !== 1) return res.status(400).json({ ok: false, error: { message: `Order item with id = '${req.body.id}' not found` } });
+            if (oldItem[0].wfStatus !== orderItem.data.wfStatus) return res.status(400).json({ ok: false, error: { message: `Order item with id = '${req.body.id}' has different wfStatus` } });
+            if (oldItem[0].wfStatus === WorkflowStatusCode.draft && user.id !== parentOrder.data.userId && !eatery.checkRoles(EateryRoleCode['sous-chef'], user.id))
+                return res.status(403).json({ ok: false, error: { message: `Order item must create guest or eatery staff with role 'sous-chef'` } });
+            if (oldItem[0].wfStatus !== WorkflowStatusCode.draft && !eatery.checkRoles(EateryRoleCode['sous-chef'], user.id)) return res.status(403).json({ ok: false, error: { message: `Order item must create guest or eatery staff with role 'sous-chef'` } });
+        }
+        if (orderItem.data.count === 0) await orderItem.delete();
+        else await orderItem.save(user.data.login);
+        await parentOrder.load();
+        return res.status(200).json({ ok: true, order: parentOrder.data });
     } catch (e: any) {
         if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });
         else return res.status(400).json({ ok: false, error: { message: e.message } });

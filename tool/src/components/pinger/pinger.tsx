@@ -15,6 +15,7 @@ export interface IPingerState extends IProtoState {
 export default class Pinger extends Proto<IPingerProps, IPingerState> {
 	state: IPingerState = {};
 	protected intervalPing?: NodeJS.Timeout;
+	protected NAIntervalPing?: NodeJS.Timeout;
 	componentDidMount(): void {
 		this.ping();
 		if (this.intervalPing === undefined) this.intervalPing = setInterval(this.ping.bind(this), this.props.pingFrequency === undefined ? (process.env.MODE === "production" ? 30000 : 120000) : this.props.pingFrequency);
@@ -27,7 +28,10 @@ export default class Pinger extends Proto<IPingerProps, IPingerState> {
 			undefined,
 			undefined,
 			res => {
-				//debugger
+				if (this.NAIntervalPing !== undefined) {
+					clearInterval(this.NAIntervalPing);
+					this.NAIntervalPing = undefined;
+				}
 				if (!res.ok) return;
 				if (this.props.onConnect !== undefined && lStatus !== ServerStatusCode.connected) this.props.onConnect();
 				const nState = this.state;
@@ -35,6 +39,9 @@ export default class Pinger extends Proto<IPingerProps, IPingerState> {
 				this.setState(nState);
 			},
 			err => {
+				if (this.NAIntervalPing === undefined) {
+					this.NAIntervalPing = setInterval(this.ping.bind(this), this.props.pingFrequency === undefined ? (process.env.MODE === "production" ? 2000 : 3000) : this.props.pingFrequency);
+				}
 				if (this.props.onDisconnect !== undefined && lStatus !== ServerStatusCode.notAvailable) this.props.onDisconnect();
 			}
 		);

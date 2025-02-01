@@ -14,7 +14,7 @@ import { updateMeal, updateMenu, viewMeal, viewMenu } from './api/meal';
 import cors from 'cors';
 import { Telegraf } from 'telegraf';
 import { User } from './model/user';
-import { eateryOrderList, newPayment, updateOrder, viewOrder, wfNextOrder, wfNextOrderItem } from './api/order';
+import { eateryOrderList, newPayment, newOrder, viewOrder, wfNextOrder, wfNextOrderItem, updateOrderItem } from './api/order';
 
 configDotenv();
 const TGTOKEN = process.env.tgtoken;
@@ -94,7 +94,8 @@ api.register({
     userMealsList: userMealsList,
     userMenusList: userMenusList,
     userOrdersList: userOrdersList,
-    updateOrder: updateOrder,
+    newOrder: newOrder,
+    updateOrderItem: updateOrderItem,
     viewOrder: viewOrder,
     wfNextOrderItem: wfNextOrderItem,
     wfNextOrder: wfNextOrder,

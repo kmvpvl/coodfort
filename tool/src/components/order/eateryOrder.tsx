@@ -40,9 +40,8 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 	}
 
 	protected save() {
-		//debugger
 		this.serverCommand(
-			"order/update",
+			"order/new",
 			JSON.stringify(this.state.value),
 			res => {
 				if (!res.ok) return;

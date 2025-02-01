@@ -321,7 +321,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		);
 	}
 	onSelectMenuItem(newItem: IOrderItem) {
-		this.orderRef.current?.addNewOrderItem(newItem);
+		this.orderRef.current?.updateNewOrderItem(newItem);
 	}
 	renderChoose(): ReactNode {
 		return (
@@ -372,7 +372,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 									data-stage={stage}
 									onClick={event => {
 										const choosenStage = event.currentTarget.attributes.getNamedItem("data-stage")?.value.toLowerCase();
-										if (choosenStage !== this.state.stage && choosenStage !== undefined) {
+										if (choosenStage !== this.state.stage && choosenStage !== undefined && (choosenStage !== "pay" || (choosenStage === "pay" && this.state.order && this.state.order.items.length > 0))) {
 											const nState = this.state;
 											nState.stage = choosenStage;
 											this.setState(nState);

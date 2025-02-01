@@ -19,6 +19,7 @@ export enum EateryRoleCode {
     'payment-get' = 'payment-get',
 }
 export interface ITable extends IDocument {
+    eatery_id?: Types.ObjectId;
     name: Types.IMLString;
     tags: ITag[];
     photos?: IPhoto[];

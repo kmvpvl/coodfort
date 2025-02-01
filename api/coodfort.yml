@@ -860,19 +860,38 @@ paths:
           $ref: "#/components/responses/errorResponse"
         '400':
           $ref: "#/components/responses/errorResponse"
-  /order/update:
+  /order/new:
     post:
-      description: Creates of update order
+      description: Creates new order by Guest
       tags:
         - order
         - create
-        - update
-      operationId: updateOrder
+      operationId: newOrder
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/order"
+      responses:
+        '200':
+          $ref: "#/components/responses/orderSuccess"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
+  /order/itemUpdate:
+    post:
+      description: Creates new order item by Guest
+      tags:
+        - order
+        - create
+        - update
+      operationId: updateOrderItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/orderItem"
       responses:
         '200':
           $ref: "#/components/responses/orderSuccess"

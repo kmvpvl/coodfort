@@ -42,6 +42,7 @@ enum LeftMenuItemIdCode {
 	menus,
 	employees,
 	guests,
+	qrs,
 }
 
 const leftMenu = [
@@ -53,6 +54,7 @@ const leftMenu = [
 	{ id: LeftMenuItemIdCode.orderReview, name: "Orders review" },
 	{ name: "MASTER DATA" },
 	{ id: LeftMenuItemIdCode.eateryData, name: "Eatery data" },
+	{ id: LeftMenuItemIdCode.qrs, name: "QRs" },
 	{ id: LeftMenuItemIdCode.meals, name: "Meals" },
 	{ id: LeftMenuItemIdCode.menus, name: "Menus" },
 	{ id: LeftMenuItemIdCode.employees, name: "Employees" },
@@ -212,12 +214,19 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	renderMiddle(): ReactNode {
 		let ret: ReactNode;
 		switch (this.state.mode) {
+			case LeftMenuItemIdCode.qrs:
+				return <div className="dispatcher-calls-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={`qr_${idx}`} defaultValue={table} toaster={this.props.toaster} showQR={true} />)}</div>;
 			case LeftMenuItemIdCode.waiterCalls:
-				return <div className="dispatcher-calls-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={idx} defaultValue={table} toaster={this.props.toaster} />)}</div>;
+				return <div className="dispatcher-calls-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={`call_${idx}`} defaultValue={table} toaster={this.props.toaster} />)}</div>;
 			case LeftMenuItemIdCode.orderBalance:
 				return (
 					<div className="dispatcher-order-balance-container">
-						{this.state.eaterySelected?.tables.map((table, idx) => <Table key={idx} defaultValue={table} orders={this.state.orders.filter(order => order.tableId === table.id)} toaster={this.props.toaster} />)}
+						<div className="standalone-toolbar">
+							<span>+</span>
+						</div>
+						<div className="dispatcher-order-balance-table-list">
+							{this.state.eaterySelected?.tables.map((table, idx) => <Table key={`balance_${idx}`} defaultValue={table} orders={this.state.orders.filter(order => order.tableId === table.id)} toaster={this.props.toaster} />)}
+						</div>
 					</div>
 				);
 			case LeftMenuItemIdCode.orderApprove:

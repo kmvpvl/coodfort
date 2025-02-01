@@ -40,20 +40,37 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 			this.setState(nState);
 		}
 	}
-	addNewOrderItem(item: IOrderItem) {
+	updateNewOrderItem(item: IOrderItem) {
+		item.order_id = this.state.value.id;
 		const nState = this.state;
-		nState.value.items.push(item);
+		const oldOrNew = nState.value.items.findIndex(el => el.id === item.id);
+		if (oldOrNew === -1) nState.value.items.push(item);
+		else nState.value.items[oldOrNew] = item;
 		this.setState(nState);
-		this.save();
+		if (this.state.value.id === undefined) this.save();
+		else
+			this.serverCommand(
+				"order/itemUpdate",
+				JSON.stringify(item),
+				res => {
+					if (res.ok) {
+						const nState = this.state;
+						nState.value = res.order;
+						this.setState(nState);
+					}
+				},
+				err => {}
+			);
 	}
 	new(): IOrder {
-		return {
+		const ret = {
 			eateryId: this.props.eateryId,
 			tableId: this.props.tableId,
 			items: [],
 			payments: [],
 			discount: 1,
 		};
+		return ret;
 	}
 	public load() {
 		this.serverCommand(
@@ -71,20 +88,20 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 	}
 
 	protected save() {
-		//debugger
-		this.serverCommand(
-			"order/update",
-			JSON.stringify(this.state.value),
-			res => {
-				if (!res.ok) return;
-				const nState = this.state;
-				nState.value = res.order;
-				nState.changed = false;
-				this.setState(nState);
-				if (this.props.onChange) this.props.onChange(this.state.value);
-			},
-			err => {}
-		);
+		if (this.state.value.id === undefined)
+			this.serverCommand(
+				"order/new",
+				JSON.stringify(this.state.value),
+				res => {
+					if (!res.ok) return;
+					const nState = this.state;
+					nState.value = res.order;
+					nState.changed = false;
+					this.setState(nState);
+					if (this.props.onChange) this.props.onChange(this.state.value);
+				},
+				err => {}
+			);
 	}
 	protected itemWfNext(items: IWfNextRequest[]) {
 		if (this.props.eatery.approveRequiredToReserve && this.state.value.wfStatus == WorkflowStatusCode.draft) {
@@ -218,9 +235,8 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 											onClick={event => {
 												event.stopPropagation();
 												const nState = this.state;
-												nState.value.items.splice(idx, 1);
-												this.save();
-												this.setState(nState);
+												nState.value.items[idx].count = 0;
+												this.updateNewOrderItem(nState.value.items[idx]);
 											}}>
 											⤬
 										</span>
@@ -235,10 +251,8 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 												const nState = this.state;
 												if (nState.value.items !== undefined && nState.value.items[idx] !== undefined) {
 													nState.value.items[idx].count -= 1;
-													if (nState.value.items[idx].count <= 0) nState.value.items.splice(idx, 1);
 												}
-												this.save();
-												this.setState(nState);
+												this.updateNewOrderItem(nState.value.items[idx]);
 											}}>
 											-
 										</span>
@@ -251,10 +265,8 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 											className="context-menu-button"
 											onClick={event => {
 												event.stopPropagation();
-												const nState = this.state;
-												if (nState.value.items !== undefined && nState.value.items[idx] !== undefined) nState.value.items[idx].count += 1;
-												this.save();
-												this.setState(nState);
+												this.state.value.items[idx].count += 1;
+												this.updateNewOrderItem(this.state.value.items[idx]);
 											}}>
 											+
 										</span>

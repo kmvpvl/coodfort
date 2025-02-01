@@ -141,6 +141,60 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
         return this._data;
     }
 
+    async delete(): Promise<void> {
+        await Document.createSQLConnection();
+        if (this._id === undefined) return;
+        await this.sqlConnection.beginTransaction();
+        let sql = `DELETE FROM \`${this.dataSchema.tableName}\` WHERE \`${this.dataSchema.idFieldName}\` = ?`;
+        let params = [this._id];
+        mconsole.sqlq(sql, params);
+        while (true) {
+            try {
+                const [sh, fields] = await this.sqlConnection.query<ResultSetHeader>(sql, params);
+                mconsole.sqld(sh, fields);
+                break;
+            } catch (e: any) {
+                if (e.code === 'ER_NO_SUCH_TABLE') {
+                    await this.createMainTable();
+                } else {
+                    await this.sqlConnection.rollback();
+                    throw e;
+                }
+            }
+        }
+
+        if (this.dataSchema.related !== undefined) {
+            for (const relObj of this.dataSchema.related) {
+                const arrProp = (this.data as any)[relObj.tableName];
+                // collect all child record to delete old children
+                sql = `DELETE FROM \`${this.dataSchema.relatedTablesPrefix + relObj.tableName}\` WHERE \`${this.dataSchema.relatedTablesPrefix + relObj.idFieldName}\` = ?`;
+                mconsole.sqlq(sql, [this._id]);
+                let [childRows, fields]: [RowDataPacket[], FieldPacket[]] = [[], []];
+                while (true) {
+                    try {
+                        [childRows, fields] = await this.sqlConnection.query<RowDataPacket[]>(sql, [this._id]);
+                        break;
+                    } catch (e: any) {
+                        if (e.code === 'ER_NO_SUCH_TABLE') {
+                            await this.createRelatedTable(relObj);
+                        } else {
+                            await this.sqlConnection.rollback();
+                            throw e;
+                        }
+                    }
+                }
+                /*if (childRows.length > 0) {
+                    sql = `DELETE FROM \`${this.dataSchema.relatedTablesPrefix + relObj.tableName}\` WHERE \`${relObj.idFieldName}\` IN (?)`;
+                    const params = childRows.map(el => el[relObj.idFieldName]);
+                    mconsole.sqlq(sql, params);
+                    const res = await this.sqlConnection.query<ResultSetHeader>(sql, [params]);
+                    mconsole.sqld(res);
+                }*/
+            }
+        }
+        await this.sqlConnection.commit();
+    }
+
     async save(username?: string): Promise<DataType> {
         await Document.createSQLConnection();
 

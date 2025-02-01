@@ -4,16 +4,19 @@ import "./table.css";
 import { ITable } from "@betypes/eaterytypes";
 import EateryOrder from "../order/eateryOrder";
 import { IOrder } from "@betypes/ordertypes";
+import QRCode from "react-qr-code";
 
 export interface ITableProps extends IProtoProps {
 	defaultValue?: ITable;
 	viewMode?: ViewModeCode;
 	orders?: IOrder[];
+	showQR?: boolean;
 }
 export interface ITableState extends IProtoState {
 	value: ITable;
 	callingWaiter: boolean;
 	viewMode: ViewModeCode;
+	showQR: boolean;
 }
 
 export default class Table extends Proto<ITableProps, ITableState> {
@@ -21,6 +24,7 @@ export default class Table extends Proto<ITableProps, ITableState> {
 		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.normal,
 		value: this.props.defaultValue !== undefined ? this.props.defaultValue : this.new(),
 		callingWaiter: false,
+		showQR: this.props.showQR === undefined ? false : this.props.showQR,
 	};
 	componentDidMount(): void {
 		this.load();
@@ -50,6 +54,10 @@ export default class Table extends Proto<ITableProps, ITableState> {
 		);
 	}
 
+	qrString(): string {
+		return `${process.env.QR_BASE_URL}?startapp=eateryId_${this.state.value.eatery_id}__tableId_${this.state.value.id}`;
+	}
+
 	protected off() {
 		this.serverCommand(
 			"user/callWaiter",
@@ -70,6 +78,7 @@ export default class Table extends Proto<ITableProps, ITableState> {
 				<span>{this.toString(this.state.value.name)}</span>
 				<span>{this.props.orders?.map((order, idx) => (order.id !== undefined ? <EateryOrder key={order.id} orderId={order.id} toaster={this.props.toaster} /> : <></>))}</span>
 				{this.state.callingWaiter ? <span onClick={this.off.bind(this)}>☉</span> : <span></span>}
+				{this.state.showQR ? <QRCode style={{ height: "auto", maxWidth: "100%", maxHeight: "100%" }} value={this.qrString()} size={256} viewBox={"0 0 256 256"} /> : <></>}
 			</div>
 		);
 	}
