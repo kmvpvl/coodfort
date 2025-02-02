@@ -216,7 +216,18 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 	}
 
 	protected relativeDate(event: string | Date): string {
-		return `${Math.round((new Date().getTime() - new Date(event).getTime()) / 1000 / 60)} min ago`;
+		let dif = (new Date().getTime() - new Date(event).getTime()) / 1000;
+		if (dif < 60) return this.ML("just now");
+		dif = dif / 60;
+		if (dif < 60) return `${Math.round(dif)} ${this.ML("min ago")}`;
+		dif = dif / 60;
+		if (dif < 24) return `${Math.round(dif)} ${this.ML("hours ago")}`;
+		dif = dif / 24;
+		if (dif < 30.5) return `${Math.round(dif)} ${this.ML("days ago")}`;
+		dif = dif / 30.5;
+		if (dif < 12) return `${Math.round(dif)} ${this.ML("months ago")}`;
+		dif = dif / 12;
+		return `${Math.round(dif)} ${this.ML("years ago")}`;
 	}
 }
 

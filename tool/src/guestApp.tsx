@@ -321,7 +321,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		);
 	}
 	onSelectMenuItem(newItem: IOrderItem) {
-		this.orderRef.current?.updateNewOrderItem(newItem);
+		this.orderRef.current?.updateOrderItem(newItem);
 	}
 	renderChoose(): ReactNode {
 		return (

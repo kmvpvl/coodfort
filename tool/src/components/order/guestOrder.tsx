@@ -40,7 +40,7 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 			this.setState(nState);
 		}
 	}
-	updateNewOrderItem(item: IOrderItem) {
+	updateOrderItem(item: IOrderItem) {
 		item.order_id = this.state.value.id;
 		const nState = this.state;
 		const oldOrNew = nState.value.items.findIndex(el => el.id === item.id);
@@ -237,6 +237,7 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 					<div>Count</div>
 					<div>Cost, {this.toString(this.state.value.items?.at(0)?.option.currency)}</div>
 					{this.state.value.items
+						.sort((a, b) => Number(b.id) - Number(a.id))
 						.filter(item => item.wfStatus !== WorkflowStatusCode.canceledByEatery || !this.state.hideCanceledOrderItems)
 						.map((item, idx) => (
 							<Fragment key={idx}>
@@ -256,7 +257,7 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 									{this.toString(item.name)}({this.toString(item.option.name)})
 								</div>
 								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>{this.toCurrency(item.option.amount)}</div>
-								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : "context-menu"}>
+								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : "-context-menu"}>
 									{item.wfStatus === WorkflowStatusCode.draft ? (
 										<span
 											className="context-menu-button"
@@ -264,9 +265,9 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 												event.stopPropagation();
 												const nState = this.state;
 												nState.value.items[idx].count = 0;
-												this.updateNewOrderItem(nState.value.items[idx]);
+												this.updateOrderItem(nState.value.items[idx]);
 											}}>
-											⤬
+											×
 										</span>
 									) : (
 										<></>
@@ -280,9 +281,9 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 												if (nState.value.items !== undefined && nState.value.items[idx] !== undefined) {
 													nState.value.items[idx].count -= 1;
 												}
-												this.updateNewOrderItem(nState.value.items[idx]);
+												this.updateOrderItem(nState.value.items[idx]);
 											}}>
-											-
+											−
 										</span>
 									) : (
 										<></>
@@ -294,7 +295,7 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 											onClick={event => {
 												event.stopPropagation();
 												this.state.value.items[idx].count += 1;
-												this.updateNewOrderItem(this.state.value.items[idx]);
+												this.updateOrderItem(this.state.value.items[idx]);
 											}}>
 											+
 										</span>
