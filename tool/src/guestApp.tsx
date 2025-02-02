@@ -353,10 +353,10 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		return (
 			<div className="guest-app-nav-top">
 				<div className="guest-app-nav-top-choosen">
-					<span>{this.state.user?.name} @ </span>
+					<span>{this.state.user?.name}</span>
+					<span>Tbl {this.toString(this.state.choosenTable?.name)}</span>
 					{this.state.choosenEatery !== undefined ? <Eatery viewMode={ViewModeCode.compact} defaultValue={this.state.choosenEatery} /> : <></>}
 				</div>
-				<Logo />
 			</div>
 		);
 	}

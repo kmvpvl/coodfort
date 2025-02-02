@@ -671,12 +671,18 @@ paths:
       parameters:
         - name: coodfort-login
           in: header
-          required: true
           schema:
             type: string
         - name: coodfort-password
           in: header
-          required: true
+          schema:
+            type: string
+        - name: coodfort-tguid
+          in: header
+          schema:
+            type: string
+        - name: coodfort-tgquerycheckstring
+          in: header
           schema:
             type: string
       security: []      
@@ -933,6 +939,38 @@ paths:
         - order
         - workflow
       operationId: wfNextOrderItem
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderItemId
+              properties:
+                orderItemId:
+                  type: object
+                  required:
+                    - id
+                    - nextWfStatus
+                  properties:
+                    id: 
+                      type: number
+                    nextWfStatus:
+                      type: number
+      responses:
+        '200':
+          $ref: "#/components/responses/orderSuccess"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
+  /order/itemsWfNext:
+    post:
+      description: Moves OrderItems to next workflow status
+      tags:
+        - order
+        - workflow
+      operationId: wfNextOrderItems
       requestBody:
         content:
           application/json:

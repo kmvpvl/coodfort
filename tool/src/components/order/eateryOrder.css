@@ -14,6 +14,22 @@
     grid-row: span 2;
 }
 
+.order-eatery-number {
+    display: flex;
+    gap: .5em;
+}
+
+.order-eatery-number > span:first-child {
+    font-weight: bold;
+    font-size: 150%;
+}
+
+.order-eatery-number > span:last-child {
+    font-size: 80%;
+    width: fit-content;
+    word-wrap: break-word;
+}
+
 .order-eatery-details {
     grid-column: span 2;
     text-align: left;
@@ -24,16 +40,19 @@
     grid-template-columns: auto 1fr auto ;
     border-top: 1px solid;
     border-left: 1px solid;
+    font-size: 80%;
 }
 
 .order-eatery-details-fragment > span {
-    padding-left: .1em;
-    padding-right: .1em;
+    padding-left: .5em;
+    padding-right: .5em;
     text-align: left;
     border-right: 1px solid;
     border-bottom: 1px solid;
 }
-
+.order-eatery-details-fragment > span:nth-child(3n+3) {
+    text-align: right;
+}
 .order-status-container{
     display: inline-flex;
     flex-wrap: wrap;
@@ -81,4 +100,8 @@
     border: 1px solid;
     width: 6em;
     display: inline-block;
+}
+
+.order-eatery-details-chapter {
+    font-weight: bold;
 }

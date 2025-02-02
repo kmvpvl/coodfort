@@ -103,16 +103,40 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 				err => {}
 			);
 	}
-	protected itemWfNext(items: IWfNextRequest[]) {
-		if (this.props.eatery.approveRequiredToReserve && this.state.value.wfStatus == WorkflowStatusCode.draft) {
+	protected itemWfNext(item: IWfNextRequest) {
+		/*if (this.props.eatery.approveRequiredToReserve && this.state.value.wfStatus == WorkflowStatusCode.draft) {
 			this.props.toaster?.current?.addToast({
 				type: ToastType.info,
 				message: `Unable register the order 'cause order not approved by ${this.toString(this.props.eatery.name)}. Pls wait or call waiter`,
 			});
 			return;
-		}
+		}*/
 		this.serverCommand(
 			"order/itemWfNext",
+			JSON.stringify({ orderItemId: item }),
+			res => {
+				if (!res.ok) return;
+				const nState = this.state;
+				nState.value = res.order;
+				this.setState(nState);
+				if (this.props.onChange) this.props.onChange(this.state.value);
+			},
+			err => {
+				this.props.toaster?.current?.addToast({ type: ToastType.error, message: `Unable register the order 'cause order not approved by ${this.toString(this.props.eatery.name)}. Pls wait or call waiter`, modal: true });
+			}
+		);
+	}
+
+	protected itemsWfNext(items: IWfNextRequest[]) {
+		/*if (this.props.eatery.approveRequiredToReserve && this.state.value.wfStatus == WorkflowStatusCode.draft) {
+			this.props.toaster?.current?.addToast({
+				type: ToastType.info,
+				message: `Unable register the order 'cause order not approved by ${this.toString(this.props.eatery.name)}. Pls wait or call waiter`,
+			});
+			return;
+		}*/
+		this.serverCommand(
+			"order/itemsWfNext",
 			JSON.stringify({ orderItemIds: items }),
 			res => {
 				if (!res.ok) return;
@@ -176,7 +200,7 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 						onClick={event => {
 							const nState = this.state;
 							if (nState.value.id !== undefined)
-								this.itemWfNext(
+								this.itemsWfNext(
 									nState.value.items
 										.filter(item => item.wfStatus === WorkflowStatusCode.draft)
 										.map(item => {
@@ -218,7 +242,7 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 										toaster={this.props.toaster}
 										orderItemId={item.id}
 										onRegister={(itemId: Types.ObjectId) => {
-											this.itemWfNext([{ id: item.id as Types.ObjectId, nextWfStatus: WorkflowStatusCode.registered }]);
+											this.itemWfNext({ id: item.id as Types.ObjectId, nextWfStatus: WorkflowStatusCode.registered });
 										}}
 									/>
 								) : (

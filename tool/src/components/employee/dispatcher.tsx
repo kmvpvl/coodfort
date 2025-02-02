@@ -234,7 +234,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 					<ApproveOrderItems
 						onApprove={items => {
 							this.serverCommand(
-								"order/itemWfNext",
+								"order/itemsWfNext",
 								JSON.stringify({ orderItemIds: items }),
 								res => {
 									if (!res.ok) return;
@@ -249,7 +249,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 						}}
 						onCancel={items => {
 							this.serverCommand(
-								"order/itemWfNext",
+								"order/itemsWfNext",
 								JSON.stringify({ orderItemIds: items }),
 								res => {
 									if (!res.ok) return;
@@ -273,7 +273,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 					<ProcessingOrderItems
 						onFulfill={items => {
 							this.serverCommand(
-								"order/itemWfNext",
+								"order/itemsWfNext",
 								JSON.stringify({ orderItemIds: items }),
 								res => {
 									if (!res.ok) return;

@@ -125,7 +125,10 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 					<span>☆</span>
 				</div>
 				<div className="order-eatery-balance">{this.toCurrency(total.payed - (total.registeredSum + total.approvedByEaterySum + total.fulfilledSum))}</div>
-				<div>#{this.state.value?.id}</div>
+				<div className="order-eatery-number">
+					<span>#{this.state.value?.id}</span>
+					{this.state.value.created !== undefined ? <span>{Math.round((new Date().getTime() - new Date(this.state.value.created).getTime()) / 1000 / 60)} min ago</span> : <></>}
+				</div>
 				{this.state.viewMode === ViewModeCode.maximized ? (
 					<div className="order-eatery-details">
 						<div className="order-eatery-payments-list">
@@ -176,26 +179,32 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 							</span>
 						</div>
 						<div>
-							{[WorkflowStatusCode.canceledByEatery, WorkflowStatusCode.draft, WorkflowStatusCode.registered, WorkflowStatusCode.approved, WorkflowStatusCode.done, WorkflowStatusCode.review].map((status, indx) => (
-								<Fragment key={indx}>
-									<div>{WorkflowStatusCode[status]}</div>
-									<div className="order-eatery-details-fragment">
-										{this.state.value?.items
-											.filter(item => item.wfStatus === status)
-											.map((item, idx) => (
-												<Fragment key={idx}>
-													<span>{idx + 1}</span>
-													<span>
-														{this.toString(item.name)} ({this.toString(item.option.name)})
-													</span>
-													<span>
-														{item.count} * {this.toCurrency(item.option.amount)} = {this.toCurrency(item.option.amount * item.count)}
-													</span>
-												</Fragment>
-											))}
-									</div>
-								</Fragment>
-							))}
+							{[WorkflowStatusCode.canceledByEatery, WorkflowStatusCode.draft, WorkflowStatusCode.registered, WorkflowStatusCode.approved, WorkflowStatusCode.done, WorkflowStatusCode.review].map((status, indx) =>
+								this.state.value !== undefined && this.state.value.items.filter(item => item.wfStatus === status).length > 0 ? (
+									<Fragment key={`${this.state.value.id}_${status}`}>
+										<div className="order-eatery-details-chapter">
+											➛ {WorkflowStatusCode[status]} {this.toCurrency(this.state.value.items.filter(item => item.wfStatus === status).reduce<number>((prev, item) => prev + item.count * item.option.amount, 0))}
+										</div>
+										<div className="order-eatery-details-fragment">
+											{this.state.value?.items
+												.filter(item => item.wfStatus === status)
+												.map((item, idx) => (
+													<Fragment key={`${item.order_id}_${item.id}`}>
+														<span>{idx + 1}</span>
+														<span>
+															{this.toString(item.name)} ({this.toString(item.option.name)})
+														</span>
+														<span>
+															{item.count} * {this.toCurrency(item.option.amount)} = {this.toCurrency(item.option.amount * item.count)}
+														</span>
+													</Fragment>
+												))}
+										</div>
+									</Fragment>
+								) : (
+									<Fragment key={indx}></Fragment>
+								)
+							)}
 						</div>
 					</div>
 				) : (

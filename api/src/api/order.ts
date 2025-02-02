@@ -87,6 +87,51 @@ export async function wfNextOrder(c: Context, req: Request, res: Response, user:
 
 export async function wfNextOrderItem(c: Context, req: Request, res: Response, user: User) {
     try {
+        if (req.body.orderItemId === undefined) {
+            throw new DocumentError(DocumentErrorCode.parameter_expected, `{orderItemId, nextWFStatus} expected`);
+        }
+        const id: IWfNextRequest = req.body.orderItemId;
+
+        let eatery: Eatery | undefined;
+        let order: Order | undefined;
+
+        const item = new OrderItem(id.id);
+        await item.load();
+        if (item.data.order_id !== undefined) {
+            if (order === undefined || order.id !== item.data.order_id) {
+                order = new Order(item.data.order_id);
+                await order.load();
+            }
+            if (eatery === undefined || eatery.id !== order.data.eateryId) {
+                eatery = new Eatery(order.data.eateryId);
+                await eatery.load();
+            }
+            if (order.data.wfStatus === WorkflowStatusCode.draft) {
+                if (eatery.data.approveRequiredToReserve) {
+                    throw new DocumentError(DocumentErrorCode.wf_suspense, `Parent order id = '${order.id}' of order item id = '${item.id}' has draft status yet`);
+                }
+            }
+            if (
+                //guest rights check
+                ((item.data.wfStatus === WorkflowStatusCode.draft || item.data.wfStatus === WorkflowStatusCode.done) && order.data.userId === user.id) ||
+                // eatery staff rights check
+                ((item.data.wfStatus === WorkflowStatusCode.registered || item.data.wfStatus === WorkflowStatusCode.approved) && eatery?.checkRoles(EateryRoleCode['sous-chef'], user.id))
+            )
+                await item.wfNext(user, id.nextWfStatus);
+            else res.status(403).json({ ok: false, error: { message: `Only geust or eatery staff with role 'sous-chef' could change state` } });
+        } else {
+            throw new DocumentError(DocumentErrorCode.wf_suspense, `Order item id = '${item.id}' MUST have non-null order_id`);
+        }
+        await order.load();
+        return res.status(200).json({ ok: true, order: order.data });
+    } catch (e: any) {
+        if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });
+        else return res.status(400).json({ ok: false, error: { message: e.message } });
+    }
+}
+
+export async function wfNextOrderItems(c: Context, req: Request, res: Response, user: User) {
+    try {
         if (req.body.orderItemIds === undefined) {
             throw new DocumentError(DocumentErrorCode.parameter_expected, `Array of {orderItemId, nextWFStatus} expected`);
         }
