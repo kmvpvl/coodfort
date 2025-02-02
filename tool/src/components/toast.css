@@ -63,14 +63,12 @@
 
 .toast-container-error {
     color: white;
-    background-color: brown;
-    border-color: red;
+    background-color: var(--error-color);
 }
 
 .toast-container-info {
-    color: white;
-    background-color: limegreen;
-    border-color: aquamarine;
+    color: var(--text-color);
+    background-color: var(--info-color);
 }
 .toast-close-button,
 .toast-copy-button,
@@ -79,8 +77,8 @@
     position: absolute;
     top: 0em;
     border-style: solid;
-    border-left-width: 1px;
-    border-bottom-width: 1px;
+    border-left-width: 0px;
+    border-bottom-width: 0px;
     border-top-width: 0px;
     border-right-width: 0px;
     --border-radius: 0.5em;

@@ -77,8 +77,14 @@ export default class Table extends Proto<ITableProps, ITableState> {
 			<div className="table-container">
 				<span>{this.toString(this.state.value.name)}</span>
 				<span>{this.props.orders?.map((order, idx) => (order.id !== undefined ? <EateryOrder key={order.id} orderId={order.id} toaster={this.props.toaster} /> : <></>))}</span>
-				{this.state.callingWaiter ? <span onClick={this.off.bind(this)}>☉</span> : <span></span>}
-				{this.state.showQR ? <QRCode style={{ height: "auto", maxWidth: "100%", maxHeight: "100%" }} value={this.qrString()} size={256} viewBox={"0 0 256 256"} /> : <></>}
+
+				{this.state.showQR ? (
+					<QRCode style={{ height: "auto", maxWidth: "100%", maxHeight: "100%" }} value={this.qrString()} size={256} viewBox={"0 0 256 256"} />
+				) : this.state.callingWaiter ? (
+					<span onClick={this.off.bind(this)}>☉</span>
+				) : (
+					<span></span>
+				)}
 			</div>
 		);
 	}

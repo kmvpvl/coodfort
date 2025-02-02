@@ -1,6 +1,10 @@
 :root {
   --text-color: #3f3f3f;
   --background-color: #FFFFFF;
+  --info-color: white;
+  --error-color: #dc3545;
+  --warning-color: #ffc107;
+  --success-color: #198754;
 }    
 
 * {

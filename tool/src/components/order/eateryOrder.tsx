@@ -127,7 +127,7 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 				<div className="order-eatery-balance">{this.toCurrency(total.payed - (total.registeredSum + total.approvedByEaterySum + total.fulfilledSum))}</div>
 				<div className="order-eatery-number">
 					<span>#{this.state.value?.id}</span>
-					{this.state.value.created !== undefined ? <span>{Math.round((new Date().getTime() - new Date(this.state.value.created).getTime()) / 1000 / 60)} min ago</span> : <></>}
+					{this.state.value.created !== undefined ? <span>{this.relativeDate(this.state.value.created)}</span> : <></>}
 				</div>
 				{this.state.viewMode === ViewModeCode.maximized ? (
 					<div className="order-eatery-details">

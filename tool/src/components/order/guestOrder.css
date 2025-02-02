@@ -24,7 +24,7 @@
 .guest-order-grid > div {
     border-right: 1px solid;
     border-bottom: 1px solid;
-    padding: 5px;
+    padding: 2px;
     position: relative;
 }
 
@@ -39,6 +39,9 @@
     top: 0;
     background-color: var(--text-color);
     color: var(--background-color);
+}
+.guest-order-grid > div:nth-child(5n+4) {
+    text-align: center;
 }
 
 .guest-order-item-progress-compact-container {
@@ -76,4 +79,9 @@
     background-color: red;
     color: white;
     border-style: solid;
+}
+
+.guest-order-summary {
+    display: flex;
+    flex-direction: column;
 }

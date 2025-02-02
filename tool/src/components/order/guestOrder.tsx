@@ -170,16 +170,20 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 		const total = calcSum(this.state.value);
 		return (
 			<div className="guest-order-container">
-				<div>
-					<div>
-						Order#{this.state.value.id}. Balance: {this.toCurrency(total.payed - (total.registeredSum + total.approvedByEaterySum + total.fulfilledSum))}
-					</div>
-					<span>Payed: {total.payed}</span>
-					<span>Ordered: {total.registeredSum + total.approvedByEaterySum + total.fulfilledSum}</span>
-					<span>of them:</span>
-					<span>Заказано, но не подтверждено {total.registeredSum}</span>
-					<span>Подтверждено, но не доставлено {total.approvedByEaterySum}</span>
-					<span>Доставлено {total.fulfilledSum}</span>
+				<div className="guest-order-summary">
+					<span>
+						Order#{this.state.value.id} {this.state.value.created ? new Date(this.state.value.created).toLocaleString() : ""}
+					</span>
+					<span>
+						Balance: {this.toCurrency(total.payed - (total.registeredSum + total.approvedByEaterySum + total.fulfilledSum))}. Payed: {this.toCurrency(total.payed)}. Ordered:{" "}
+						{this.toCurrency(total.registeredSum + total.approvedByEaterySum + total.fulfilledSum)}
+					</span>
+					{
+						//<span>of them:</span>
+						//<span>Заказано, но не подтверждено {total.registeredSum}</span>
+						//<span>Подтверждено, но не доставлено {total.approvedByEaterySum}</span>
+						//<span>Доставлено {total.fulfilledSum}</span>
+					}
 				</div>
 				<div className="standalone-toolbar">
 					<div>

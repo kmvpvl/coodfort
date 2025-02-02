@@ -214,6 +214,10 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 	protected toCurrency(x: number): string {
 		return Intl.NumberFormat(this.getLanguage(), { minimumFractionDigits: 2 }).format(x);
 	}
+
+	protected relativeDate(event: string | Date): string {
+		return `${Math.round((new Date().getTime() - new Date(event).getTime()) / 1000 / 60)} min ago`;
+	}
 }
 
 export enum ViewModeCode {
