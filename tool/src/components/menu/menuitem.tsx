@@ -37,7 +37,11 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 	}
 	renderEditMode(): ReactNode {
 		return (
-			<span className="menu-item-admin-container">
+			<span className="menu-item-admin-container has-caption">
+				<span className="caption">Menu item</span>
+				<div className="toolbar">
+					<span>X</span>
+				</div>
 				<Meal mealId={this.state.value.mealId} />
 				<div className="menu-item-admin-options-list-container has-caption">
 					<span className="caption">Options</span>
@@ -95,6 +99,9 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 										this.setState(nState);
 									}}
 								/>
+								<span className="toolbar">
+									<span>X</span>
+								</span>
 							</span>
 						))}
 					</div>

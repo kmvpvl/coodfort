@@ -28,16 +28,26 @@
     font-size: 75%;
 }
 
+.menu-item-admin-container {
+    display: grid;
+    grid-template-rows: auto auto;
+    width: max-content;
+    border: 1px dotted;
+    border-radius: .5em;
+    padding: .2em;
+}
+
 .menu-item-admin-options-list-container {
-    height: 100%;
-    max-height: 15em;
+    height: max-content;
+    --max-height: 15em;
     display: flex;
     justify-content: space-between;
+    flex-direction: column;
 }
 
 .menu-item-admin-options-list {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 0.5em;
     justify-content: space-between;
     height: 100%;

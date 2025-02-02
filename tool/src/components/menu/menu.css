@@ -3,6 +3,7 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 5px;
+    --overflow: auto;
 }
 
 .menu-admin-chapters-container {
@@ -15,7 +16,8 @@
 .menu-admin-meals-container {
     display: flex;
     align-items: center;
-    gap: 1em;
+    gap: .5em;
+    flex-wrap: wrap;
 }
 .menu-container {
     --width: fit-content;
