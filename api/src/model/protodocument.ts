@@ -113,12 +113,14 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
 
     static async createSQLConnection(): Promise<Connection> {
         if (Document._sqlConnection === undefined) {
+            const db_host = process.env.db_host;
             const db_name = process.env.db_name;
             const db_user = process.env.db_user;
             const db_pwd = process.env.db_pwd;
             const db_port = process.env.db_port === undefined ? undefined : parseInt(process.env.db_port);
-            mconsole.sqlinfo(`Creating database connection: database: '${db_name}'; user: '${db_user}'; pwd: ${db_pwd ? "'******'" : '-'}; port: '${db_port}'`);
+            mconsole.sqlinfo(`Creating database connection: database: '${db_name}'; user: '${db_user}'; pwd: ${db_pwd ? "'******'" : '-'}; host: '${db_host}'; port: '${db_port}'`);
             Document._sqlConnection = await mysql.createConnection({
+                host: db_host,
                 database: db_name,
                 user: db_user,
                 password: db_pwd,
