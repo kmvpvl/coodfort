@@ -102,11 +102,18 @@ export interface IAward {
     };
     url: string;
 }
+export enum ObjectTypeCode {
+    eatery = "eatery",
+    meal = "meal",
+    order = "order",
+    orderitem = "orderitem",
+    menuitem = "menuitem"
+}
 export interface IFeedback {
     userId: Types.ObjectId;
     rating: number;
     comment?: string;
-    objectType: string;
+    objectType: ObjectTypeCode;
     objectId: Types.ObjectId;
 }
 export interface IUser extends IDocument {

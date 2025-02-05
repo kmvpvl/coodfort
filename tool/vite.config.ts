@@ -2,15 +2,22 @@
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 
-import { defineConfig, loadEnv } from "vite";
+import { ConfigEnv, defineConfig, loadEnv, UserConfig, UserConfigExport, UserConfigFnObject } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
 // https://vite.dev/config/
-export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
-  const env = loadEnv(mode, process.cwd(), "");
+interface MyC extends ConfigEnv{
+  server: {
+    allowedHosts: boolean
+  }
+};
+
+export default defineConfig((config)  => {
+  const env = loadEnv(config.mode, process.cwd(), "");
   return {
     server: {
+      allowedHosts: true
       //  port: 4000
     },
     build: {
@@ -23,7 +30,7 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
       "process.env.SERVER_BASE_URL": JSON.stringify(env.SERVER_BASE_URL),
       "process.env.QR_BASE_URL": JSON.stringify(env.QR_BASE_URL),
       "process.env.LANGUAGES": JSON.stringify(env.LANGUAGES),
-      "process.env.MODE": JSON.stringify(mode),
+      "process.env.MODE": JSON.stringify(config.mode),
     },
     plugins: [react()],
     resolve: {
@@ -37,5 +44,5 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
       setupFiles: "./src/__test__/setup.ts",
       css: true,
     },
-  };
+  } as UserConfig;
 });

@@ -7,6 +7,8 @@ servers:
     description: Local server
   - url: https://3z6czkv5-4000.euw.devtunnels.ms/
     description: Development server
+  - url: https://cf-api.misis.space
+    description: Test server
 components:
   schemas:
 ###
@@ -353,6 +355,29 @@ components:
             esId:
               type: string
         - $ref: "#/components/schemas/proto"
+    ###
+    # The Feedback object
+    feedback:
+      description: IFeedback object
+      allOf:
+        - type: object
+          required:
+            - userId
+            - rating
+            - objectType
+            - objectId
+          properties:
+            userId: 
+              type: number
+            rating:
+              type: number
+            comment:
+              type: string
+            objectType:
+              type: string
+            objectId:
+              type: number
+        - $ref: "#/components/schemas/proto"
   requestBodies:
     eateryPointer:
       required: true
@@ -464,6 +489,20 @@ components:
                 type: boolean
               user:
                 $ref: "#/components/schemas/order"
+    feedbackSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - ok
+              - feedback
+            properties:
+              ok:
+                type: boolean
+              feedback:
+                $ref: "#/components/schemas/feedback"
   securitySchemes:
     COODFortTGUserId:
       type: apiKey
@@ -1028,6 +1067,95 @@ paths:
       responses:
         '200':
           $ref: "#/components/responses/orderSuccess"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
+  /feedback/update:
+    post:
+      tags:
+        - feedback
+        - update
+      description: 
+        Creates or update feedback
+      operationId: updateFeedback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/feedback"
+      responses:
+        '200': 
+          $ref: "#/components/responses/feedbackSuccess"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
+  /feedback/view:
+    post:
+      tags:
+        - feedback
+        - view
+      description: 
+        Returns feedback information
+      operationId: viewFeedback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  type: number
+      responses:
+        '200': 
+          $ref: "#/components/responses/feedbackSuccess"
+        '403':
+          $ref: "#/components/responses/errorResponse"
+        '400':
+          $ref: "#/components/responses/errorResponse"
+  /feedback/list:
+    post:
+      tags:
+        - feedback
+        - view
+      description: 
+        Returns list of feedback information
+      operationId: feedbackList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - objectType
+                - objectId
+              properties:
+                objectId:
+                  type: number
+                objectType:
+                  type: string
+                userId: 
+                  type: number
+      responses:
+        '200': 
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - ok
+                  - feedbacks
+                properties:
+                  ok:
+                    type: boolean
+                  feedbacks:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/feedback"
         '403':
           $ref: "#/components/responses/errorResponse"
         '400':
