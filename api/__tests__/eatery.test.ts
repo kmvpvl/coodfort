@@ -7,11 +7,13 @@ import { IMenu } from '../src/types/eaterytypes';
 
 beforeAll(async () => {
     dotenv.config();
+    const db_host = process.env.db_host;
     const db_name = process.env.db_name;
     const db_user = process.env.db_user;
     const db_pwd = process.env.db_pwd;
     const db_port = process.env.db_port === undefined ? undefined : parseInt(process.env.db_port);
     const conn = await mysql.createConnection({
+        host: db_host,
         database: db_name,
         user: db_user,
         password: db_pwd,

@@ -13,7 +13,7 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "serve": "vite preview",
+    "serve": "vite preview --host",
     "test": "vitest",
     "commit_prepare": "npm version patch && npm run prettier && npm run test",
     "prettier": "npx prettier -w **/*.{ts*,html}"
