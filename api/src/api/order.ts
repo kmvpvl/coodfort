@@ -194,7 +194,7 @@ export async function eateryOrderList(c: Context, req: Request, res: Response, u
         await order.getCollection(`\`eateryId\` = ? ${wfStatuses !== undefined && wfStatuses.length > 0 ? `AND ( ${wfStatuses.map(status => '`wfStatus` = ? ').join(' OR ')} )` : ''}`, [req.body.eateryId, ...wfStatuses], '`created` DESC');
         const ret: IOrder[] = [];
         for (const orderId of order.collection) {
-            const order = new Order(orderId);
+            const order = new Order(orderId.id);
             await order.load();
             ret.push(order.data);
         }

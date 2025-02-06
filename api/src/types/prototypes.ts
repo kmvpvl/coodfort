@@ -109,13 +109,6 @@ export enum ObjectTypeCode {
     orderitem = "orderitem",
     menuitem = "menuitem"
 }
-export interface IFeedback {
-    userId: Types.ObjectId;
-    rating: number;
-    comment?: string;
-    objectType: ObjectTypeCode;
-    objectId: Types.ObjectId;
-}
 export interface IUser extends IDocument {
     login: string /**Telegram ID or login or phone */;
     hash: string /** */;

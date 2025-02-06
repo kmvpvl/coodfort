@@ -15,6 +15,7 @@ import cors from 'cors';
 import { Telegraf } from 'telegraf';
 import { User } from './model/user';
 import { eateryOrderList, newPayment, newOrder, viewOrder, wfNextOrder, wfNextOrderItems, updateOrderItem, wfNextOrderItem } from './api/order';
+import { feedbackList, updateFeedback } from './api/feedback';
 
 configDotenv();
 const TGTOKEN = process.env.tgtoken;
@@ -106,6 +107,9 @@ api.register({
     newPayment: newPayment,
     addEateryEmployee: addEateryEmployee,
     findUser: findUser,
+    updateFeedback: updateFeedback,
+    //viewFeedback: viewFeedback,
+    feedbackList: feedbackList,
 
     validationFail: (c: Context, req: Request, res: Response) => res.status(400).json({ ok: false, err: c.validation.errors }),
     notFound: (c: Context, req: Request, res: Response) => {
