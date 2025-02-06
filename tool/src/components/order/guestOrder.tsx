@@ -2,9 +2,11 @@ import { Fragment, ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import { IOrder, IOrderItem, IOrderSumBalance } from "@betypes/ordertypes";
 import "./guestOrder.css";
-import { IWfHistoryItem, IWfNextRequest, Types, WorkflowStatusCode } from "@betypes/prototypes";
+import { IWfHistoryItem, IWfNextRequest, ObjectTypeCode, Types, WorkflowStatusCode } from "@betypes/prototypes";
 import { ToastType } from "../toast";
 import { IEatery } from "@betypes/eaterytypes";
+import Stars from "../feedback/stars";
+import { IFeedback } from "@betypes/feedback";
 export interface IGuestOrderProps extends IProtoProps {
 	defaultValue?: IOrder;
 	viewMode?: ViewModeCode;
@@ -249,6 +251,11 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 										onRegister={(itemId: Types.ObjectId) => {
 											this.itemWfNext({ id: item.id as Types.ObjectId, nextWfStatus: WorkflowStatusCode.registered });
 										}}
+										onReviewChanged={fb=> {
+											//if (this.state.value.)
+											if (item.wfStatus !== WorkflowStatusCode.done) return
+											this.itemWfNext({ id: item.id as Types.ObjectId, nextWfStatus: WorkflowStatusCode.review });
+										}}
 									/>
 								) : (
 									<></>
@@ -317,22 +324,37 @@ export interface IGuestOrderItemProgressProps extends IProtoProps {
 	viewMode?: ViewModeCode;
 	wfHistory: IWfHistoryItem[];
 	onRegister?: (itemId: Types.ObjectId) => void;
-	onReview?: () => void;
+	onReviewChanged?: (feedback: IFeedback) => void;
 }
 
 export interface IGuestOrderItemProgressState extends IProtoState {
 	viewMode: ViewModeCode;
+	feedback: IFeedback;
 }
 
 export class GuestOrderItemProgress extends Proto<IGuestOrderItemProgressProps, IGuestOrderItemProgressState> {
 	state: Readonly<IGuestOrderItemProgressState> = {
 		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.compact,
+		feedback: {
+			objectId: this.props.orderItemId,
+			objectType: ObjectTypeCode.orderitem,
+			rating: 0,
+		}
 	};
+	saveFeedback() {
+		if (this.props.onReviewChanged !== undefined) this.props.onReviewChanged(this.state.feedback);
+		this.serverCommand("feedback/update", JSON.stringify(this.state.feedback), res=>{
+			if (res.ok) {
+				this.setState({...this.state, feedback: res.feedback});
+			}
+		}, err=>{})
+	}
 	renderCompact(): ReactNode {
 		const isRegistered = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.registered).length === 1;
 		const isApproved = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.approved).length === 1;
 		const isCanceledByEatery = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.canceledByEatery).length === 1;
 		const isFulfilled = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.done).length === 1;
+		const isReviewed = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.review).length === 1;
 		return (
 			<div
 				className="guest-order-item-progress-compact-container"
@@ -351,7 +373,37 @@ export class GuestOrderItemProgress extends Proto<IGuestOrderItemProgressProps, 
 				</span>
 				{isCanceledByEatery ? <span className="canceled">✖</span> : <span className={isApproved ? "done" : ""}>✔</span>}
 				<span className={isFulfilled ? "done" : ""}>⚗</span>
-				<span>☆</span>
+				<span 
+					className={isReviewed ? "done" : ""}
+					onClick={event=> {
+					if (!isFulfilled) return;
+					event.preventDefault();
+					event.stopPropagation();
+					//const ✮
+					this.props.toaster?.current?.addToast({
+						type: ToastType.info,
+						modal: true,
+						message: <div>
+							<Stars rating={this.state.feedback.rating} onChange={rating=> {
+								this.setState({...this.state, feedback: {...this.state.feedback, rating: rating}});
+							}}/>
+							<div>
+								<textarea 
+									defaultValue={this.state.feedback.comment}
+									onChange={event=> {
+										const strVal = event.currentTarget.value;
+										this.setState({...this.state, feedback: {...this.state.feedback, comment: strVal}});
+									}}
+								/></div>
+						</div>,
+						buttons: [
+							{text: "Publish", callback: this.saveFeedback.bind(this)},
+							{text: "Cancel", callback:()=>""},
+							{text: "Save draft", callback:()=>""}
+						]
+					});
+				}}
+				>☆</span>
 			</div>
 		);
 	}

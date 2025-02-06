@@ -116,7 +116,7 @@ export async function tableCallWaiterSignalsList(c: Context, req: Request, res: 
         for (const tableId of req.body.tableIds) {
             await signal.getCollection('`tableId` = ?', [tableId], '`created` DESC', 1);
             if (signal.collection.length === 1) {
-                const s = new TableCallWaiterSignal(signal.collection[0]);
+                const s = new TableCallWaiterSignal(signal.collection[0].id);
                 await s.load();
                 ret.push(s.data);
             }

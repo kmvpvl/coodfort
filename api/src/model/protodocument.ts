@@ -71,7 +71,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     protected _id?: Types.ObjectId;
     protected _data?: DataType;
     protected _byUniqField?: { field: string; value: any };
-    protected _collection?: Types.ObjectId[];
+    protected _collection?: {id: Types.ObjectId}[];
     constructor();
     constructor(id: Types.ObjectId);
     constructor(data: DataType);

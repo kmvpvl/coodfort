@@ -45,7 +45,7 @@ export async function findUser(c: Context, req: Request, res: Response, user: Us
         const collectionUser = new User();
         await collectionUser.getCollection(`\`name\` like ? OR \`login\` like ?`, [`${fl}%`, `${fl}%`], '`login` DESC', 2);
         if (collectionUser.collection.length === 1) {
-            const anUser = new User(collectionUser.collection[0]);
+            const anUser = new User(collectionUser.collection[0].id);
             await anUser.load();
             return res.status(200).json({ ok: true, user: anUser.data });
         } else {

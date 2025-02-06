@@ -239,6 +239,10 @@ export class OrderItem extends Document<IOrderItem, IOrderItemDataSchema, IOrder
                     from: WorkflowStatusCode.review,
                     to: WorkflowStatusCode.closed,
                 },
+                {
+                    from: WorkflowStatusCode.done,
+                    to: WorkflowStatusCode.closed,
+                },
             ],
         };
     }

@@ -362,7 +362,6 @@ components:
       allOf:
         - type: object
           required:
-            - userId
             - rating
             - objectType
             - objectId
@@ -377,7 +376,20 @@ components:
               type: string
             objectId:
               type: number
+            answerToId:
+              type: number
         - $ref: "#/components/schemas/proto"
+    feedbacksSummary:
+      description: average rating and rating count
+      type: object
+      required:
+        - rating
+        - count
+      properties:
+        rating:
+          type: number
+        count: 
+          type: number
   requestBodies:
     eateryPointer:
       required: true
@@ -1156,6 +1168,8 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/feedback"
+                  summary:
+                    $ref: "#/components/schemas/feedbacksSummary"
         '403':
           $ref: "#/components/responses/errorResponse"
         '400':
