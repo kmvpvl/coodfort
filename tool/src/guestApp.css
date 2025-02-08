@@ -47,7 +47,7 @@
   width: 100%;
   height: 100%;
   display: grid;
-  grid-template-rows: 1fr auto;
+  grid-template-rows: auto 1fr auto;
   gap: 0.5em;
 }
 .guest-app-checkin-container button {
@@ -131,4 +131,15 @@
   @keyframes blink-caret {
     from, to { border-color: transparent }
     50% { border-color: orange; }
+  }
+
+  .guest-app-checkin-unclosed-orders-list {
+    display: flex;
+  }
+
+  .guest-app-checkin-unclosed-orders-list > div {
+    cursor: pointer;
+    border: 1px solid;
+    border-radius: .5em;
+    padding: .5em;
   }

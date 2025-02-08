@@ -14,7 +14,7 @@ import { Eatery } from "./components/eatery/eatery";
 import { ViewModeCode } from "./components/proto";
 import { revealTelegramStartAppParams } from "./model/tools";
 import Menu from "./components/menu/menu";
-import GuestOrder from "./components/order/guestOrder";
+import GuestOrder, { calcSum } from "./components/order/guestOrder";
 import { IOrder, IOrderItem } from "@betypes/ordertypes";
 
 export interface IGuestAppProps extends IProtoProps {
@@ -37,6 +37,8 @@ export interface IGuestAppState extends IProtoState {
 	scanner?: Html5Qrcode;
 	stage?: string;
 	order?: IOrder;
+	activeOrders?: IOrder[];
+	eateriesInfo: IEatery[];
 }
 
 export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
@@ -45,6 +47,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	state: IGuestAppState = {
 		eateryId: this.props.eateryId,
 		tableId: this.props.tableId,
+		eateriesInfo: []
 	};
 
 	init() {
@@ -53,6 +56,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			res => {
 				const nState = this.state;
 				if (this.state.eateryId === undefined && this.state.tableId === undefined) {
+					this.updateOrdersList();
 					nState.stage = "checkin";
 				} else {
 					//nState.stage = "choose";
@@ -85,6 +89,26 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		);
 	}
 
+	updateEateriesInfo() {
+		if (this.state.activeOrders === undefined) return;
+		for (const order of this.state.activeOrders) {
+			if (this.state.eateriesInfo.filter(e=>e.id === order.eateryId).length === 0) {
+				this.serverCommand("eatery/view", JSON.stringify({id: order.eateryId}), res=>{
+					if (res.ok) {
+						const nState = this.state;
+						const idx = this.state.eateriesInfo.findIndex(e=>e.id === res.eatery.id);
+						if (idx !== -1) {
+							nState.eateriesInfo[idx] = res.eatery;
+						} else {
+							nState.eateriesInfo.push(res.eatery);
+						}
+						this.setState(nState);
+					}
+				}, err=>{})
+			}
+		}
+	}
+
 	updateOrdersList() {
 		this.serverCommand(
 			"user/ordersList",
@@ -96,11 +120,12 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			res => {
 				if (res.ok) {
 					const nState = this.state;
+					nState.activeOrders = res.orders;
 					if (res.orders.length !== 1) {
 					} else {
 						nState.order = res.orders[0];
 					}
-
+					this.updateEateriesInfo();
 					this.setState(nState);
 				}
 			},
@@ -274,12 +299,8 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			{ fps: 10, qrbox: { width: 200, height: 200 } },
 			((decode: any, decoded: any) => {
 				const [eateryId, tableId] = revealTelegramStartAppParams(decode);
-				const nState = this.state;
-				nState.eateryId = eateryId;
-				nState.tableId = eateryId;
-				this.setState(nState);
 				this.stopScanner();
-				this.checkEateryId();
+				this.chooseEateryAndTable(eateryId, tableId);
 			}).bind(this),
 			err => {}
 		);
@@ -292,9 +313,33 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		delete nState.scanner;
 		this.setState(nState);
 	}
+	chooseEateryAndTable(eateryId: Types.ObjectId, tableId: Types.ObjectId) {
+		const nState = this.state;
+		nState.eateryId = eateryId;
+		nState.tableId = tableId;
+		nState.activeOrders = undefined;
+		nState.eateriesInfo = [];
+		this.checkEateryId();
+		this.setState(nState)
+	}
 	renderCheckIn(): ReactNode {
 		return (
 			<div className="guest-app-checkin-container">
+				<div>
+					<div>Your unclosed orders (tap to select or close):</div>
+					<div 
+						className="guest-app-checkin-unclosed-orders-list"
+					>{this.state.activeOrders?.map((order, idx)=>{
+					const eatery_arr = this.state.eateriesInfo.filter(e=>e.id === order.eateryId);
+					const table_arr = eatery_arr.length === 1?eatery_arr[0].tables.filter(t=>t.id === order.tableId):[];
+					const total = calcSum(order)	
+					return <div 
+						key={idx}
+						onClick={this.chooseEateryAndTable.bind(this, order.eateryId, order.tableId)}
+					>{table_arr.length === 1?this.toString(table_arr[0].name):""} @ {eatery_arr.length === 1?this.toString(eatery_arr[0].name):""} - {this.toCurrency(total.registeredSum)} - {order.created !== undefined?this.relativeDate(order.created):""}</div>
+
+					})}</div>
+				</div>
 				<div id="reader"></div>
 				<div>
 					<div>You can find the eatery and table or scan QR code on the table or on eatery's wall or door. </div>
