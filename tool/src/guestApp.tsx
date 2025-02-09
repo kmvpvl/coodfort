@@ -47,7 +47,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	state: IGuestAppState = {
 		eateryId: this.props.eateryId,
 		tableId: this.props.tableId,
-		eateriesInfo: []
+		eateriesInfo: [],
 	};
 
 	init() {
@@ -92,19 +92,24 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	updateEateriesInfo() {
 		if (this.state.activeOrders === undefined) return;
 		for (const order of this.state.activeOrders) {
-			if (this.state.eateriesInfo.filter(e=>e.id === order.eateryId).length === 0) {
-				this.serverCommand("eatery/view", JSON.stringify({id: order.eateryId}), res=>{
-					if (res.ok) {
-						const nState = this.state;
-						const idx = this.state.eateriesInfo.findIndex(e=>e.id === res.eatery.id);
-						if (idx !== -1) {
-							nState.eateriesInfo[idx] = res.eatery;
-						} else {
-							nState.eateriesInfo.push(res.eatery);
+			if (this.state.eateriesInfo.filter(e => e.id === order.eateryId).length === 0) {
+				this.serverCommand(
+					"eatery/view",
+					JSON.stringify({ id: order.eateryId }),
+					res => {
+						if (res.ok) {
+							const nState = this.state;
+							const idx = this.state.eateriesInfo.findIndex(e => e.id === res.eatery.id);
+							if (idx !== -1) {
+								nState.eateriesInfo[idx] = res.eatery;
+							} else {
+								nState.eateriesInfo.push(res.eatery);
+							}
+							this.setState(nState);
 						}
-						this.setState(nState);
-					}
-				}, err=>{})
+					},
+					err => {}
+				);
 			}
 		}
 	}
@@ -320,25 +325,26 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		nState.activeOrders = undefined;
 		nState.eateriesInfo = [];
 		this.checkEateryId();
-		this.setState(nState)
+		this.setState(nState);
 	}
 	renderCheckIn(): ReactNode {
 		return (
 			<div className="guest-app-checkin-container">
 				<div>
 					<div>Your unclosed orders (tap to select or close):</div>
-					<div 
-						className="guest-app-checkin-unclosed-orders-list"
-					>{this.state.activeOrders?.map((order, idx)=>{
-					const eatery_arr = this.state.eateriesInfo.filter(e=>e.id === order.eateryId);
-					const table_arr = eatery_arr.length === 1?eatery_arr[0].tables.filter(t=>t.id === order.tableId):[];
-					const total = calcSum(order)	
-					return <div 
-						key={idx}
-						onClick={this.chooseEateryAndTable.bind(this, order.eateryId, order.tableId)}
-					>{table_arr.length === 1?this.toString(table_arr[0].name):""} @ {eatery_arr.length === 1?this.toString(eatery_arr[0].name):""} - {this.toCurrency(total.registeredSum)} - {order.created !== undefined?this.relativeDate(order.created):""}</div>
-
-					})}</div>
+					<div className="guest-app-checkin-unclosed-orders-list">
+						{this.state.activeOrders?.map((order, idx) => {
+							const eatery_arr = this.state.eateriesInfo.filter(e => e.id === order.eateryId);
+							const table_arr = eatery_arr.length === 1 ? eatery_arr[0].tables.filter(t => t.id === order.tableId) : [];
+							const total = calcSum(order);
+							return (
+								<div key={idx} onClick={this.chooseEateryAndTable.bind(this, order.eateryId, order.tableId)}>
+									{table_arr.length === 1 ? this.toString(table_arr[0].name) : ""} @ {eatery_arr.length === 1 ? this.toString(eatery_arr[0].name) : ""} - {this.toCurrency(total.registeredSum)} -{" "}
+									{order.created !== undefined ? this.relativeDate(order.created) : ""}
+								</div>
+							);
+						})}
+					</div>
 				</div>
 				<div id="reader"></div>
 				<div>

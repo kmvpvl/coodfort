@@ -251,9 +251,9 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 										onRegister={(itemId: Types.ObjectId) => {
 											this.itemWfNext({ id: item.id as Types.ObjectId, nextWfStatus: WorkflowStatusCode.registered });
 										}}
-										onReviewChanged={fb=> {
+										onReviewChanged={fb => {
 											//if (this.state.value.)
-											if (item.wfStatus !== WorkflowStatusCode.done) return
+											if (item.wfStatus !== WorkflowStatusCode.done) return;
 											this.itemWfNext({ id: item.id as Types.ObjectId, nextWfStatus: WorkflowStatusCode.review });
 										}}
 									/>
@@ -339,15 +339,20 @@ export class GuestOrderItemProgress extends Proto<IGuestOrderItemProgressProps, 
 			objectId: this.props.orderItemId,
 			objectType: ObjectTypeCode.orderitem,
 			rating: 0,
-		}
+		},
 	};
 	saveFeedback() {
 		if (this.props.onReviewChanged !== undefined) this.props.onReviewChanged(this.state.feedback);
-		this.serverCommand("feedback/update", JSON.stringify(this.state.feedback), res=>{
-			if (res.ok) {
-				this.setState({...this.state, feedback: res.feedback});
-			}
-		}, err=>{})
+		this.serverCommand(
+			"feedback/update",
+			JSON.stringify(this.state.feedback),
+			res => {
+				if (res.ok) {
+					this.setState({ ...this.state, feedback: res.feedback });
+				}
+			},
+			err => {}
+		);
 	}
 	renderCompact(): ReactNode {
 		const isRegistered = this.props.wfHistory.filter(item => item.wfStatus === WorkflowStatusCode.registered).length === 1;
@@ -373,37 +378,44 @@ export class GuestOrderItemProgress extends Proto<IGuestOrderItemProgressProps, 
 				</span>
 				{isCanceledByEatery ? <span className="canceled">✖</span> : <span className={isApproved ? "done" : ""}>✔</span>}
 				<span className={isFulfilled ? "done" : ""}>⚗</span>
-				<span 
+				<span
 					className={isReviewed ? "done" : ""}
-					onClick={event=> {
-					if (!isFulfilled) return;
-					event.preventDefault();
-					event.stopPropagation();
-					//const ✮
-					this.props.toaster?.current?.addToast({
-						type: ToastType.info,
-						modal: true,
-						message: <div>
-							<Stars rating={this.state.feedback.rating} onChange={rating=> {
-								this.setState({...this.state, feedback: {...this.state.feedback, rating: rating}});
-							}}/>
-							<div>
-								<textarea 
-									defaultValue={this.state.feedback.comment}
-									onChange={event=> {
-										const strVal = event.currentTarget.value;
-										this.setState({...this.state, feedback: {...this.state.feedback, comment: strVal}});
-									}}
-								/></div>
-						</div>,
-						buttons: [
-							{text: "Publish", callback: this.saveFeedback.bind(this)},
-							{text: "Cancel", callback:()=>""},
-							{text: "Save draft", callback:()=>""}
-						]
-					});
-				}}
-				>☆</span>
+					onClick={event => {
+						if (!isFulfilled) return;
+						event.preventDefault();
+						event.stopPropagation();
+						//const ✮
+						this.props.toaster?.current?.addToast({
+							type: ToastType.info,
+							modal: true,
+							message: (
+								<div className="guest-order-item-feedback-container">
+									<div>Leave your feedback here</div>
+									<Stars
+										rating={this.state.feedback.rating}
+										onChange={rating => {
+											this.setState({ ...this.state, feedback: { ...this.state.feedback, rating: rating } });
+										}}
+									/>
+									<div>
+										<textarea
+											defaultValue={this.state.feedback.comment}
+											onChange={event => {
+												const strVal = event.currentTarget.value;
+												this.setState({ ...this.state, feedback: { ...this.state.feedback, comment: strVal } });
+											}}
+										/>
+									</div>
+								</div>
+							),
+							buttons: [
+								{ text: "Publish", default: true, callback: this.saveFeedback.bind(this) },
+								{ text: "Cancel", callback: () => "" },
+							],
+						});
+					}}>
+					☆
+				</span>
 			</div>
 		);
 	}

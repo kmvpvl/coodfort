@@ -2,22 +2,29 @@
 /// <reference types="vitest" />
 /// <reference types="vite/client" />
 
-import { ConfigEnv, defineConfig, loadEnv, UserConfig, UserConfigExport, UserConfigFnObject } from "vite";
+import {
+  ConfigEnv,
+  defineConfig,
+  loadEnv,
+  UserConfig,
+  UserConfigExport,
+  UserConfigFnObject,
+} from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 
 // https://vite.dev/config/
-interface MyC extends ConfigEnv{
+interface MyC extends ConfigEnv {
   server: {
-    allowedHosts: boolean
-  }
-};
+    allowedHosts: boolean;
+  };
+}
 
-export default defineConfig((config)  => {
+export default defineConfig((config) => {
   const env = loadEnv(config.mode, process.cwd(), "");
   return {
     server: {
-      allowedHosts: true
+      allowedHosts: true,
       //  port: 4000
     },
     build: {

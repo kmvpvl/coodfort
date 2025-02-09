@@ -115,7 +115,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	loadOrdersList(eateryId: Types.ObjectId) {
 		this.serverCommand(
 			"eatery/ordersList",
-			JSON.stringify({ eateryId: eateryId, wfStatuses: [WorkflowStatusCode.draft, WorkflowStatusCode.approved] }),
+			JSON.stringify({ eateryId: eateryId, wfStatuses: [WorkflowStatusCode.draft, WorkflowStatusCode.approved, WorkflowStatusCode.done, WorkflowStatusCode.review] }),
 			res => {
 				if (res.ok) {
 					this.setState({ ...this.state, orders: res.orders });

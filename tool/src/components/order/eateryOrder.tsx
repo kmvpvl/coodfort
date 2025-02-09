@@ -2,9 +2,11 @@ import { Fragment, ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import "./eateryOrder.css";
 import { IOrder, PaymentMethod } from "@betypes/ordertypes";
-import { Types, WorkflowStatusCode } from "@betypes/prototypes";
+import { ObjectTypeCode, Types, WorkflowStatusCode } from "@betypes/prototypes";
 import { calcSum } from "./guestOrder";
 import { ToastType } from "../toast";
+import { IFeedback } from "@betypes/feedback";
+import Stars from "../feedback/stars";
 
 export interface IEateryOrderProps extends IProtoProps {
 	defaultValue?: IOrder;
@@ -15,6 +17,7 @@ export interface IEateryOrderProps extends IProtoProps {
 export interface IEateryOrderState extends IProtoState {
 	viewMode: ViewModeCode;
 	value?: IOrder;
+	guestFeedback?: IFeedback;
 }
 
 export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderState> {
@@ -33,7 +36,15 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 				if (!res.ok) return;
 				const nState = this.state;
 				nState.value = res.order;
-				this.setState(nState);
+				(nState.guestFeedback =
+					nState.value?.userId !== undefined
+						? {
+								objectType: ObjectTypeCode.guest,
+								rating: 0,
+								objectId: nState.value?.userId,
+							}
+						: undefined),
+					this.setState(nState);
 			},
 			err => {}
 		);
@@ -83,11 +94,76 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 			err => {}
 		);
 	}
+	doneOrder() {
+		this.serverCommand(
+			"order/wfNext",
+			JSON.stringify({ id: this.state.value?.id, nextWfStatus: WorkflowStatusCode.done }),
+			res => {
+				if (res.ok) {
+					const nState = this.state;
+					nState.value = res.order;
+					this.setState(nState);
+					this.props.toaster?.current?.addToast({
+						type: ToastType.info,
+						message: "Order's closed successfully. Leave feedback about the guest",
+					});
+				}
+			},
+			err => {
+				this.props.toaster?.current?.addToast({
+					type: ToastType.error,
+					message: "You couldn't close the order 'cause you have approved and not fulfilled items",
+				});
+			}
+		);
+	}
+	saveFeedback() {
+		if (this.state.guestFeedback === undefined) return;
+		this.serverCommand(
+			"feedback/update",
+			JSON.stringify(this.state.guestFeedback),
+			res => {
+				if (res.ok) {
+					this.setState({ ...this.state, guestFeedback: res.feedback });
+					this.serverCommand(
+						"order/wfNext",
+						JSON.stringify({ id: this.state.value?.id, nextWfStatus: WorkflowStatusCode.review }),
+						res => {
+							if (res.ok) {
+								const nState = this.state;
+								nState.value = res.order;
+								this.setState(nState);
+							}
+						},
+						err => {}
+					);
+				}
+			},
+			err => {}
+		);
+	}
+	close() {
+		if (this.state.guestFeedback === undefined) return;
+		this.serverCommand(
+			"order/wfNext",
+			JSON.stringify({ id: this.state.value?.id, nextWfStatus: WorkflowStatusCode.closed }),
+			res => {
+				if (res.ok) {
+					const nState = this.state;
+					nState.value = res.order;
+					this.setState(nState);
+				}
+			},
+			err => {}
+		);
+	}
 	render(): ReactNode {
 		if (this.state.value === undefined) return <></>;
 		const total = calcSum(this.state.value);
 		const isApproved = this.state.value.wfHistory?.filter(item => item.wfStatus === WorkflowStatusCode.approved).length === 1;
 		const isCanceledByEatery = this.state.value.wfHistory?.filter(item => item.wfStatus === WorkflowStatusCode.canceledByEatery).length === 1;
+		const isDone = this.state.value.wfHistory?.filter(item => item.wfStatus === WorkflowStatusCode.done).length === 1;
+		const isReview = this.state.value.wfHistory?.filter(item => item.wfStatus === WorkflowStatusCode.review).length === 1;
 		return (
 			<div className="order-eatery-container">
 				<div className="context-toolbar">
@@ -121,8 +197,46 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 							✔
 						</span>
 					)}
-					<span>$</span>
-					<span>☆</span>
+					<span className={isDone ? "done" : ""} onClick={this.doneOrder.bind(this)}>
+						$
+					</span>
+					<span
+						className={isReview ? "done" : ""}
+						onClick={event => {
+							this.props.toaster?.current?.addToast({
+								type: ToastType.info,
+								modal: true,
+								message: (
+									<div className="guest-order-item-feedback-container">
+										<div>Leave your feedback here</div>
+										<Stars
+											rating={this.state.guestFeedback?.rating}
+											onChange={rating => {
+												if (this.state.guestFeedback === undefined) return;
+												this.setState({ ...this.state, guestFeedback: { ...this.state.guestFeedback, rating: rating } });
+											}}
+										/>
+										<div>
+											<textarea
+												defaultValue={this.state.guestFeedback?.comment}
+												onChange={event => {
+													const strVal = event.currentTarget.value;
+													if (this.state.guestFeedback === undefined) return;
+													this.setState({ ...this.state, guestFeedback: { ...this.state.guestFeedback, comment: strVal } });
+												}}
+											/>
+										</div>
+									</div>
+								),
+								buttons: [
+									{ text: "Publish", default: true, callback: this.saveFeedback.bind(this) },
+									{ text: "Cancel", callback: () => "" },
+								],
+							});
+						}}>
+						☆
+					</span>
+					{isDone || isReview ? <span onClick={this.close.bind(this)}>Close</span> : <></>}
 				</div>
 				<div className="order-eatery-balance">{this.toCurrency(total.payed - (total.registeredSum + total.approvedByEaterySum + total.fulfilledSum))}</div>
 				<div className="order-eatery-number">

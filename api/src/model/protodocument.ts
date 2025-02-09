@@ -71,7 +71,7 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     protected _id?: Types.ObjectId;
     protected _data?: DataType;
     protected _byUniqField?: { field: string; value: any };
-    protected _collection?: {id: Types.ObjectId}[];
+    protected _collection?: { id: Types.ObjectId }[];
     constructor();
     constructor(id: Types.ObjectId);
     constructor(data: DataType);
@@ -564,8 +564,20 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     async getCollection(whereTense: string, params: any[], orderTense: string, limit: number = 100): Promise<void> {
         const sql = `SELECT \`${this.dataSchema.idFieldName}\` FROM \`${this.dataSchema.tableName}\` WHERE (${whereTense}) AND \`blocked\` = 0 ORDER BY ${orderTense} LIMIT ${limit}`;
         mconsole.sqlq(sql, params);
-        const [rows, fields] = await this.sqlConnection.query<[]>(sql, params);
-        this._collection = rows;
+        while (true) {
+            try {
+                const [rows, fields] = await this.sqlConnection.query<[]>(sql, params);
+                this._collection = rows;
+                break;
+            } catch (e: any) {
+                if (e.code === 'ER_NO_SUCH_TABLE') {
+                    await this.createMainTable();
+                } else {
+                    //await this.sqlConnection.rollback();
+                    throw e;
+                }
+            }
+        }
     }
     get collection() {
         if (this._collection === undefined) throw new DocumentError(DocumentErrorCode.abstract_method, `getCollection MUST be called in await mode before this call`);
