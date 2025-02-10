@@ -1,6 +1,6 @@
-import { WorkflowStatusCode } from "../types/prototypes";
-import { IFeedback } from "../types/feedback";
-import { IDocumentDataSchema, IDocumentWFSchema, Document } from "./protodocument";
+import { WorkflowStatusCode } from '../types/prototypes';
+import { IFeedback } from '../types/feedback';
+import { IDocumentDataSchema, IDocumentWFSchema, Document } from './protodocument';
 
 interface IFeedbackDataSchema extends IDocumentDataSchema {}
 interface IFeedbackWFSchema extends IDocumentWFSchema {}
@@ -18,10 +18,12 @@ export class Feedback extends Document<IFeedback, IFeedbackDataSchema, IFeedback
                 { name: `comment`, type: 'varchar(512)' },
                 { name: `answerToId`, type: 'bigint(20)', required: false },
             ],
-            indexes: [{
-                fields: ['userId', 'objectId', 'objectType', 'answerToId'],
-                indexType: "UNIQUE"
-            }]
+            indexes: [
+                {
+                    fields: ['userId', 'objectId', 'objectType', 'answerToId'],
+                    indexType: 'UNIQUE',
+                },
+            ],
         };
     }
 
@@ -29,9 +31,7 @@ export class Feedback extends Document<IFeedback, IFeedbackDataSchema, IFeedback
         return {
             tableName: 'feedbacks',
             initialState: WorkflowStatusCode.draft,
-            transfers: [
-                {from: WorkflowStatusCode.draft, to: WorkflowStatusCode.registered}
-            ]
+            transfers: [{ from: WorkflowStatusCode.draft, to: WorkflowStatusCode.registered }],
         };
     }
 }

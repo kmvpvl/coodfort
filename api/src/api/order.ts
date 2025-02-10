@@ -77,7 +77,19 @@ export async function wfNextOrder(c: Context, req: Request, res: Response, user:
         await order.load();
         const eatery = new Eatery(order.data.eateryId);
         await eatery.load();
-        if (order.data.wfStatus === WorkflowStatusCode.draft && eatery.checkRoles(EateryRoleCode['payment-get'], user.id)) order.wfNext(user, req.body.nextWfStatus);
+
+        if (
+            // approve order or cancel by eatery
+            (order.data.wfStatus === WorkflowStatusCode.draft && eatery.checkRoles(EateryRoleCode['payment-get'], user.id)) ||
+            // close order and check order to unclosed obligations
+            (order.data.wfStatus === WorkflowStatusCode.approved && eatery.checkRoles(EateryRoleCode['payment-get'], user.id) && order.data.items.filter(item => item.wfStatus === WorkflowStatusCode.approved).length === 0) ||
+            // review
+            (order.data.wfStatus === WorkflowStatusCode.done && eatery.checkRoles(EateryRoleCode['payment-get'], user.id)) ||
+            // close
+            ((order.data.wfStatus === WorkflowStatusCode.done || order.data.wfStatus === WorkflowStatusCode.review) && eatery.checkRoles(EateryRoleCode['payment-get'], user.id))
+        )
+            order.wfNext(user, req.body.nextWfStatus);
+        else throw new DocumentError(DocumentErrorCode.wf_suspense, 'Order has obstacles to change of state');
         return res.status(200).json({ ok: true, order: order.data });
     } catch (e: any) {
         if (e instanceof DocumentError) return res.status(400).json({ ok: false, error: e.json });

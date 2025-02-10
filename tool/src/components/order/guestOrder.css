@@ -85,3 +85,12 @@
     display: flex;
     flex-direction: column;
 }
+
+.guest-order-item-feedback-container {
+    width: 100%;
+
+}
+
+.guest-order-item-feedback-container textarea {
+    width: 100%;
+}

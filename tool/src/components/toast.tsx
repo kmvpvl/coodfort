@@ -9,6 +9,7 @@ export interface IToasterProps {
 	placesCount: number;
 }
 interface IToastButton {
+	default?: boolean;
 	text: string;
 	callback: () => void;
 }
@@ -43,6 +44,7 @@ export enum ToastType {
 	error = "error",
 	warning = "warning",
 	info = "info",
+	success = "success",
 }
 
 export default class Toaster extends React.Component<IToasterProps, IToasterState> {
@@ -137,9 +139,9 @@ export class Toast extends React.Component<IToastProps, IToastState> {
 				<div className="toast-message">{this.props.message}</div>
 				{this.state.showDescription ? <div className="toast-description">{this.props.description}</div> : <></>}
 				{this.props.buttons !== undefined ? (
-					<div>
+					<div className="toast-buttons-container">
 						{this.props.buttons.map((button, idx) => (
-							<button key={idx} onClick={this.onButtonClick.bind(this, button)}>
+							<button className={button.default ? "default" : ""} key={idx} onClick={this.onButtonClick.bind(this, button)}>
 								{button.text}
 							</button>
 						))}

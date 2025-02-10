@@ -1,4 +1,4 @@
-import { IDocument, Types, ObjectTypeCode } from "./prototypes";
+import { IDocument, Types, ObjectTypeCode } from './prototypes';
 
 export enum MnemonicRating {
     no = 0,
@@ -6,8 +6,9 @@ export enum MnemonicRating {
     nasty = 2,
     ordinary = 3,
     nice = 4,
-    excellent = 5
-}export interface IFeedback extends IDocument {
+    excellent = 5,
+}
+export interface IFeedback extends IDocument {
     userId?: Types.ObjectId;
     rating: MnemonicRating;
     comment?: string;
@@ -20,4 +21,3 @@ export interface IFeedbacksSummary {
     rating: number;
     count: number;
 }
-

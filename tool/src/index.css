@@ -199,3 +199,15 @@ body {
   width: auto;
   border: 2px solid white;
 }
+
+button {
+  font-family: "UbuntuMono", monospace;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid var(--text-color);
+  border-radius: .5em;
+}
+
+button.default {
+  font-weight: bold;
+}

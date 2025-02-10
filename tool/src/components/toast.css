@@ -52,10 +52,11 @@
 }
 .toast-container-error,
 .toast-container-warning,
-.toast-container-info {
+.toast-container-info,
+.toast-container-success {
     border-width: 1px;
     border-style: solid;
-    padding: 1em;
+    padding: .5em;
     border-radius: 0.5em;
     margin: 10px;
     position: relative;
@@ -65,7 +66,10 @@
     color: white;
     background-color: var(--error-color);
 }
-
+.toast-container-success {
+    color: white;
+    background-color: var(--success-color);
+}
 .toast-container-info {
     color: var(--text-color);
     background-color: var(--info-color);
@@ -119,4 +123,11 @@
     font-size: small;
     max-height: 4em;
     overflow: auto;
+}
+
+.toast-buttons-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 1em;
 }

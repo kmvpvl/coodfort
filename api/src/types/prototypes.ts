@@ -103,11 +103,12 @@ export interface IAward {
     url: string;
 }
 export enum ObjectTypeCode {
-    eatery = "eatery",
-    meal = "meal",
-    order = "order",
-    orderitem = "orderitem",
-    menuitem = "menuitem"
+    eatery = 'eatery',
+    meal = 'meal',
+    order = 'order',
+    orderitem = 'orderitem',
+    menuitem = 'menuitem',
+    guest = 'guest',
 }
 export interface IUser extends IDocument {
     login: string /**Telegram ID or login or phone */;
