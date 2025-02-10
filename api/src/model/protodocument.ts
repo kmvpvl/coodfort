@@ -112,6 +112,14 @@ export abstract class Document<DataType extends IDocument, DBSchema extends IDoc
     }
 
     static async createSQLConnection(): Promise<Connection> {
+        if (Document._sqlConnection !== undefined) {
+            try {
+                await Document._sqlConnection.query('SELECT 1');
+            } catch (e: any) {
+                console.log(`Connection to database is not longer alive, reconnecting...`);
+                Document._sqlConnection = undefined;
+            }
+        }
         if (Document._sqlConnection === undefined) {
             const db_host = process.env.db_host;
             const db_name = process.env.db_name;
