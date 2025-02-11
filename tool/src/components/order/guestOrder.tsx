@@ -15,6 +15,7 @@ export interface IGuestOrderProps extends IProtoProps {
 	eateryId: Types.ObjectId;
 	tableId: Types.ObjectId;
 	onChange?: (order: IOrder) => void;
+	onClick?: (order: IOrder) => void;
 }
 export interface IGuestOrderState extends IProtoState {
 	value: IOrder;
@@ -167,8 +168,41 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 			</div>
 		);
 	}
+	renderNormal(): ReactNode {
+		const total = calcSum(this.state.value);
+		return (
+			<div
+				className="guest-order-normal-container"
+				style={this.props.onClick !== undefined ? { cursor: "pointer" } : {}}
+				onClick={event => {
+					if (this.props.onClick !== undefined) this.props.onClick(this.state.value);
+				}}>
+				<div className="has-label">
+					<div className="label">{this.ML("Table")}</div>
+					<div>{this.toString(this.props.eatery.tables.filter(t => t.id === this.state.value.tableId)[0].name)}</div>
+				</div>
+				<div className="has-label">
+					<div className="label">{this.ML("Restaraunt")}</div>
+					<div>{this.toString(this.props.eatery.name)}</div>
+				</div>
+				<div className="has-label">
+					<div className="label">{this.ML("Order number")}</div>
+					<div>
+						<span className="number">#{this.state.value.id}</span> <span className="date">{this.state.value.created !== undefined ? this.relativeDate(this.state.value.created) : ""}</span>
+					</div>
+				</div>
+				<div className="has-label">
+					<div className="label">{this.ML("Total")}</div>
+					<div className="total">
+						{this.toCurrency(total.approvedByEaterySum + total.registeredSum + total.fulfilledSum)} {this.toString(this.state.value.items.at(0)?.option.currency)}
+					</div>
+				</div>
+			</div>
+		);
+	}
 	render(): ReactNode {
 		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
+		if (this.state.viewMode === ViewModeCode.normal) return this.renderNormal();
 		const total = calcSum(this.state.value);
 		return (
 			<div className="guest-order-container">

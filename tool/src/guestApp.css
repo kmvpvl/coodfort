@@ -49,6 +49,7 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   gap: 0.5em;
+  text-align: center;
 }
 .guest-app-checkin-container button {
   font-size: large;
@@ -135,11 +136,20 @@
 
   .guest-app-checkin-unclosed-orders-list {
     display: flex;
+    justify-content: center;
+    padding: .5em;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
   }
 
-  .guest-app-checkin-unclosed-orders-list > div {
+  .--guest-app-checkin-unclosed-orders-list > div {
     cursor: pointer;
     border: 1px solid;
     border-radius: .5em;
     padding: .5em;
+  }
+  #reader {
+    min-height: min-content;
+    --max-height: 250px;
   }

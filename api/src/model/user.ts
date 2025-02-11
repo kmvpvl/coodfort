@@ -135,15 +135,18 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
     }
 
     async ordersList(eateryId?: Types.ObjectId, tableId?: Types.ObjectId, wfStatuses?: WorkflowStatusCode[]): Promise<IOrder[]> {
-        const sql = `select \`orders\`.* from \`orders\` where \`userId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ? ' : ''} ${tableId !== undefined ? 'AND `tableId` = ? ' : ''} ${wfStatuses !== undefined && wfStatuses.length > 0 ? `AND ( ${wfStatuses.map(status => '`wfStatus` = ? ').join(' OR ')} )` : ''}`;
+        const orders = new Order();
         const params: any[] = [this.id];
         if (eateryId !== undefined) params.push(eateryId);
         if (tableId !== undefined) params.push(tableId);
         if (wfStatuses !== undefined) params.push(...wfStatuses);
-        mconsole.sqlq(sql, params);
-        const [rows, fields] = await this.sqlConnection.query<IOrderRow[]>(sql, params);
+        await orders.getCollection(
+            `\`userId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ? ' : ''} ${tableId !== undefined ? 'AND `tableId` = ? ' : ''} ${wfStatuses !== undefined && wfStatuses.length > 0 ? `AND ( ${wfStatuses.map(status => '`wfStatus` = ? ').join(' OR ')} )` : ''}`,
+            params,
+            `\`created\` DESC`
+        );
         const ret: IOrder[] = [];
-        for (const row of rows) {
+        for (const row of orders.collection) {
             const o = new Order(row.id as Types.ObjectId);
             await o.load();
             ret.push(o.data);
