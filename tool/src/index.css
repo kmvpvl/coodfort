@@ -225,7 +225,7 @@ button.default, .button.default {
 
 .label, .tooltip {
   color: #afafaf;
-  font-size: 80%;
+  --font-size: 80%;
   font-style: italic;
 }
 
