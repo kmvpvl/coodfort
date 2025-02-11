@@ -24,7 +24,7 @@ export interface IGuestAppProps extends IProtoProps {
 	itemMenuId?: Types.ObjectId;
 }
 
-const OrderStages = ["CheckIn", "Choose", "Pay"];
+const OrderStages = ["CheckIn", "Menu", "Order"];
 
 export interface IGuestAppState extends IProtoState {
 	eateryId?: Types.ObjectId;
@@ -59,7 +59,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 					this.updateOrdersList();
 					nState.stage = "checkin";
 				} else {
-					//nState.stage = "choose";
+					//nState.stage = "menu";
 					this.checkEateryId();
 				}
 				this.setState(nState);
@@ -177,7 +177,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 						nState.choosenTable = suitableTables[0];
 					}
 				}
-				this.state.stage = "choose";
+				this.state.stage = "menu";
 				this.setState(nState);
 				this.updateOrdersList();
 			},
@@ -330,30 +330,29 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	renderCheckIn(): ReactNode {
 		return (
 			<div className="guest-app-checkin-container">
-				<div>
-					<div>Your unclosed orders (tap to select or close):</div>
-					<div className="guest-app-checkin-unclosed-orders-list">
-						{this.state.activeOrders?.map((order, idx) => {
-							const eatery_arr = this.state.eateriesInfo.filter(e => e.id === order.eateryId);
-							const table_arr = eatery_arr.length === 1 ? eatery_arr[0].tables.filter(t => t.id === order.tableId) : [];
-							const total = calcSum(order);
-							return (
-								<div key={idx} onClick={this.chooseEateryAndTable.bind(this, order.eateryId, order.tableId)}>
-									{table_arr.length === 1 ? this.toString(table_arr[0].name) : ""} @ {eatery_arr.length === 1 ? this.toString(eatery_arr[0].name) : ""} - {this.toCurrency(total.registeredSum)} -{" "}
-									{order.created !== undefined ? this.relativeDate(order.created) : ""}
-								</div>
-							);
-						})}
+				{this.state.activeOrders !== undefined && this.state.activeOrders.length > 0 && this.state.scanner === undefined ? (
+					<div>
+						<div>{this.ML("Your unclosed orders (tap to select or close):")}</div>
+						<div className="guest-app-checkin-unclosed-orders-list">
+							{this.state.activeOrders?.map((order, idx) => {
+								const eatery_arr = this.state.eateriesInfo.filter(e => e.id === order.eateryId);
+								return (
+									<GuestOrder onClick={order => this.chooseEateryAndTable(order.eateryId, order.tableId)} viewMode={ViewModeCode.normal} key={idx} orderId={order.id} eatery={eatery_arr[0]} eateryId={order.eateryId} tableId={order.eateryId} />
+								);
+							})}
+						</div>
 					</div>
-				</div>
+				) : (
+					<div></div>
+				)}
 				<div id="reader"></div>
 				<div>
-					<div>You can find the eatery and table or scan QR code on the table or on eatery's wall or door. </div>
+					<div className="tooltip">
+						{this.ML("Scan the QR code on the table or next to the table to start choosing dishes in the order. As soon as your registration is confirmed by the staff of the institution, you can send an order for execution.")}
+					</div>
 					{this.state.scanner === undefined ? (
-						<div>
-							Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on
-							the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition,
-							injected
+						<div className="tooltip">
+							{this.ML("By pressing the button, agree to use the camera. We use only the rear camera of your smartphone. Point the camera at the QR code, it is calculated automatically. You do not need to press the photo buttons")}
 						</div>
 					) : (
 						<></>
@@ -364,7 +363,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 								if (this.state.scanner === undefined) this.startScanner();
 								else this.stopScanner();
 							}}>
-							{this.state.scanner === undefined ? "Press to Scan" : "Cancel scan"}
+							{this.state.scanner === undefined ? this.ML("Press to scan QR Code") : this.ML("Cancel scan")}
 						</button>
 					</div>
 				</div>
@@ -385,7 +384,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		return this.state.choosenEatery !== undefined && this.state.eateryId !== undefined && this.state.tableId !== undefined && this.state.order !== undefined ? (
 			<GuestOrder
 				eatery={this.state.choosenEatery}
-				viewMode={ViewModeCode.normal}
+				viewMode={ViewModeCode.maximized}
 				orderId={this.state.order.id}
 				eateryId={this.state.eateryId}
 				tableId={this.state.tableId}
@@ -405,8 +404,8 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			<div className="guest-app-nav-top">
 				<div className="guest-app-nav-top-choosen">
 					<span>{this.state.user?.name}</span>
-					<span>Tbl {this.toString(this.state.choosenTable?.name)}</span>
-					{this.state.choosenEatery !== undefined ? <Eatery viewMode={ViewModeCode.compact} defaultValue={this.state.choosenEatery} /> : <></>}
+					<span>{this.toString(this.state.choosenTable?.name)}</span>
+					{this.state.choosenEatery !== undefined && this.state.stage !== "checkin" ? <Eatery viewMode={ViewModeCode.compact} defaultValue={this.state.choosenEatery} /> : <></>}
 				</div>
 			</div>
 		);
@@ -423,14 +422,20 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 									data-stage={stage}
 									onClick={event => {
 										const choosenStage = event.currentTarget.attributes.getNamedItem("data-stage")?.value.toLowerCase();
-										if (choosenStage !== this.state.stage && choosenStage !== undefined && (choosenStage !== "pay" || (choosenStage === "pay" && this.state.order && this.state.order.items.length > 0))) {
-											const nState = this.state;
-											nState.stage = choosenStage;
-											this.setState(nState);
+										if (choosenStage !== this.state.stage && choosenStage !== undefined) {
+											switch (choosenStage) {
+												case "menu":
+												case "order":
+													if (this.state.eateryId === undefined || this.state.tableId === undefined) break;
+												default:
+													const nState = this.state;
+													nState.stage = choosenStage;
+													this.setState(nState);
+											}
 										}
 									}}
-									className={`stage ${curStage ? "current" : ""}`}>
-									{stage === "Pay" && this.state.eateryId !== undefined && this.state.tableId !== undefined && this.state.choosenEatery !== undefined ? (
+									className={`button stage ${curStage ? "current" : ""}`}>
+									{stage === "Order" && this.state.eateryId !== undefined && this.state.tableId !== undefined && this.state.choosenEatery !== undefined ? (
 										<GuestOrder
 											ref={this.orderRef}
 											eatery={this.state.choosenEatery}
@@ -443,9 +448,10 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 												nState.order = order;
 												this.setState(nState);
 											}}
+											viewMode={ViewModeCode.compact}
 										/>
 									) : (
-										stage
+										this.ML(stage)
 									)}
 								</span>
 								{idx + 1 < arr.length ? <span>→</span> : <></>}{" "}
@@ -474,10 +480,10 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 					case "checkin":
 						content = this.renderCheckIn();
 						break;
-					case "choose":
+					case "menu":
 						content = this.renderChoose();
 						break;
-					case "pay":
+					case "order":
 						content = this.renderPay();
 						break;
 					default:

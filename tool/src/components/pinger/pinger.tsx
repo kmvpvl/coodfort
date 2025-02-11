@@ -56,7 +56,7 @@ export default class Pinger extends Proto<IPingerProps, IPingerState> {
 		return (
 			<span className="pinger-container" onClick={this.toggleExtended.bind(this)}>
 				{this.state.serverStatus !== undefined ? (this.state.extended ? ServerStatusCode[this.state.serverStatus] : legend[this.state.serverStatus]) : "unknown"}
-				{this.state.extended ? ` ${process.env.SERVER_BASE_URL} ${this.state.serverVersion}` : ""}
+				{this.state.extended ? ` ${process.env.SERVER_BASE_URL} ${this.state.serverVersion} ${this.getLanguage()}` : ""}
 			</span>
 		);
 	}

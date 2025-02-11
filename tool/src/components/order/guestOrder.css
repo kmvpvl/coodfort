@@ -94,3 +94,30 @@
 .guest-order-item-feedback-container textarea {
     width: 100%;
 }
+
+.guest-order-normal-container {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto;
+    border-radius: .2em;
+    gap: .5em;
+    box-shadow: 0 0 1em silver;
+    padding: .2em;
+    width: max-content;
+    height: max-content;
+}
+
+.guest-order-normal-container .total {
+    font-size: 200%;
+    font-weight: bold;
+}
+
+.guest-order-normal-container .date {
+    font-weight: bold;
+    font-size: 80%;
+}
+
+.guest-order-normal-container .number {
+    font-weight: bold;
+    font-size: 150%;
+}

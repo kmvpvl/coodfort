@@ -91,6 +91,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 	}
 
 	protected getLanguage(): string {
+		if (window.Telegram?.WebApp.initDataUnsafe?.user?.language_code !== undefined) return window.Telegram.WebApp.initDataUnsafe.user.language_code;
 		if (this.props.lang !== undefined) return this.props.lang;
 		const params: string[] = window.location.search.substring(1).split("&");
 		let lang = window.navigator.language.split("-")[0];
@@ -117,6 +118,7 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		}
 		const el = mlStrings.get(str);
 		if (!el?.has(lang)) return str;
+		if (el.get(lang) === undefined) return str;
 		return el.get(lang) as string;
 	}
 

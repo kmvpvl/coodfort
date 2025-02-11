@@ -201,13 +201,41 @@ body {
 }
 
 button {
+  border-width: 1px;
+}
+
+button, .button {
   font-family: "UbuntuMono", monospace;
   background-color: var(--background-color);
   color: var(--text-color);
-  border: 1px solid var(--text-color);
-  border-radius: .5em;
+  --border: 1px solid var(--text-color);
+  border-radius: .2em;
+  cursor: pointer;
+  box-shadow: 0 0 1em silver;
 }
 
-button.default {
+button.default, .button.default {
   font-weight: bold;
+}
+
+.has-label {
+  position: relative;
+  margin-top: .8em;
+}
+
+.label, .tooltip {
+  color: #afafaf;
+  font-size: 80%;
+  font-style: italic;
+}
+
+.tooltip {
+  margin-bottom: 1em;
+  text-align: justify;
+}
+
+.label {
+  position: absolute;
+  left: 1em;
+  top: -.8em;
 }
