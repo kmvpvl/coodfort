@@ -6,7 +6,7 @@
     position: relative;
     display: grid;
     grid-template-rows: auto 1fr auto;
-    padding: 0.5em;
+    padding: 0.2em;
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
@@ -29,7 +29,7 @@
   display: grid;
   grid-template-columns: 20% 1fr;
   grid-template-rows: auto auto;
-  gap: 0.5em;
+  gap: 0.2em;
 }
 
 .guest-app-greetings-requisites div:first-child {
@@ -48,8 +48,9 @@
   height: 100%;
   display: grid;
   grid-template-rows: auto 1fr auto;
-  gap: 0.5em;
+  gap: 0.2em;
   text-align: center;
+  overflow: hidden;
 }
 .guest-app-checkin-container button {
   font-size: large;
@@ -81,7 +82,7 @@
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
-    gap: .5em;
+    gap: .2em;
 }
 
 .guest-app-nav-bottom {
@@ -94,8 +95,8 @@
 .guest-app-nav-bottom span.stage {
   --flex-basis: 15%;
   border: 1px solid;
-  padding: 0.5em;
-  border-radius: 0.5em;
+  padding: 0.2em;
+  border-radius: 0.2em;
   cursor: pointer;
 }
 .guest-app-nav-bottom span.stage.current {
@@ -137,18 +138,13 @@
   .guest-app-checkin-unclosed-orders-list {
     display: flex;
     justify-content: center;
-    padding: .5em;
+    padding: .2em;
     height: 100%;
     width: 100%;
     overflow: auto;
+    flex-direction: column;
   }
 
-  .--guest-app-checkin-unclosed-orders-list > div {
-    cursor: pointer;
-    border: 1px solid;
-    border-radius: .5em;
-    padding: .5em;
-  }
   #reader {
     min-height: min-content;
     --max-height: 250px;
