@@ -230,7 +230,7 @@ button.default, .button.default {
 }
 
 .tooltip {
-  margin-bottom: 1em;
+  margin-bottom: .5em;
   text-align: justify;
 }
 
