@@ -294,8 +294,14 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 	}
 	renderCompact(): ReactNode {
 		return (
-			<div className={`eatery-compact-container ${this.props.className !== undefined ? this.props.className : ""}`} onClick={event => this.props.onClick?.call(this, this.state.value)}>
-				<Photos className="eatery-compact-photos" defaultValue={this.state.value.photos} />
+			<div className={`eatery-compact-container ${this.props.className !== undefined ? this.props.className : ""}`} onClick={event => this.props.onClick?.call(this, this.state.value)} style={this.props.onClick !== undefined ? { cursor: "pointer" } : {}}>
+				{this.state.value.photos !== undefined && this.state.value.photos.length > 0 ? (
+					<span className="circle-img-container">
+						<img src={this.state.value.photos[0].url} />
+					</span>
+				) : (
+					<></>
+				)}
 				<div>{this.toString(this.state.value.name)}</div>
 			</div>
 		);
