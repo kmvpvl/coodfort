@@ -331,7 +331,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		return (
 			<div className="guest-app-checkin-container">
 				{this.state.activeOrders !== undefined && this.state.activeOrders.length > 0 && this.state.scanner === undefined ? (
-					<div style={{width:"100%", height:"100%", overflow: "auto", display: "grid"}}>
+					<div style={{width:"100%", height:"100%", overflow:"hidden", display: "grid"}}>
 						<div>{this.ML("Your unclosed orders (tap to select or close):")}</div>
 						<div className="guest-app-checkin-unclosed-orders-list">
 							{this.state.activeOrders?.map((order, idx) => {
@@ -346,7 +346,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 					<div></div>
 				)}
 				<div id="reader"></div>
-				<div>
+				<div style={{width:"100%", height:"100%", overflow:"hidden", display: "grid"}}>
 					<div className="tooltip">
 						{this.ML("Scan the QR code on the table or next to the table to start choosing dishes in the order. As soon as your registration is confirmed by the staff of the institution, you can send an order for execution.")}
 					</div>
