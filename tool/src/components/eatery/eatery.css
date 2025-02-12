@@ -56,13 +56,12 @@
     flex-wrap: nowrap;
     flex-direction: row;
     align-items: center;
-    gap: .5em;
+    gap: .2em;
     --font-size: 170%;
-    width: min-content;
+    width: fit-content;
 }
-.eatery-compact-photos {
-    width: 5em;
-    height: 4em;
+.eatery-compact-container > div {
+    font-weight: bold;
 }
 
 .eatery-container.maximized {
