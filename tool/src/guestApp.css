@@ -147,6 +147,6 @@
   }
 
   #reader {
-    min-height: min-content;
+    --min-height: min-content;
     --max-height: 250px;
   }
