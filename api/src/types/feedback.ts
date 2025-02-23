@@ -8,6 +8,9 @@ export enum MnemonicRating {
     nice = 4,
     excellent = 5,
 }
+
+export const MnemonicRatingNames = ['no', 'disgusting', 'nasty', 'ordinary', 'nice', 'excellently'];
+
 export interface IFeedback extends IDocument {
     userId?: Types.ObjectId;
     rating: MnemonicRating;

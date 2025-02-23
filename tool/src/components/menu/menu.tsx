@@ -261,7 +261,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						<span
 							key={idx}
 							data-chapter-index={idx}
-							className={idx === this.state.currentChapterIndex ? "selected" : ""}
+							className={`button ${idx === this.state.currentChapterIndex ? "selected" : ""}`}
 							onClick={event => {
 								const nState = this.state;
 								const newIndex = event.currentTarget.attributes.getNamedItem("data-chapter-index")?.value;

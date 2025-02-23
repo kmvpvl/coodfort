@@ -57,7 +57,7 @@
     border-width: 1px;
     border-style: solid;
     padding: .5em;
-    border-radius: 0.5em;
+    border-radius: 0.2em;
     margin: 10px;
     position: relative;
 }
@@ -130,4 +130,8 @@
     display: flex;
     justify-content: center;
     gap: 1em;
+}
+
+.toast-buttons-container > button {
+    flex-grow: .2;
 }

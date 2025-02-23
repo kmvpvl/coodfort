@@ -59,7 +59,7 @@ export default class Toaster extends React.Component<IToasterProps, IToasterStat
 			uid: this.toastCounter++,
 			...toast,
 		};
-		if (extToast.autohide === undefined && extToast.type === ToastType.info && !extToast.modal) extToast.autohide = 3;
+		if (extToast.autohide === undefined && extToast.type === ToastType.info && !extToast.modal) extToast.autohide = 5;
 		nState.toasts.push(extToast);
 		this.setState(nState);
 		if (extToast.autohide !== undefined) {

@@ -208,7 +208,7 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 								modal: true,
 								message: (
 									<div className="guest-order-item-feedback-container">
-										<div>Leave your feedback here</div>
+										<div>{this.ML("Leave your feedback here")}</div>
 										<Stars
 											rating={this.state.guestFeedback?.rating}
 											onChange={rating => {
@@ -229,8 +229,8 @@ export default class EateryOrder extends Proto<IEateryOrderProps, IEateryOrderSt
 									</div>
 								),
 								buttons: [
-									{ text: "Publish", default: true, callback: this.saveFeedback.bind(this) },
-									{ text: "Cancel", callback: () => "" },
+									{ text: this.ML("Publish"), default: true, callback: this.saveFeedback.bind(this) },
+									{ text: this.ML("Cancel"), callback: () => "" },
 								],
 							});
 						}}>

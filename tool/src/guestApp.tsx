@@ -175,6 +175,16 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 					const suitableTables = this.state.choosenEatery?.tables.filter(table => table.id === this.state.tableId);
 					if (suitableTables?.length === 1) {
 						nState.choosenTable = suitableTables[0];
+					} else {
+						this.toasterRef.current?.addToast({
+							type: ToastType.error,
+							message: "Choosen table doesn't belong to the Eatery",
+						});
+						const nState = this.state;
+						nState.eateryId = undefined;
+						nState.tableId = undefined;
+						this.setState(nState);
+						return;
 					}
 				}
 				this.state.stage = "menu";
@@ -331,7 +341,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		return (
 			<div className="guest-app-checkin-container">
 				{this.state.activeOrders !== undefined && this.state.activeOrders.length > 0 && this.state.scanner === undefined ? (
-					<div style={{width:"100%", height:"100%", overflow:"hidden", display: "grid"}}>
+					<div style={{ width: "100%", height: "100%", overflow: "hidden", display: "grid" }}>
 						<div>{this.ML("Your unclosed orders (tap to select or close):")}</div>
 						<div className="guest-app-checkin-unclosed-orders-list">
 							{this.state.activeOrders?.map((order, idx) => {
@@ -346,7 +356,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 					<div></div>
 				)}
 				<div id="reader"></div>
-				<div style={{width:"100%", height:"100%", overflow:"hidden", display: "grid"}}>
+				<div style={{ width: "100%", height: "100%", overflow: "hidden", display: "grid" }}>
 					<div className="tooltip">
 						{this.ML("Scan the QR code on the table or next to the table to start choosing dishes in the order. As soon as your registration is confirmed by the staff of the institution, you can send an order for execution.")}
 					</div>
@@ -357,15 +367,13 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 					) : (
 						<></>
 					)}
-					<div>
-						<button
-							onClick={event => {
-								if (this.state.scanner === undefined) this.startScanner();
-								else this.stopScanner();
-							}}>
-							{this.state.scanner === undefined ? this.ML("Press to scan QR Code") : this.ML("Cancel scan")}
-						</button>
-					</div>
+					<button
+						onClick={event => {
+							if (this.state.scanner === undefined) this.startScanner();
+							else this.stopScanner();
+						}}>
+						{this.state.scanner === undefined ? this.ML("Press to scan QR Code") : this.ML("Cancel scan")}
+					</button>
 				</div>
 			</div>
 		);
@@ -373,6 +381,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	onSelectMenuItem(newItem: IOrderItem) {
 		this.orderRef.current?.updateOrderItem(newItem);
 	}
+
 	renderChoose(): ReactNode {
 		return (
 			<div className="guest-app-choose-container">
@@ -390,6 +399,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 				tableId={this.state.tableId}
 				toaster={this.toasterRef}
 				onChange={order => {
+					//debugger
 					const nState = this.state;
 					nState.order = order;
 					this.setState(nState);
@@ -404,13 +414,17 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			<div className="guest-app-nav-top">
 				<div className="guest-app-nav-top-choosen">
 					<span>{this.state.user?.name}</span>
-					<span>{this.toString(this.state.choosenTable?.name)}</span>
-					{this.state.choosenEatery !== undefined && this.state.stage !== "checkin" ? <Eatery viewMode={ViewModeCode.compact} defaultValue={this.state.choosenEatery} /> : <></>}
+					{this.state.choosenEatery !== undefined && this.state.stage !== "checkin" ? (
+						<Eatery viewMode={ViewModeCode.compact} defaultValue={this.state.choosenEatery} toaster={this.toasterRef} tableToCompactRender={this.state.choosenTable?.id} />
+					) : (
+						<></>
+					)}
 				</div>
 			</div>
 		);
 	}
 	renderNavBottom(): ReactNode {
+		const max_order_item_date = this.state.order?.items.reduce<string>((prev, curr) => (curr.changed !== undefined && new Date(curr.changed).toISOString() > prev ? new Date(curr.changed).toISOString() : prev), "");
 		return (
 			<div className="guest-app-nav-bottom">
 				{this.state.user !== undefined ? (
@@ -443,12 +457,13 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 											eateryId={this.state.eateryId}
 											tableId={this.state.tableId}
 											toaster={this.toasterRef}
-											onChange={order => {
-												const nState = this.state;
-												nState.order = order;
-												this.setState(nState);
-											}}
+											//onChange={order => {
+											//	const nState = this.state;
+											//	nState.order = order;
+											//	this.setState(nState);
+											//}}
 											viewMode={ViewModeCode.compact}
+											key={max_order_item_date}
 										/>
 									) : (
 										this.ML(stage)

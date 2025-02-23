@@ -3,18 +3,24 @@
     font-size: 80%;
     justify-content: space-around;
 }
-
+.menu-item-container{
+    box-shadow: 0 0 4px silver;
+    width: max-content;
+    height: max-content;
+    padding: .5em;
+}
 .menu-item-option {
-    border-radius: 5px;
-    border: 1px dotted var(--text-color);
-    padding: 5px;
+    border-radius: 2px;
+    --border: 1px dotted var(--text-color);
+    padding: .2em;
     text-align: center;
     display: grid;
     grid-template-rows: auto 1fr;
     grid-template-columns: auto 1fr;
     cursor: pointer;
     gap: 2px;
-    opacity: 0.3;
+    opacity: 0.9;
+    box-shadow: 0 0 2px silver;
 }
 
 .menu-item-option:hover,.selected {
@@ -25,7 +31,7 @@
     font-weight: bold;
 }
 .menu-item-option-price {
-    font-size: 75%;
+    --font-size: 75%;
 }
 
 .menu-item-admin-container {
@@ -35,6 +41,7 @@
     border: 1px dotted;
     border-radius: .5em;
     padding: .2em;
+    padding-top: .6em;
 }
 
 .menu-item-admin-options-list-container {

@@ -110,10 +110,13 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		if (lang === undefined) {
 			lang = this.getLanguage();
 		}
-		if (str === undefined) return `Unknown string`;
+		if (str === undefined) {
+			console.warn("Empty or undefined string");
+			return ``;
+		}
 		if (lang === undefined) return str;
 		if (!mlStrings.has(str)) {
-			console.log(`String '${str}' is absent`);
+			console.warn(`String '${str}' is absent`);
 			return str;
 		}
 		const el = mlStrings.get(str);

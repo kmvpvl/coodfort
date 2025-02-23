@@ -60,6 +60,7 @@
     flex-flow: row;
     justify-content: center;
     gap: 0.5em;
+    padding: 1px;
 }
 
 .photos-scroll > span {

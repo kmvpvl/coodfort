@@ -197,7 +197,10 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 						</div>
 						<div className="photos-scroll">
 							{this.state.value.map((photo, idx) => (
-								<span
+								<svg
+									width="8px"
+									height="8px"
+									viewBox="0 0 8 8"
 									data-index={idx}
 									key={idx}
 									onMouseOver={event => {
@@ -211,8 +214,8 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 											}
 										}
 									}}>
-									{idx === this.state.currentPhotoIndex ? `☉` : "⚬"}
-								</span>
+									{idx === this.state.currentPhotoIndex ? <circle cx="4" cy="4" r="3" fill="silver" stroke="gray"></circle> : <circle cx="4" cy="4" r="3" fill="transparent" stroke="gray"></circle>}
+								</svg>
 							))}
 						</div>
 					</div>

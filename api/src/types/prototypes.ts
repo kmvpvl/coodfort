@@ -56,13 +56,14 @@ export enum WorkflowStatusCode {
     draft,
     registered,
     approved,
-    payed,
+    paid,
     done,
     review,
     closed,
     canceledByEatery,
     canceledByGuest,
 }
+export const WorkflowStatusCodeNamesArray = ['Draft', 'Registered', 'Approved', 'Paid', 'Done', 'Review waiting', 'Closed', 'Canceled by the eatery', 'Canceld by the guest'];
 export interface IDocument {
     id?: Types.ObjectId;
     locked?: boolean;

@@ -1,17 +1,18 @@
 import { ReactNode } from "react";
 import "./stars.css";
 import React from "react";
-import { MnemonicRating } from "@betypes/feedback";
+import { MnemonicRating, MnemonicRatingNames } from "@betypes/feedback";
+import Proto, { IProtoProps, IProtoState } from "../proto";
 
-export interface IStarsProps {
+export interface IStarsProps extends IProtoProps {
 	rating?: MnemonicRating;
 	onChange?: (rating: MnemonicRating) => void;
 }
-export interface IStarsState {
+export interface IStarsState extends IProtoState {
 	rating: MnemonicRating;
 }
 
-export default class Stars extends React.Component<IStarsProps, IStarsState> {
+export default class Stars extends Proto<IStarsProps, IStarsState> {
 	state: IStarsState = {
 		rating: this.props.rating !== undefined ? this.props.rating : 0,
 	};
@@ -38,7 +39,7 @@ export default class Stars extends React.Component<IStarsProps, IStarsState> {
 					onClick={event => {
 						this.setState({ ...this.state, rating: 0 });
 					}}>
-					{this.state.rating > 0 ? MnemonicRating[this.state.rating] : ""}
+					{this.state.rating > 0 ? this.ML(MnemonicRatingNames[this.state.rating]) : ""}
 				</span>
 			</div>
 		);

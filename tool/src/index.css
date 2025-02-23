@@ -69,8 +69,9 @@ body {
 
 .standalone-toolbar {
   display: flex;
-  gap: .1em;
+  gap: .5em;
   align-items: end;
+  padding: .5em;
 }
 
 .toolbar > span, .toolbar > label, .standalone-toolbar > span{
@@ -80,7 +81,7 @@ body {
   padding-left: 0.5em;
   padding-right: 0.5em;
   border: 1px dotted var(--text-color);
-  border-radius: 5px;
+  border-radius: .2em;
   background-color: var(--background-color);
 }
 
@@ -111,7 +112,7 @@ body {
 
 .context-menu {
   display: inline-flex;
-  gap: .2em;
+  gap: 1px;
 }
 
 .context-toolbar > span, .context-menu-button {
@@ -119,7 +120,7 @@ body {
   background-color: var(--background-color);
   border: 1px solid var(--text-color);
   border-radius: 5px;
-  opacity: 0.7;
+  --opacity: 0.7;
   text-align: center;
   cursor: pointer;
   --max-width: fit-content;
@@ -208,10 +209,15 @@ button, .button {
   font-family: "UbuntuMono", monospace;
   background-color: var(--background-color);
   color: var(--text-color);
-  --border: 1px solid var(--text-color);
+  border: 1px solid var(--text-color);
   border-radius: .2em;
   cursor: pointer;
-  box-shadow: 0 0 1em silver;
+  box-shadow: 0 0 .5em silver;
+  display: flex;
+  align-items: center;
+  padding: .2em;
+  text-align: center;
+  justify-content: center;
 }
 
 button.default, .button.default {
@@ -236,7 +242,7 @@ button.default, .button.default {
 
 .label {
   position: absolute;
-  left: 1em;
+  left: .5em;
   top: -.8em;
 }
 
@@ -252,4 +258,20 @@ button.default, .button.default {
   object-fit: contain;
   border-radius: 50%;
   box-shadow: 0 0 4px silver;
+}
+
+@keyframes red-blink-shadow {
+  0% {
+    box-shadow: 0 0 4px silver;
+  }
+  50% {
+    box-shadow: 0 0 4px red;
+  }
+  100% {
+    box-shadow: 0 0 4px silver;
+  }
+}
+
+.circle-img-container.red-blink > img {
+  animation: red-blink-shadow 1s infinite;
 }
