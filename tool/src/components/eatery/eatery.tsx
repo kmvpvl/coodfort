@@ -7,6 +7,8 @@ import Tags from "../tags/tags";
 import Photos from "../photos/photos";
 import Menu from "../menu/menu";
 import React from "react";
+import { Types } from "@betypes/prototypes";
+import { ToastType } from "../toast";
 
 type EateryFocus = "none" | "profile" | "tables" | "menu" | "entertainments";
 
@@ -18,6 +20,7 @@ export interface IEateryProps extends IProtoProps {
 	viewMode?: ViewModeCode;
 	className?: string;
 	onClick?: (eatery: IEatery) => void;
+	tableToCompactRender?: Types.ObjectId;
 }
 
 export interface IEateryState extends IProtoState {
@@ -26,6 +29,7 @@ export interface IEateryState extends IProtoState {
 	focus?: EateryFocus;
 	changed?: boolean;
 	viewMode: ViewModeCode;
+	waiterCalled?: boolean;
 }
 
 export class Eatery extends Proto<IEateryProps, IEateryState> {
@@ -35,7 +39,12 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 		editMode: this.props.editMode !== undefined ? this.props.editMode : false,
 		changed: false,
 		viewMode: this.props.viewMode === undefined ? ViewModeCode.normal : this.props.viewMode,
+		waiterCalled: false,
 	};
+
+	componentDidMount(): void {
+		this.checkCallWaiterSignal();
+	}
 
 	save() {
 		//	if (this.state.value.id !== undefined) {
@@ -66,6 +75,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 					nState.value = res.eatery;
 					nState.changed = false;
 					this.setState(nState);
+					this.checkCallWaiterSignal();
 				}
 			},
 			err => {}
@@ -82,6 +92,40 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 		};
 
 		return newEatery;
+	}
+
+	doCallWaiter(cancelCall?: boolean) {
+		if (this.props.tableToCompactRender === undefined) return;
+		this.serverCommand(
+			"user/callWaiter",
+			JSON.stringify({ tableId: this.props.tableToCompactRender, on: cancelCall === undefined ? true : !cancelCall }),
+			res => {
+				if (!res.ok) return;
+				const nState = this.state;
+				nState.waiterCalled = res.tableCallWaiterSignal.on;
+				this.setState(nState);
+			},
+			err => {}
+		);
+	}
+
+	checkCallWaiterSignal() {
+		if (this.props.tableToCompactRender === undefined) return;
+		this.serverCommand(
+			"eatery/tableCallWaiterSignals",
+			JSON.stringify({ tableIds: [this.props.tableToCompactRender] }),
+			res => {
+				if (!res.ok) return;
+				const nState = this.state;
+				if (res.tableCallWaiterSignals.length === 1 && res.tableCallWaiterSignals[0].on) {
+					nState.waiterCalled = true;
+				} else {
+					nState.waiterCalled = false;
+				}
+				this.setState(nState);
+			},
+			err => {}
+		);
 	}
 
 	renderEditMode(): ReactNode {
@@ -293,10 +337,29 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 		);
 	}
 	renderCompact(): ReactNode {
+		let tableToRenderName: Types.IMLString | undefined;
+		if (this.props.tableToCompactRender !== undefined) {
+			tableToRenderName = this.state.value.tables.filter(table => table.id === this.props.tableToCompactRender).at(0)?.name;
+		}
 		return (
-			<div className={`eatery-compact-container ${this.props.className !== undefined ? this.props.className : ""}`} onClick={event => this.props.onClick?.call(this, this.state.value)} style={this.props.onClick !== undefined ? { cursor: "pointer" } : {}}>
+			<div
+				className={`eatery-compact-container ${this.props.className !== undefined ? this.props.className : ""}`}
+				onClick={event => {
+					this.props.onClick?.call(this, this.state.value);
+					this.props.toaster?.current?.addToast({
+						type: ToastType.info,
+						modal: true,
+						message: this.state.waiterCalled ? this.ML("Do you want to cancel the waiter call?") : this.ML("Do you want to call waiter?"),
+						buttons: [
+							{ default: true, text: this.ML("Yes"), callback: this.doCallWaiter.bind(this, this.state.waiterCalled) },
+							{ text: this.ML("No"), callback: () => {} },
+						],
+					});
+				}}
+				style={this.props.onClick !== undefined ? { cursor: "pointer" } : {}}>
+				{tableToRenderName !== undefined ? <span>{this.toString(tableToRenderName)}</span> : <></>}
 				{this.state.value.photos !== undefined && this.state.value.photos.length > 0 ? (
-					<span className="circle-img-container">
+					<span className={`circle-img-container ${this.state.waiterCalled ? "red-blink" : ""}`}>
 						<img src={this.state.value.photos[0].url} />
 					</span>
 				) : (

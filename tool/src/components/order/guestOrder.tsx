@@ -2,7 +2,7 @@ import { Fragment, ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import { IOrder, IOrderItem, IOrderSumBalance } from "@betypes/ordertypes";
 import "./guestOrder.css";
-import { IWfHistoryItem, IWfNextRequest, ObjectTypeCode, Types, WorkflowStatusCode } from "@betypes/prototypes";
+import { IWfHistoryItem, IWfNextRequest, ObjectTypeCode, Types, WorkflowStatusCode, WorkflowStatusCodeNamesArray } from "@betypes/prototypes";
 import { ToastType } from "../toast";
 import { IEatery } from "@betypes/eaterytypes";
 import Stars from "../feedback/stars";
@@ -163,7 +163,7 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 		const total = calcSum(this.state.value);
 		return (
 			<div>
-				<i className="fa fa-shopping-basket"></i> {this.toCurrency(total.approvedByEaterySum + total.registeredSum + total.fulfilledSum)} {this.toString(this.state.value.items.at(0)?.option.currency)}
+				<i className="fa fa-shopping-basket"></i> {this.toCurrency(total.approvedByEaterySum + total.registeredSum + total.fulfilledSum)}
 				{total.draftCount > 0 ? <span className="badge">{total.draftCount}</span> : <></>}
 			</div>
 		);
@@ -207,77 +207,98 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 		return (
 			<div className="guest-order-container">
 				<div className="guest-order-summary">
-					<span>
-						Order#{this.state.value.id} {this.state.value.created ? new Date(this.state.value.created).toLocaleString() : ""}
-					</span>
-					<span>
-						Balance: {this.toCurrency(total.payed - (total.registeredSum + total.approvedByEaterySum + total.fulfilledSum))}. Payed: {this.toCurrency(total.payed)}. Ordered:{" "}
-						{this.toCurrency(total.registeredSum + total.approvedByEaterySum + total.fulfilledSum)}
-					</span>
-					{
-						//<span>of them:</span>
-						//<span>Заказано, но не подтверждено {total.registeredSum}</span>
-						//<span>Подтверждено, но не доставлено {total.approvedByEaterySum}</span>
-						//<span>Доставлено {total.fulfilledSum}</span>
-					}
+					<div className="guest-order-summary-order">
+						<div className="has-label">
+							<div className="label">{this.ML("Order number")}</div>
+							<div>
+								<span className="number">#{this.state.value.id}</span> <span className="date">{this.state.value.created !== undefined ? this.relativeDate(this.state.value.created) : ""}</span>
+							</div>
+						</div>
+						<div className="has-label" style={{ cursor: "pointer" }}>
+							<div className="label">{this.ML("Status")}</div>
+							<div>
+								<span
+									className="number"
+									style={this.state.value.wfStatus === WorkflowStatusCode.draft ? { color: "var(--error-color)" } : {}}
+									onClick={event => {
+										if (this.state.value.wfStatus === WorkflowStatusCode.draft)
+											this.props.toaster?.current?.addToast({
+												type: ToastType.info,
+												message: this.ML("Restaurant staff haven't approve your booking yet"),
+											});
+									}}>
+									{this.state.value.wfStatus !== undefined ? this.ML(WorkflowStatusCodeNamesArray[this.state.value.wfStatus]) : ""}
+								</span>
+							</div>
+						</div>
+					</div>
+					<div className="guest-order-summary-balance">
+						<div className="has-label">
+							<div className="label">{this.ML("Total")}</div>
+							<div className="total">{this.toCurrency(total.payed - (total.approvedByEaterySum + total.registeredSum + total.fulfilledSum))}</div>
+						</div>
+						<div className="has-label">
+							<div className="label">{this.ML("Paid")}</div>
+							<div className="total">{this.toCurrency(total.payed)}</div>
+						</div>
+						<div className="has-label">
+							<div className="label">{this.ML("Ordered")}</div>
+							<div className="total">{this.toCurrency(total.approvedByEaterySum + total.registeredSum + total.fulfilledSum)}</div>
+						</div>
+					</div>
 				</div>
 				<div className="standalone-toolbar">
-					<div>
-						<input
-							id="checkBoxHideCanceledOrderItem"
-							type="checkbox"
-							defaultChecked={this.state.hideCanceledOrderItems}
-							onChange={event => {
+					{this.state.value.wfStatus !== WorkflowStatusCode.draft && this.state.value.items.filter(item => item.wfStatus === WorkflowStatusCode.canceledByEatery).length > 0 ? (
+						<div>
+							<span style={{ display: "flex", alignItems: "center" }}>
+								<input
+									id="checkBoxHideCanceledOrderItem"
+									type="checkbox"
+									defaultChecked={this.state.hideCanceledOrderItems}
+									onChange={event => {
+										const nState = this.state;
+										nState.hideCanceledOrderItems = !nState.hideCanceledOrderItems;
+										this.setState(nState);
+									}}
+								/>
+								{this.ML("Hide cancelled")}
+							</span>
+						</div>
+					) : (
+						<></>
+					)}
+					{this.state.value.wfStatus !== WorkflowStatusCode.draft && total.draftSum > 0 ? (
+						<span
+							className="context-menu-button"
+							onClick={event => {
 								const nState = this.state;
-								nState.hideCanceledOrderItems = !nState.hideCanceledOrderItems;
-								this.setState(nState);
-							}}
-						/>
-						Hide canceled
-					</div>
-					<span
-						className="context-menu-button"
-						onClick={event => {
-							const nState = this.state;
-							if (nState.value.id !== undefined)
-								this.itemsWfNext(
-									nState.value.items
-										.filter(item => item.wfStatus === WorkflowStatusCode.draft)
-										.map(item => {
-											return { id: item.id as Types.ObjectId, nextWfStatus: WorkflowStatusCode.registered };
-										})
-								);
-						}}>
-						Register all
-					</span>
-					<span
-						onClick={event => {
-							this.serverCommand(
-								"user/callWaiter",
-								JSON.stringify({ tableId: this.state.value.tableId, on: true }),
-								res => {
-									if (!res.ok) return;
-									const nState = this.state;
-									//this.setState(nState);
-								},
-								err => {}
-							);
-						}}>
-						Call waiter
-					</span>
+								if (nState.value.id !== undefined)
+									this.itemsWfNext(
+										nState.value.items
+											.filter(item => item.wfStatus === WorkflowStatusCode.draft)
+											.map(item => {
+												return { id: item.id as Types.ObjectId, nextWfStatus: WorkflowStatusCode.registered };
+											})
+									);
+							}}>
+							{this.ML("Send all")}
+						</span>
+					) : (
+						<></>
+					)}
 				</div>
 				<div className="guest-order-grid">
-					<div>WF</div>
-					<div>Name</div>
-					<div>Price</div>
-					<div>Count</div>
-					<div>Cost, {this.toString(this.state.value.items?.at(0)?.option.currency)}</div>
+					<div>{this.ML("Status")}</div>
+					<div>{this.ML("Meal")}</div>
+					<div>{this.ML("Price")}</div>
+					<div>{this.ML("Qty.")}</div>
+					<div>{this.ML("Cost")}</div>
 					{this.state.value.items
 						.sort((a, b) => Number(b.id) - Number(a.id))
 						.filter(item => item.wfStatus !== WorkflowStatusCode.canceledByEatery || !this.state.hideCanceledOrderItems)
 						.map((item, idx) => (
 							<Fragment key={idx}>
-								{item.wfHistory !== undefined && item.id !== undefined ? (
+								{this.state.value.wfStatus !== WorkflowStatusCode.draft && item.wfHistory !== undefined && item.id !== undefined ? (
 									<GuestOrderItemProgress
 										wfHistory={item.wfHistory}
 										toaster={this.props.toaster}
@@ -292,13 +313,13 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 										}}
 									/>
 								) : (
-									<></>
+									<div></div>
 								)}
 								<div key={idx} className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>
 									{this.toString(item.name)}({this.toString(item.option.name)})
 								</div>
 								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : ""}>{this.toCurrency(item.option.amount)}</div>
-								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : "-context-menu"}>
+								<div className={item.wfStatus === WorkflowStatusCode.canceledByEatery ? "canceled" : "context-menu"}>
 									{item.wfStatus === WorkflowStatusCode.draft ? (
 										<span
 											className="context-menu-button"
@@ -398,7 +419,22 @@ export class GuestOrderItemProgress extends Proto<IGuestOrderItemProgressProps, 
 			<div
 				className="guest-order-item-progress-compact-container"
 				onClick={event => {
-					this.props.toaster?.current?.addToast({ type: ToastType.info, message: JSON.stringify(this.props.wfHistory), modal: false });
+					this.props.toaster?.current?.addToast({
+						type: ToastType.info,
+						message: (
+							<div className="guest-order-history">
+								{this.props.wfHistory
+									.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime())
+									.map((el, idx) => (
+										<Fragment key={idx}>
+											<span>{this.ML(WorkflowStatusCodeNamesArray[el.wfStatus])}</span>
+											<span>{this.relativeDate(el.created)}</span>
+										</Fragment>
+									))}
+							</div>
+						),
+						modal: false,
+					});
 				}}>
 				<span
 					onClick={event => {
@@ -424,7 +460,7 @@ export class GuestOrderItemProgress extends Proto<IGuestOrderItemProgressProps, 
 							modal: true,
 							message: (
 								<div className="guest-order-item-feedback-container">
-									<div>Leave your feedback here</div>
+									<div>{this.ML("Leave your feedback here")}</div>
 									<Stars
 										rating={this.state.feedback.rating}
 										onChange={rating => {
@@ -443,8 +479,8 @@ export class GuestOrderItemProgress extends Proto<IGuestOrderItemProgressProps, 
 								</div>
 							),
 							buttons: [
-								{ text: "Publish", default: true, callback: this.saveFeedback.bind(this) },
-								{ text: "Cancel", callback: () => "" },
+								{ text: this.ML("Publish"), default: true, callback: this.saveFeedback.bind(this) },
+								{ text: this.ML("Cancel"), callback: () => "" },
 							],
 						});
 					}}>

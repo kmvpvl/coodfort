@@ -83,6 +83,7 @@
     flex-wrap: nowrap;
     align-items: center;
     gap: .2em;
+    justify-content: space-between;
 }
 
 .guest-app-nav-bottom {
@@ -92,13 +93,6 @@
   justify-content: space-around;
 }
 
-.guest-app-nav-bottom span.stage {
-  --flex-basis: 15%;
-  border: 1px solid;
-  padding: 0.2em;
-  border-radius: 0.2em;
-  cursor: pointer;
-}
 .guest-app-nav-bottom span.stage.current {
     background-color: var(--text-color);
     color: var(--background-color);
@@ -107,10 +101,6 @@
   font-size: 200%;
 }
 
-.guest-app-nav-bottom span {
-  text-align: center;
-  align-items: center;
-}
 .typewriter {
     overflow: hidden; /* Ensures the content is not revealed until the animation */
     --border-right: .15em solid orange; /* The typwriter cursor */
@@ -138,7 +128,7 @@
   .guest-app-checkin-unclosed-orders-list {
     display: flex;
     justify-content: center;
-    padding: .2em;
+    padding: .5em;
     height: 100%;
     width: 100%;
     overflow: auto;

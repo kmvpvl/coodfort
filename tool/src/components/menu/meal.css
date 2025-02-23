@@ -3,7 +3,7 @@
     /* Photo, description, price of all options*/
     grid-template-rows: 1fr auto auto;
     width: 10em;
-    height: 13em;
+    height: 8em;
     position: relative;
     overflow: hidden;
     --border: 1px dotted var(--text-color);
