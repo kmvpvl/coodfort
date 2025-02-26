@@ -109,6 +109,7 @@
     display: grid;
     grid-template-rows: auto auto;
     gap: .5em;
+    grid-template-columns: minmax(5em, auto) minmax(5em, auto);
 }
 
 .guest-order-summary-balance > div:first-child {

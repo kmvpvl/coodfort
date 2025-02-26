@@ -25,6 +25,7 @@ export interface IGuestOrderState extends IProtoState {
 }
 
 export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState> {
+	private pingDescriptor?: NodeJS.Timeout;
 	state: IGuestOrderState = {
 		value: this.props.defaultValue !== undefined ? this.props.defaultValue : this.new(),
 		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.compact,
@@ -35,6 +36,40 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 	}
 	componentDidMount(): void {
 		if (this.props.orderId !== undefined || this.state.value.id !== undefined) this.load();
+		this.pingOrder();
+	}
+	pingOrder() {
+		if (this.props.orderId !== undefined || this.state.value.id !== undefined) {
+			this.serverCommand(
+				"order/view",
+				JSON.stringify({ id: this.props.orderId === undefined ? this.state.value.id : this.props.orderId }),
+				res => {
+					if (!res.ok) return;
+					let changed = false;
+					const lOrder: IOrder = res.order;
+					const nState = this.state;
+					if (lOrder.wfStatus !== nState.value.wfStatus) {
+						nState.value.wfStatus = lOrder.wfStatus;
+						changed = true;
+					}
+					for (const item of nState.value.items) {
+						const tItems = lOrder.items.filter(i => i.id === item.id);
+						if (tItems.length === 1 && item.wfStatus !== tItems[0].wfStatus) {
+							item.wfStatus = tItems[0].wfStatus;
+							item.wfHistory = tItems[0].wfHistory;
+							changed = true;
+						}
+					}
+					if (nState.value.payments.length !== lOrder.payments.length) {
+						changed = true;
+						nState.value.payments = lOrder.payments;
+					}
+					if (changed) this.setState({ ...nState });
+					if (lOrder.wfStatus === WorkflowStatusCode.draft || lOrder.wfStatus === WorkflowStatusCode.approved) this.pingDescriptor = setTimeout(this.pingOrder.bind(this), 5000);
+				},
+				err => {}
+			);
+		}
 	}
 	componentDidUpdate(prevProps: Readonly<IGuestOrderProps>, prevState: Readonly<IGuestOrderState>, snapshot?: any): void {
 		if (this.props.defaultValue !== undefined && this.props.defaultValue.id !== this.state.value.id) {
@@ -43,6 +78,13 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 			this.setState(nState);
 		}
 	}
+
+	private reRenderOrder(order: IOrder) {
+		const nState = this.state;
+		nState.value = order;
+		this.setState(nState);
+	}
+
 	updateOrderItem(item: IOrderItem) {
 		item.order_id = this.state.value.id;
 		const nState = this.state;
@@ -56,11 +98,7 @@ export default class GuestOrder extends Proto<IGuestOrderProps, IGuestOrderState
 				"order/itemUpdate",
 				JSON.stringify(item),
 				res => {
-					if (res.ok) {
-						const nState = this.state;
-						nState.value = res.order;
-						this.setState(nState);
-					}
+					if (res.ok) this.reRenderOrder(res.order);
 				},
 				err => {}
 			);
