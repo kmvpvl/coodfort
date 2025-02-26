@@ -440,7 +440,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 											switch (choosenStage) {
 												case "menu":
 												case "order":
-													if (this.state.eateryId === undefined || this.state.tableId === undefined) break;
+													if (this.state.eateryId === undefined || this.state.tableId === undefined || this.orderRef.current?.value?.id === undefined) break;
 												default:
 													const nState = this.state;
 													nState.stage = choosenStage;
@@ -457,11 +457,11 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 											eateryId={this.state.eateryId}
 											tableId={this.state.tableId}
 											toaster={this.toasterRef}
-											//onChange={order => {
-											//	const nState = this.state;
-											//	nState.order = order;
-											//	this.setState(nState);
-											//}}
+											onChange={order => {
+												const nState = this.state;
+												nState.order = order;
+												this.setState(nState);
+											}}
 											viewMode={ViewModeCode.compact}
 											key={max_order_item_date}
 										/>
