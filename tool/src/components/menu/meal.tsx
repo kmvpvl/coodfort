@@ -12,23 +12,23 @@ export interface IMealProps extends IProtoProps {
 	mealId?: Types.ObjectId;
 	defaultValue?: IMeal;
 	admin?: boolean;
-	maximized?: boolean;
 	viewMode?: ViewModeCode;
 	onSave?: (newValue: IMeal) => void;
 	onChange?: (newValue: IMeal) => void;
+	onViewModeChange?: (oldValue: ViewModeCode, newValue: ViewModeCode)=>void;
 }
 
 export interface IMealState extends IProtoState {
-	maximized?: boolean;
 	editMode?: boolean;
 	value: IMeal;
 	changed?: boolean;
+	viewMode: ViewModeCode;
 }
 
 export default class Meal extends Proto<IMealProps, IMealState> {
 	state: IMealState = {
 		value: this.props.defaultValue ? this.props.defaultValue : this.new(),
-		maximized: this.props.maximized,
+		viewMode: this.props.viewMode !== undefined? this.props.viewMode:ViewModeCode.normal
 	};
 
 	componentDidMount(): void {
@@ -155,7 +155,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 		if (this.state.editMode) return this.renderEditMode();
 		return (
 			<span
-				className={`meal-container${this.state.maximized ? " maximized" : ""}`}
+				className={`meal-container${this.state.viewMode === ViewModeCode.maximized ? " maximized" : ""}`}
 				draggable={true}
 				onDragStart={event => {
 					event.dataTransfer.setData("coodfort/meal", JSON.stringify(this.state.value));
@@ -181,16 +181,19 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 					)}
 					<span
 						onClick={event => {
+							const oldV = this.state.viewMode;
 							const nState = this.state;
-							nState.maximized = !this.state.maximized;
+							nState.viewMode = this.state.viewMode === ViewModeCode.maximized?ViewModeCode.normal:ViewModeCode.maximized;
 							this.setState(nState);
+							if (this.props.onViewModeChange !== undefined) this.props.onViewModeChange(oldV, nState.viewMode);
 						}}>
-						{this.state.maximized ? "⚊" : "⤢"}
+						{this.state.viewMode === ViewModeCode.maximized ? "⚊" : "⤢"}
 					</span>
-					<span>
-						{" "}
-						<i className="fa fa-qrcode"></i>
-					</span>
+					{
+					//<span>
+					//	<i className="fa fa-qrcode"></i>
+					//</span>
+					}
 				</div>
 			</span>
 		);
