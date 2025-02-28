@@ -45,7 +45,7 @@
 
 .menu-chapters-nav > span {
     padding: .5em;
-    border: 1px solid;
+    border: 0px solid;
     border-radius: .5em;
     cursor: pointer;
     flex-grow: 1;

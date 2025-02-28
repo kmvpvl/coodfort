@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import Proto, { IProtoProps, IProtoState } from "../proto";
+import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
 import "./menuitem.css";
 import Meal, { IMealProps, IMealState } from "./meal";
 import { Types } from "@betypes/prototypes";
@@ -10,18 +10,18 @@ import React from "react";
 export interface IMenuItemProps extends IProtoProps {
 	defaultValue?: IMenuItem;
 	admin?: boolean;
-	maximized?: boolean;
 	editMode?: boolean;
 	onSave?: (newValue: IMenuItem) => void;
 	onChange?: (newValue: IMenuItem) => void;
 	onSelectOption?: (meal: IMeal, option: IMealOption) => void;
+	viewMode?: ViewModeCode;
 }
 export interface IMenuItemState extends IProtoState {
 	value: IMenuItem;
-	maximized?: boolean;
 	editMode?: boolean;
 	changed?: boolean;
 	currentOptionSelected?: number;
+	viewMode: ViewModeCode;
 }
 
 export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
@@ -29,6 +29,7 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 	state: IMenuItemState = {
 		value: this.props.defaultValue !== undefined ? this.props.defaultValue : this.new(),
 		editMode: this.props.editMode,
+		viewMode: this.props.viewMode !== undefined? this.props.viewMode: ViewModeCode.normal
 	};
 	new(): IMenuItem {
 		return {
@@ -112,8 +113,12 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 	render(): ReactNode {
 		if (this.state.editMode) return this.renderEditMode();
 		return (
-			<span className={`menu-item-container${this.state.maximized ? " maximized" : ""}`}>
-				<Meal mealId={this.state.value.mealId} ref={this.mealRef} />
+			<span className={`menu-item-container${this.state.viewMode === ViewModeCode.maximized ? " maximized" : ""}`}>
+				<Meal 
+					mealId={this.state.value.mealId} 
+					ref={this.mealRef} 
+					onViewModeChange={(oldV, newV)=>this.setState({...this.state, viewMode: newV})}
+				/>
 				<div className="menu-item-options">
 					{this.state.value.options?.map((option, idx) => (
 						<span
@@ -128,7 +133,8 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 									this.setState(nState);
 									if (this.props.onSelectOption && this.mealRef.current) this.props.onSelectOption(this.mealRef.current.value, this.state.value.options[parseInt(optionId)]);
 								}
-							}}>
+							}}
+							style={this.state.viewMode === ViewModeCode.maximized?{fontSize:"150%"}:{}}>
 							<span style={{ gridRow: "1 / 3" }}>{this.state.currentOptionSelected === idx ? "☑" : "☐"}</span>
 							<span className="menu-item-option-volume">{this.toString(option.name)}</span>
 							<span className="menu-item-option-price">
