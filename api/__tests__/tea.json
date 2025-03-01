@@ -1,11 +1,17 @@
 {
     "name": {
-        "default": "Чай черный",
-        "values": []
+        "default": "Black tea",
+        "values": [
+            ["ru", "Чай черный"],
+            ["sr", "Crni čaj"]
+        ]
     },
     "description": {
-        "default": "Ароматный чай Greenfield в ассортименте",
-        "values": []
+        "default": "Greenfield aromatic tea in assortment",
+        "values": [
+            ["ru", "Ароматный чай Greenfield в ассортименте"],
+            ["sr", "Greenfield aromatični čaj u asortimanu"]
+        ]
     },
     "photos": [
         {

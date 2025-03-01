@@ -2,7 +2,7 @@
     display: grid;
     /* Photo, description, price of all options*/
     grid-template-rows: 1fr auto auto;
-    width: 12em;
+    width: 9em;
     height: 9em;
     position: relative;
     overflow: hidden;
@@ -12,8 +12,8 @@
 }
 
 .meal-container.maximized {
-    width: 16em;
-    height: 12em;
+    width: 20em;
+    height: 14em;
     font-size: 120%;
 }
 

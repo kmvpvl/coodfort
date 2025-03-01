@@ -1,11 +1,30 @@
 {
+    "userId": 1,
     "name": {
-        "default": "Холодец",
-        "values": []
+        "default": "Aspic",
+        "values": [
+            [
+                "sr",
+                "Aspic"
+            ],
+            [
+                "ru",
+                "Холодец"
+            ]
+        ]
     },
     "description": {
-        "default": "Говядина, приправы, хрен, петрушка",
-        "values": []
+        "default": "Beef, spices, horseradish, parsley",
+        "values": [
+            [
+                "ru",
+                "Говядина, приправы, хрен, петрушка"
+            ],
+            [
+                "sr",
+                "Govedina, začini, ren, peršun"
+            ]
+        ]
     },
     "photos": [
         {
@@ -21,7 +40,5 @@
             "caption": ""
         }
     ],
-    "tags": [
-        "холодная закуска"
-    ]
+    "tags": []
 }

@@ -45,8 +45,8 @@ describe('user -> eatery', () => {
             .set('coodfort-login', 'new_employee')
             .set('coodfort-password', 'password_of_new_employee')
             .send({
-                name: 'Name of new Employee',
-                bio: 'Bio of new Employee',
+                name: 'David Rhyxel',
+                bio: 'In my prime',
                 tags: ['tag1', 'tag2', 'tag3'],
             });
         expect(owner.statusCode).toBe(200);
@@ -249,12 +249,14 @@ describe('Meals editing', () => {
             options: [
                 {
                     name: {
-                        default: '250 гр.',
-                        values: [],
+                        default: '250 gr',
+                        values: [
+                            ["ru", "250 гр."]
+                        ],
                     },
                     amount: 89,
                     currency: {
-                        default: 'руб.',
+                        default: 'RSD',
                         values: [],
                     },
                 },
@@ -265,12 +267,14 @@ describe('Meals editing', () => {
             options: [
                 {
                     name: {
-                        default: '350 гр.',
-                        values: [],
+                        default: '350 gr',
+                        values: [
+                            ["ru", "350 гр."]
+                        ],
                     },
                     amount: 650,
                     currency: {
-                        default: 'руб',
+                        default: 'RSD',
                         values: [],
                     },
                 },
@@ -281,12 +285,14 @@ describe('Meals editing', () => {
             options: [
                 {
                     name: {
-                        default: '350 гр.',
-                        values: [],
+                        default: '350 gr',
+                        values: [
+                            ["ru", "350 гр."]
+                        ],
                     },
                     amount: 300,
                     currency: {
-                        default: 'руб.',
+                        default: 'RSD',
                         values: [],
                     },
                 },
@@ -302,8 +308,8 @@ describe('Meals editing', () => {
                     },
                     amount: 150,
                     currency: {
-                        default: 'RUR',
-                        values: [['ru', 'руб.']],
+                        default: 'RSD',
+                        values: [],
                     },
                 },
                 {
@@ -313,8 +319,8 @@ describe('Meals editing', () => {
                     },
                     amount: 250,
                     currency: {
-                        default: 'RUR',
-                        values: [['ru', 'руб.']],
+                        default: 'RSD',
+                        values: [],
                     },
                 },
             ],
@@ -329,19 +335,22 @@ describe('Meals editing', () => {
                     },
                     amount: 99,
                     currency: {
-                        default: 'RUR',
-                        values: [['ru', 'руб.']],
+                        default: 'RSD',
+                        values: [],
                     },
                 },
                 {
                     name: {
                         default: 'with honey',
-                        values: [['ru', 'с медом']],
+                        values: [
+                            ['ru', 'с медом'],
+                            ["sr", "sa medom"]
+                        ],
                     },
                     amount: 150,
                     currency: {
-                        default: 'RUR',
-                        values: [['ru', 'руб.']],
+                        default: 'RSD',
+                        values: [],
                     },
                 },
             ],

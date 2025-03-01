@@ -1,8 +1,30 @@
 {
-    "name": "Фруктовый салат",
+    "userId": 1,
+    "name": {
+        "default": "Fruit salad",
+        "values": [
+            [
+                "ru",
+                "Фруктовый салат"
+            ],
+            [
+                "sr",
+                "Voćna salata"
+            ]
+        ]
+    },
     "description": {
         "default": "банан, апельсин, яблоко, сметана",
-        "values": []
+        "values": [
+            [
+                "ru",
+                "banana, orange, apple, sour cream"
+            ],
+            [
+                "sr",
+                "banana, narandža, jabuka, pavlaka"
+            ]
+        ]
     },
     "photos": [
         {

@@ -1,35 +1,62 @@
 {
     "name": "New menu",
     "headerHtml": {
-        "default": "<center>Приятного аппетита!</center>",
-        "values": []
+        "default": "<center>Bon appetit!</center>",
+        "values": [
+            ["sr", "<center>Prijatan apetit!</center>"],
+            ["ru", "<center>Приятного аппетита!</center>"]
+        ]
     },
     "footerHtml": {
-        "default": "Именинникам скидка 10%",
-        "values": []
+        "default": "<center>10% discount for birthday people</center>",
+        "values": [
+            ["ru", "<center>Именинникам скидка 10%</center>"],
+            ["sr", "<center>10% popusta za rođendane</center>"]
+        ]
     },
     "chapters": [
         {
             "name": {
-                "default": "Холодные закуски",
-                "values": [[]]
+                "default": "Cold appetizers",
+                "values": [
+                    ["ru", "Холодные закуски"],
+                    ["sr", "Hladna predjela"]
+                ]
             },
-            "headerHtml": "Овощи, сыр, мясо и фрукты",
+            "headerHtml": {
+                "default": "Vegetables, cheese, meat and fruits",
+                "values": [
+                    ["sr", "Povrće, sir, meso i voće"],
+                    ["ru", "Овощи, сыр, мясо и фрукты"]
+                ]
+            },
             "items": []
         },
         {
             "name": {
-                "default": "Горячие мясные блюда",
-                "values": []
+                "default": "Hot meat dishes",
+                "values": [
+                    ["ru", "Горячие мясные блюда"],
+                    ["sr", "Topla jela od mesa"]
+                ]
             },
             "items": []
         },
         {
             "name": {
-                "default": "Горячие безалкогольные напитки",
-                "values": []
+                "default": "Hot soft drinks",
+                "values": [
+                    ["ru", "Горячие безалкогольные напитки"],
+                    ["sr", "Topla bezalkoholna pića"]
+                ]
             },
-            "headerHtml": "Кофе, чай, ягодные напитки",
+            "headerHtml": {
+                "default": "Coffee, tea, berry drinks",
+                "values":[
+                    ["ru", "Кофе, чай, ягодные напитки"],
+                    ["sr", "Kafa, čaj, bobičasto voće"]
+                ]
+            },
             "items": []
         }
     ]
