@@ -1,11 +1,30 @@
 {
+    "userId": 1,
     "name": {
-        "default": "Чахохбили",
-        "values": []
+        "default": "Chakhokhbili",
+        "values": [
+            [
+                "sr",
+                "Chakhokhbili"
+            ],
+            [
+                "ru",
+                "Чахохбили"
+            ]
+        ]
     },
     "description": {
-        "default": "Курица, лук репчатый, томаты, кинза",
-        "values": []
+        "default": "Chicken, onions, tomatoes, cilantro",
+        "values": [
+            [
+                "ru",
+                "Курица, лук репчатый, томаты, кинза"
+            ],
+            [
+                "sr",
+                "Piletina, luk, paradajz, cilantro"
+            ]
+        ]
     },
     "photos": [
         {

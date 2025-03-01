@@ -1,11 +1,28 @@
 {
-    "name": "Кофе Американо",
+    "userId": 1,
+    "name": {
+        "default": "Americano coffee",
+        "values": [
+            [
+                "ru",
+                "Кофе Американо"
+            ],
+            [
+                "sr",
+                "Americano kafa"
+            ]
+        ]
+    },
     "description": {
         "default": "Brasilian arabica, middle roast",
         "values": [
             [
                 "ru",
                 "Арабика из Бразилии, средняя обжарка"
+            ],
+            [
+                "sr",
+                "Arabica iz Brazila, srednje pečenje"
             ]
         ]
     },
