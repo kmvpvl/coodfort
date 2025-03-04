@@ -8,6 +8,12 @@ import { Types } from "@betypes/prototypes";
 import Meal from "./meal";
 import { IOrderItem } from "@betypes/ordertypes";
 
+enum AdminFocusCode {
+	All = "All",
+	Attributes = "Attributes",
+	Chapters = "Chapters"
+}
+
 export interface IMenuProps extends IProtoProps {
 	admin?: boolean;
 	editMode?: boolean;
@@ -17,6 +23,7 @@ export interface IMenuProps extends IProtoProps {
 	onSelectMenuItem?: (item: IOrderItem) => void;
 	viewMode?: ViewModeCode;
 	menuId?: Types.ObjectId;
+	onClick?: (menuId?: Types.ObjectId)=>void;
 }
 
 export interface IMenuState extends IProtoState {
@@ -25,6 +32,7 @@ export interface IMenuState extends IProtoState {
 	changed?: boolean;
 	viewMode: ViewModeCode;
 	currentChapterIndex?: number;
+	adminFocus?: AdminFocusCode;
 }
 
 export default class Menu extends Proto<IMenuProps, IMenuState> {
@@ -34,6 +42,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 		changed: false,
 		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.normal,
 		currentChapterIndex: this.props.defaultValue !== undefined && this.props.defaultValue.chapters.length > 0 ? 0 : undefined,
+		adminFocus: AdminFocusCode.All
 	};
 	componentDidMount(): void {
 		if (this.props.defaultValue === undefined && this.props.menuId !== undefined) this.load();
@@ -80,10 +89,21 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 		);
 	}
 	renderEditMode(): ReactNode {
+		const curChapter = this.state.currentChapterIndex !== undefined ? this.state.value.chapters.at(this.state.currentChapterIndex):undefined;
 		return (
-			<div className="menu-admin-container has-caption">
-				<div className="toolbar">
-					<span>⤬</span>
+			<div className="menu-admin-container" style={this.state.adminFocus !== AdminFocusCode.All?{gridTemplateRows:""}:{}}>
+				<div className="menu-admin-view-focus-list">{Object.keys(AdminFocusCode).map((key, idx)=> <span 
+					className={this.state.adminFocus === key?"selected":""}
+					key={idx}
+					onClick={event=> {
+						this.setState({...this.state, adminFocus: Object.values(AdminFocusCode)[idx]});
+					}}
+				>{key}</span>)}</div>
+				<div className="standalone-toolbar">
+					<span onClick={this.save.bind(this)}>
+						<i className="fa fa-save" style={this.state.changed ? { color: "red" } : {}} />
+					</span>
+					<span>✖</span>
 					<span
 						onClick={event => {
 							const nState = this.state;
@@ -98,15 +118,12 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						}}>
 						⚯
 					</span>
-					<span onClick={this.save.bind(this)}>
-						<i className="fa fa-save" style={this.state.changed ? { color: "red" } : {}} />
-					</span>
 				</div>
-				<div className="caption">
+				{this.state.adminFocus === AdminFocusCode.Attributes || this.state.adminFocus === AdminFocusCode.All? <><div>
 					MENU: {this.state.value.name}-{new Date(this.state.value.changed ? this.state.value.changed : new Date()).toLocaleString()}
 				</div>
-				<div className="has-caption">
-					<div className="caption">Menu name</div>
+				<div>
+					<span >Menu name</span>
 					<input
 						type="text"
 						defaultValue={this.state.value.name}
@@ -128,96 +145,8 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						nState.changed = true;
 						this.setState(nState);
 					}}
+					key={`menuHeaderHtml${this.state.value.id}`}
 				/>
-				<div className="has-caption menu-admin-chapters-container">
-					<div className="caption">Chapters</div>
-					<div className="toolbar">
-						<span
-							onClick={event => {
-								const nState = this.state;
-								nState.value.chapters.push({ name: "", items: [] });
-								nState.changed = true;
-								this.setState(nState);
-							}}>
-							+
-						</span>
-					</div>
-					<div>
-						{this.state.value.chapters.map((chapter, idx) => (
-							<div className="has-caption" key={idx}>
-								<div className="caption">CHAPTER</div>
-								<MLStringEditor
-									caption="Chapter name"
-									defaultValue={this.toString(chapter.name)}
-									onChange={newVal => {
-										const nState = this.state;
-										nState.changed = true;
-										nState.value.chapters[idx].name = newVal;
-										this.setState(nState);
-									}}
-								/>
-								<MLStringEditor
-									caption="Chapter Header"
-									defaultValue={this.toString(chapter.headerHtml)}
-									onChange={newVal => {
-										const nState = this.state;
-										nState.changed = true;
-										nState.value.chapters[idx].headerHtml = newVal;
-										this.setState(nState);
-									}}
-								/>
-								<div className="has-caption menu-admin-meals-container">
-									<div className="caption">Menu items</div>
-									<div
-										onDragEnter={event => {
-											event.preventDefault();
-											event.currentTarget.classList.toggle("ready-to-drop", true);
-											event.dataTransfer.dropEffect = "link";
-										}}
-										onDragOver={event => {
-											event.preventDefault();
-											event.dataTransfer.dropEffect = "link";
-										}}
-										onDragLeave={event => {
-											console.log("leave");
-											event.preventDefault();
-											event.currentTarget.classList.toggle("ready-to-drop", false);
-										}}
-										onDragEnd={event => {
-											console.log("end");
-											event.preventDefault();
-											event.currentTarget.classList.toggle("ready-to-drop", false);
-										}}
-										onDrop={event => {
-											event.preventDefault();
-											const meal = JSON.parse(event.dataTransfer.getData("coodfort/meal"));
-											event.currentTarget.classList.toggle("ready-to-drop", false);
-											console.log(meal);
-											const nState = this.state;
-											nState.value.chapters[idx].items.push({ mealId: meal.id, options: [] });
-											nState.changed = true;
-											this.setState(nState);
-										}}>
-										Drop meals here
-									</div>
-									{chapter.items.map((item, iidx) => (
-										<MenuItem key={iidx} defaultValue={item} admin={true} editMode={true} />
-									))}
-								</div>
-								<MLStringEditor
-									caption="Chapter Footer"
-									defaultValue={this.toString(chapter.footerHtml)}
-									onChange={newVal => {
-										const nState = this.state;
-										nState.changed = true;
-										nState.value.chapters[idx].footerHtml = newVal;
-										this.setState(nState);
-									}}
-								/>
-							</div>
-						))}
-					</div>
-				</div>
 				<MLStringEditor
 					caption="Menu footer"
 					defaultValue={this.state.value.footerHtml}
@@ -227,7 +156,131 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						nState.changed = true;
 						this.setState(nState);
 					}}
+					key={`menuFooterHtml${this.state.value.id}`}
+				/></>:<></>}
+				{this.state.adminFocus === AdminFocusCode.Chapters || this.state.adminFocus === AdminFocusCode.All? <><div className="menu-admin-chapters-container has-caption">
+					<div className="toolbar">
+						<span
+							onClick={event => {
+								const nState = this.state;
+								nState.value.chapters.push({ name: "New chapter", items: [] });
+								nState.changed = true;
+								this.setState(nState);
+							}}>
+							+
+						</span>						
+						{this.state.currentChapterIndex !== undefined && this.state.currentChapterIndex > 0?<span onClick={event=> {
+							if (this.state.currentChapterIndex === undefined) return;
+							this.state.value.chapters.splice(
+								this.state.currentChapterIndex - 1, 
+								0, 
+								...this.state.value.chapters.splice(this.state.currentChapterIndex, 1));
+							this.setState({...this.state, currentChapterIndex: this.state.currentChapterIndex - 1, changed: true});
+						}}>↑</span>:<></>}
+						{this.state.currentChapterIndex !== undefined && this.state.currentChapterIndex < this.state.value.chapters.length - 1?<span onClick={event=> {
+							if (this.state.currentChapterIndex === undefined) return;
+							this.state.value.chapters.splice(
+								this.state.currentChapterIndex + 1, 
+								0, 
+								...this.state.value.chapters.splice(this.state.currentChapterIndex, 1));
+							this.setState({...this.state, currentChapterIndex: this.state.currentChapterIndex + 1, changed: true});
+						}}>↓</span>:<></>}
+						<span>✖</span>
+					</div>
+					<div className="caption">Chapters</div>
+					<div className="menu-admin-chapters-nav">
+					{this.state.value.chapters.map((chapter, idx) => <span 
+						key={idx} 
+						className={this.state.currentChapterIndex === idx?"selected":""}
+						onClick={event=>{
+							const nState = this.state;
+							nState.currentChapterIndex = idx;
+							this.setState(nState);
+						}}
+					>{this.toString(chapter.name)}</span>)}
+					</div>
+				</div>
+				<MLStringEditor 
+					caption="Chapter name"
+					defaultValue={curChapter?.name}
+					key={`menuChapterName${this.state.currentChapterIndex}`}
+					onChange={newVal => {
+						const nState = this.state;
+						if (this.state.currentChapterIndex !== undefined) nState.value.chapters[this.state.currentChapterIndex].name = newVal;
+						nState.changed = true;
+						this.setState(nState);
+					}}
 				/>
+				<MLStringEditor 
+					caption="Chapter header"
+					defaultValue={curChapter?.headerHtml}
+					key={`menuChapterHeader${this.state.currentChapterIndex}`}
+					onChange={newVal => {
+						const nState = this.state;
+						if (this.state.currentChapterIndex !== undefined) nState.value.chapters[this.state.currentChapterIndex].headerHtml = newVal;
+						nState.changed = true;
+						this.setState(nState);
+					}}
+				/>
+				<MLStringEditor 
+					caption="Chapter footer"
+					defaultValue={curChapter?.footerHtml}
+					key={`menuChapterFooter${this.state.currentChapterIndex}`}
+					onChange={newVal => {
+						const nState = this.state;
+						if (this.state.currentChapterIndex !== undefined) nState.value.chapters[this.state.currentChapterIndex].footerHtml = newVal;
+						nState.changed = true;
+						this.setState(nState);
+					}}
+				/>
+				<div className="drop-zone"
+					onDragEnter={event => {
+						event.preventDefault();
+						event.currentTarget.classList.toggle("ready-to-drop", true);
+						event.dataTransfer.dropEffect = "link";
+					}}
+					onDragOver={event => {
+						event.preventDefault();
+						event.dataTransfer.dropEffect = "link";
+					}}
+					onDragLeave={event => {
+						console.log("leave");
+						event.preventDefault();
+						event.currentTarget.classList.toggle("ready-to-drop", false);
+					}}
+					onDragEnd={event => {
+						console.log("end");
+						event.preventDefault();
+						event.currentTarget.classList.toggle("ready-to-drop", false);
+					}}
+					onDrop={event => {
+						event.preventDefault();
+						const meal = JSON.parse(event.dataTransfer.getData("coodfort/meal"));
+						event.currentTarget.classList.toggle("ready-to-drop", false);
+						console.log(meal);
+						const nState = this.state;
+						curChapter?.items.push({ mealId: meal.id, options: [] });
+						nState.changed = true;
+						this.setState(nState);
+					}}>
+					Drop meals here
+				</div>
+				<div className="menu-admin-meals-container">
+					{curChapter?.items.map((item, idx) => (
+						<MenuItem 
+							key={`menuItem${this.state.value.id}_${this.state.currentChapterIndex}_${idx}`} 
+							defaultValue={item} 
+							admin={true} 
+							editMode={true} 
+							onChange={newVal => {
+								const nState = this.state;
+								curChapter.items[idx] = newVal;
+								nState.changed = true;
+								this.setState(nState);
+							}}
+						/>
+					))}
+				</div></>:<></>}
 			</div>
 		);
 	}
@@ -238,7 +291,12 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 				draggable={true}
 				onDragStart={event => {
 					event.dataTransfer.setData("coodfort/menu", JSON.stringify(this.state.value));
-				}}>
+				}}
+				onClick={event=> {
+					if (this.props.onClick !== undefined) this.props.onClick(this.state.value.id)
+				}}
+				style={this.props.onClick !== undefined?{cursor:"pointer"}:{}}
+			>
 				<div>{this.state.value.name}</div>
 				<div>{new Date(this.state.value.changed ? this.state.value.changed : new Date()).toLocaleDateString()}</div>
 				<div>{new Date(this.state.value.changed ? this.state.value.changed : new Date()).toLocaleTimeString()}</div>
@@ -307,10 +365,12 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 							}}>
 							✎
 						</span>
-						<span>⤢</span>
-						<span>
-							<i className="fa fa-qrcode"></i>
-						</span>
+						{
+						//<span>⤢</span>
+						}
+						{
+						//<span><i className="fa fa-qrcode"></i></span>
+						}
 					</div>
 				) : (
 					<></>

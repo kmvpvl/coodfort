@@ -14,15 +14,15 @@
         ]
     },
     "description": {
-        "default": "банан, апельсин, яблоко, сметана",
+        "default": "Banana, orange, apple, sour cream",
         "values": [
             [
                 "ru",
-                "banana, orange, apple, sour cream"
+                "Банан, апельсин, яблоко, сметана"
             ],
             [
                 "sr",
-                "banana, narandža, jabuka, pavlaka"
+                "Banana, narandža, jabuka, pavlaka"
             ]
         ]
     },

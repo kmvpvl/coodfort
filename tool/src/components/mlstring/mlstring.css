@@ -1,7 +1,7 @@
 .mlstring-editor-container {
     width: 100%;
     display: grid;
-    gap: 0.5em;
+    gap: 0.1em;
     --font-size: 50%;
 }
 

@@ -20,8 +20,8 @@ export interface IDispatcherProps extends IProtoProps {
 }
 export interface IDispatcherState extends IProtoState {
 	eateriesBrief: Array<IEateryBrief | undefined>;
-	eateryIdSelected?: Types.ObjectId;
-	eaterySelected?: IEatery;
+	selectedEateryId?: Types.ObjectId;
+	selectedEatery?: IEatery;
 	mode?: LeftMenuItemIdCode;
 	meals: Array<IMeal | undefined>;
 	menus: Array<IMenu | undefined>;
@@ -29,6 +29,7 @@ export interface IDispatcherState extends IProtoState {
 	selectedOrderItemsToApprove?: Set<number>;
 	selectedOrderItemsToFulfill?: Set<number>;
 	tableCallWaiterSignals?: ITableCallWaiterSignal[];
+	selectedMenuId?: Types.ObjectId;
 }
 
 enum LeftMenuItemIdCode {
@@ -133,10 +134,10 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	}
 
 	loadTableCallWaiterSignals() {
-		if (this.state.eaterySelected !== undefined) {
+		if (this.state.selectedEatery !== undefined) {
 			this.serverCommand(
 				"eatery/tableCallWaiterSignals",
-				JSON.stringify({ tableIds: this.state.eaterySelected.tables.map(table => table.id) }),
+				JSON.stringify({ tableIds: this.state.selectedEatery.tables.map(table => table.id) }),
 				res => {
 					const nState = this.state;
 					nState.tableCallWaiterSignals = res.tableCallWaiterSignals;
@@ -155,7 +156,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 			res => {
 				if (res.ok) {
 					const nState = this.state;
-					nState.eaterySelected = res.eatery;
+					nState.selectedEatery = res.eatery;
 					this.setState(nState);
 					this.loadTableCallWaiterSignals();
 				}
@@ -167,8 +168,8 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	onEaterySelect(eatery: IEatery) {
 		console.log(eatery);
 		const nState = this.state;
-		nState.eateryIdSelected = eatery.id;
-		nState.eaterySelected = undefined;
+		nState.selectedEateryId = eatery.id;
+		nState.selectedEatery = undefined;
 		this.setState(nState);
 		if (eatery.id !== undefined) {
 			this.loadEatery(eatery.id);
@@ -205,7 +206,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 				ret = this.state.menus.length;
 				break;
 			case LeftMenuItemIdCode.employees:
-				ret = this.state.eaterySelected?.employees.length;
+				ret = this.state.selectedEatery?.employees.length;
 				break;
 		}
 		return ret === undefined || ret === 0 ? <></> : <span className="badge">{ret}</span>;
@@ -215,9 +216,9 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 		let ret: ReactNode;
 		switch (this.state.mode) {
 			case LeftMenuItemIdCode.qrs:
-				return <div className="dispatcher-calls-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={`qr_${idx}`} defaultValue={table} toaster={this.props.toaster} showQR={true} />)}</div>;
+				return <div className="dispatcher-calls-container">{this.state.selectedEatery?.tables.map((table, idx) => <Table key={`qr_${idx}`} defaultValue={table} toaster={this.props.toaster} showQR={true} />)}</div>;
 			case LeftMenuItemIdCode.waiterCalls:
-				return <div className="dispatcher-calls-container">{this.state.eaterySelected?.tables.map((table, idx) => <Table key={`call_${idx}`} defaultValue={table} toaster={this.props.toaster} />)}</div>;
+				return <div className="dispatcher-calls-container">{this.state.selectedEatery?.tables.map((table, idx) => <Table key={`call_${idx}`} defaultValue={table} toaster={this.props.toaster} />)}</div>;
 			case LeftMenuItemIdCode.orderBalance:
 				return (
 					<div className="dispatcher-order-balance-container">
@@ -225,7 +226,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 							<span>+</span>
 						</div>
 						<div className="dispatcher-order-balance-table-list">
-							{this.state.eaterySelected?.tables.map((table, idx) => <Table key={`balance_${idx}`} defaultValue={table} orders={this.state.orders.filter(order => order.tableId === table.id)} toaster={this.props.toaster} />)}
+							{this.state.selectedEatery?.tables.map((table, idx) => <Table key={`balance_${idx}`} defaultValue={table} orders={this.state.orders.filter(order => order.tableId === table.id)} toaster={this.props.toaster} />)}
 						</div>
 					</div>
 				);
@@ -240,7 +241,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 									if (!res.ok) return;
 									const nState = this.state;
 									const items: IOrderItem[] = res.orderItems;
-									if (this.state.eateryIdSelected !== undefined) this.loadOrdersList(this.state.eateryIdSelected);
+									if (this.state.selectedEateryId !== undefined) this.loadOrdersList(this.state.selectedEateryId);
 								},
 								err => {
 									this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
@@ -255,7 +256,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 									if (!res.ok) return;
 									const nState = this.state;
 									const items: IOrderItem[] = res.orderItems;
-									if (this.state.eateryIdSelected !== undefined) this.loadOrdersList(this.state.eateryIdSelected);
+									if (this.state.selectedEateryId !== undefined) this.loadOrdersList(this.state.selectedEateryId);
 								},
 								err => {
 									this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
@@ -279,7 +280,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 									if (!res.ok) return;
 									const nState = this.state;
 									const items: IOrderItem[] = res.orderItems;
-									if (this.state.eateryIdSelected !== undefined) this.loadOrdersList(this.state.eateryIdSelected);
+									if (this.state.selectedEateryId !== undefined) this.loadOrdersList(this.state.selectedEateryId);
 								},
 								err => {
 									this.props.toaster?.current?.addToast({ type: ToastType.error, message: err.json.message, modal: true });
@@ -303,12 +304,19 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 								}}>
 								+
 							</span>
-							<input placeholder="filter" />
+							{
+								//<input placeholder="filter" />
+							}
+							<div className="dispatcher-menus-list">
+								{this.state.menus.map((menu, idx) => (
+									<Menu key={idx} admin={true} defaultValue={menu} viewMode={ViewModeCode.compact} onClick={menuId=> {
+										this.setState({...this.state, selectedMenuId: menuId})
+									}}/>
+								))}
+							</div>
 						</div>
-						<div className="dispatcher-menus-list">
-							{this.state.menus.map((menu, idx) => (
-								<Menu key={idx} admin={true} defaultValue={menu} />
-							))}
+						<div className="dispatcher-menu-details">
+							{this.state.selectedMenuId !== undefined  ?<Menu admin={true} editMode={true} menuId={this.state.selectedMenuId} key={this.state.selectedMenuId}/>:<></>}
 						</div>
 					</div>
 				);
@@ -337,10 +345,10 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 				break;
 			case LeftMenuItemIdCode.eateryData:
 				//if (this.state.eaterySelected !== undefined)
-				return <Eatery key={this.state.eaterySelected?.id} defaultValue={this.state.eaterySelected} admin={true} editMode={true} />;
+				return <Eatery key={this.state.selectedEatery?.id} defaultValue={this.state.selectedEatery} admin={true} editMode={true} />;
 				break;
 			case LeftMenuItemIdCode.employees:
-				return this.state.eaterySelected !== undefined ? <Employees eatery={this.state.eaterySelected} /> : <></>;
+				return this.state.selectedEatery !== undefined ? <Employees eatery={this.state.selectedEatery} /> : <></>;
 				break;
 			default:
 				ret = <></>;
@@ -369,7 +377,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 					</div>
 				);
 			case LeftMenuItemIdCode.menus:
-				if (this.state.eaterySelected !== undefined)
+				if (this.state.selectedEatery !== undefined)
 					return (
 						<div className="dispatcher-right-meals-container">
 							<div>Available meals</div>
@@ -382,7 +390,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 					);
 				break;
 			case LeftMenuItemIdCode.eateryData:
-				if (this.state.eaterySelected !== undefined)
+				if (this.state.selectedEatery !== undefined)
 					return (
 						<div>
 							<div>Available menus</div>
@@ -403,11 +411,11 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 			<div className="dispatcher-container">
 				<div className="dispatcher-header-container">
 					<div className="dispatcher-logo-container">
-						<Logo viewMode={ViewModeCode.compact} width="50px" />
+						<Logo viewMode={ViewModeCode.compact} width="40px" />
 					</div>
 					<div className="dispatcher-eateries-container">
 						{this.state.eateriesBrief.map((eatery, idx) => (
-							<div className={`dispatcher-eateries-eatery-container ${eatery?.id === this.state.eateryIdSelected ? "selected" : ""}`} key={idx}>
+							<div className={`dispatcher-eateries-eatery-container ${eatery?.id === this.state.selectedEateryId ? "selected" : ""}`} key={idx}>
 								<Eatery className="" viewMode={ViewModeCode.compact} defaultValue={eatery} onClick={this.onEaterySelect.bind(this)} />
 								<div className="context-toolbar">
 									{
@@ -422,7 +430,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 									const nState = this.state;
 									if (!nState.eateriesBrief.includes(undefined)) nState.eateriesBrief.push(undefined);
 									this.state.mode = LeftMenuItemIdCode.eateryData;
-									this.state.eaterySelected = undefined;
+									this.state.selectedEatery = undefined;
 									this.setState(nState);
 								}}>
 								+
@@ -433,11 +441,11 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 						<span>{this.props.employee.name}</span>
 					</div>
 				</div>
-				{this.state.eateryIdSelected !== undefined || this.state.eateriesBrief.includes(undefined) ? (
+				{this.state.selectedEateryId !== undefined || this.state.eateriesBrief.includes(undefined) ? (
 					<div className="dispatcher-content-container">
 						<div className="dispatcher-content-leftmenu">
 							<div>
-								<span>{this.toString(this.state.eaterySelected?.name)}</span>
+								<span>{this.toString(this.state.selectedEatery?.name)}</span>
 								<span>|||</span>
 							</div>
 							{leftMenu.map((menuitem, idx) =>

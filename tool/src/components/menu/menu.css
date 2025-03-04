@@ -1,13 +1,60 @@
 .menu-admin-container {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 5px;
-    --overflow: auto;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto auto auto auto 1fr;
+    gap: .2em;
+    overflow: auto;
+    height: 100%;
+    border: 1px solid;
+    padding: .2em;
 }
 
 .menu-admin-chapters-container {
-    --grid-column: span 2;
+    grid-column: span 2;
+}
+
+.menu-admin-chapters-nav {
+    display: flex;
+    align-items: center;
+    gap: .2em;
+    padding: .1em;
+    overflow-x: auto;
+}
+
+.menu-admin-chapters-nav > span, .menu-admin-chapters-nav > label {
+    text-wrap: nowrap;
+
+}
+.menu-admin-view-focus-list {
+    display: flex;
+    gap:.2em;
+}
+.menu-admin-view-focus-list > span {
+    border: 1px solid;
+    cursor: pointer;
+    padding-left: .2em;
+    padding-right: .2em;
+    display: flex;
+    align-items: center;
+    border-radius: .2em;
+}
+.menu-admin-view-focus-list > span.selected {
+    color: var(--background-color);
+    background-color: var(--text-color);
+}
+.menu-admin-chapters-nav > span {
+    cursor: pointer;
+    padding: .1em;
+    border: 1px solid;
+    align-self: stretch;
+    border-radius: .2em;
+}
+
+.menu-admin-chapters-nav > span.selected {
+    font-weight: bold;
+    color: var(--background-color);
+    background-color: var(--text-color);
 }
 
 .menu-admin-header {
@@ -18,6 +65,10 @@
     align-items: center;
     gap: .5em;
     flex-wrap: wrap;
+    grid-column: span 2;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
 }
 .menu-container {
     --width: fit-content;
@@ -41,6 +92,7 @@
     overflow: auto;
     gap: .5em;
     padding: .5em;
+    align-items: center;
 }
 
 .menu-chapters-nav > span {
@@ -83,8 +135,15 @@
 }
 
 .menu-compact-container{
-    font-size: 80%;
+    --font-size: 80%;
     border: 1px solid;
-    border-radius: .5em;
+    border-radius: .2em;
     padding: .1em;
+    --height: fit-content;
+    display: flex;
+    gap: .2em;
+}
+
+.menu-compact-container > div {
+    display: inline-block;
 }

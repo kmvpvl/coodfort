@@ -41,7 +41,9 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 			<span className="menu-item-admin-container has-caption">
 				<span className="caption">Menu item</span>
 				<div className="toolbar">
-					<span>X</span>
+					<span>↑</span>
+					<span>↓</span>
+					<span>✖</span>
 				</div>
 				<Meal mealId={this.state.value.mealId} />
 				<div className="menu-item-admin-options-list-container has-caption">
@@ -64,7 +66,7 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 					</div>
 					<div className="menu-item-admin-options-list">
 						{this.state.value?.options?.map((option, idx) => (
-							<span className="has-caption" key={idx}>
+							<span className="has-caption" key={`${Math.random()}_${idx}`}>
 								<MLStringEditor
 									defaultValue={option.name}
 									caption="Option name"
@@ -74,6 +76,7 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 										nState.changed = true;
 										nState.value.options[idx].name = newValue;
 										this.setState(nState);
+										if (this.props.onChange !== undefined) this.props.onChange(this.state.value);
 									}}
 								/>
 								<input
@@ -87,6 +90,7 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 											nState.changed = true;
 											nState.value.options[idx].amount = nv;
 											this.setState(nState);
+											if (this.props.onChange !== undefined) this.props.onChange(this.state.value);
 										}
 									}}></input>
 								<MLStringEditor
@@ -98,10 +102,26 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 										nState.changed = true;
 										nState.value.options[idx].currency = newValue;
 										this.setState(nState);
+										if (this.props.onChange !== undefined) this.props.onChange(this.state.value);
 									}}
 								/>
 								<span className="toolbar">
-									<span>X</span>
+									{idx !== 0? <span
+										onClick={event=> {
+											//debugger
+											this.state.value?.options.splice(idx - 1, 0, ...this.state.value?.options.splice(idx, 1));
+											this.setState(this.state);
+											if (this.props.onChange !== undefined) this.props.onChange(this.state.value);
+										}}
+									>↑</span>:<></>}
+									{idx !== this.state.value?.options.length -1?<span
+										onClick={event=> {
+											this.state.value?.options.splice(idx + 1, 0, ...this.state.value?.options.splice(idx, 1));
+											this.setState(this.state);
+											if (this.props.onChange !== undefined) this.props.onChange(this.state.value);
+										}}
+									>↓</span>:<></>}
+									<span>✖</span>
 								</span>
 							</span>
 						))}

@@ -39,7 +39,7 @@
     grid-template-rows: auto auto;
     width: max-content;
     border: 1px dotted;
-    border-radius: .5em;
+    border-radius: .2em;
     padding: .2em;
     padding-top: .6em;
 }
