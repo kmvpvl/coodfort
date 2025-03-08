@@ -95,6 +95,16 @@
     flex-wrap: wrap;
 }
 
+.dispatcher-menus-list > span {
+    border: 1px solid;
+
+}
+
+.dispatcher-menus-list > span.selected {
+    color: var(--background-color);
+    background-color: var(--text-color);
+}
+
 .dispatcher-menus-container {
     display: grid;
     width: 100%;

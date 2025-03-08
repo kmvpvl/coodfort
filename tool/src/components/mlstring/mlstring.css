@@ -29,8 +29,8 @@
 
 .mlstring-editor-compact {
     display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
+    grid-template-columns: fit-content 1fr;
+    grid-template-rows: min-content min-content;
 }
 
 .mlstring-editor-compact > input, .mlstring-editor-compact > input:focus {
@@ -46,6 +46,7 @@
     font-size: 80%;
     border-left: 1px solid;
     border-top: 1px solid;
+    border-bottom: 1px dashed;
     border-top-left-radius: .2em;
     padding-left: .2em;
     padding-right: .2em;

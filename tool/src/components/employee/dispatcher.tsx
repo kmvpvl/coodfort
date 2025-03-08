@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ViewModeCode } from "../proto";
-import { IUser, IWfNextRequest, Types, WorkflowStatusCode } from "@betypes/prototypes";
+import { IUser, Types, WorkflowStatusCode } from "@betypes/prototypes";
 import "./dispatcher.css";
 import { EateryRoleCode, IEatery, IEateryBrief, IMeal, IMenu } from "@betypes/eaterytypes";
 import Logo from "../logo/logo";
@@ -309,14 +309,21 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 							}
 							<div className="dispatcher-menus-list">
 								{this.state.menus.map((menu, idx) => (
-									<Menu key={idx} admin={true} defaultValue={menu} viewMode={ViewModeCode.compact} onClick={menuId=> {
-										this.setState({...this.state, selectedMenuId: menuId})
-									}}/>
+									<span key={idx} className={menu?.id === this.state.selectedMenuId ? "selected" : ""}>
+										<Menu
+											admin={true}
+											defaultValue={menu}
+											viewMode={ViewModeCode.compact}
+											onClick={menuId => {
+												this.setState({ ...this.state, selectedMenuId: menuId });
+											}}
+										/>
+									</span>
 								))}
 							</div>
 						</div>
 						<div className="dispatcher-menu-details">
-							{this.state.selectedMenuId !== undefined  ?<Menu admin={true} editMode={true} menuId={this.state.selectedMenuId} key={this.state.selectedMenuId}/>:<></>}
+							{this.state.menus.filter(el => el?.id === this.state.selectedMenuId).length > 0 ? <Menu admin={true} editMode={true} menuId={this.state.selectedMenuId} key={this.state.selectedMenuId} toaster={this.props.toaster} /> : <></>}
 						</div>
 					</div>
 				);
@@ -383,7 +390,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 							<div>Available meals</div>
 							<div>
 								{this.state.meals.map((meal, idx) => (
-									<Meal key={idx} defaultValue={meal} viewMode={ViewModeCode.compact} />
+									<Meal key={idx} defaultValue={meal} viewMode={ViewModeCode.normal} />
 								))}
 							</div>
 						</div>

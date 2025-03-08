@@ -14,7 +14,11 @@ export interface IMenuItemProps extends IProtoProps {
 	onSave?: (newValue: IMenuItem) => void;
 	onChange?: (newValue: IMenuItem) => void;
 	onSelectOption?: (meal: IMeal, option: IMealOption) => void;
+	onUp?: (menuItemId: Types.ObjectId) => void;
+	onDown?: (menuItemId: Types.ObjectId) => void;
+	onDelete?: (menuItemId: Types.ObjectId) => void;
 	viewMode?: ViewModeCode;
+	className?: string;
 }
 export interface IMenuItemState extends IProtoState {
 	value: IMenuItem;
@@ -26,25 +30,25 @@ export interface IMenuItemState extends IProtoState {
 
 export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 	protected mealRef: React.RefObject<Meal | null> = React.createRef();
+	optionIds: number[] = [];
 	state: IMenuItemState = {
 		value: this.props.defaultValue !== undefined ? this.props.defaultValue : this.new(),
 		editMode: this.props.editMode,
-		viewMode: this.props.viewMode !== undefined? this.props.viewMode: ViewModeCode.normal
+		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.normal,
 	};
 	new(): IMenuItem {
 		return {
 			options: [],
 		};
 	}
+	hashOption(x: number): string {
+		while (this.optionIds.length - 1 < x) this.optionIds.push(Math.random());
+		return `${this.optionIds[x]}_${x}`;
+	}
 	renderEditMode(): ReactNode {
 		return (
 			<span className="menu-item-admin-container has-caption">
 				<span className="caption">Menu item</span>
-				<div className="toolbar">
-					<span>↑</span>
-					<span>↓</span>
-					<span>✖</span>
-				</div>
 				<Meal mealId={this.state.value.mealId} />
 				<div className="menu-item-admin-options-list-container has-caption">
 					<span className="caption">Options</span>
@@ -66,7 +70,7 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 					</div>
 					<div className="menu-item-admin-options-list">
 						{this.state.value?.options?.map((option, idx) => (
-							<span className="has-caption" key={`${Math.random()}_${idx}`}>
+							<span className="has-caption" key={this.hashOption(idx)}>
 								<MLStringEditor
 									defaultValue={option.name}
 									caption="Option name"
@@ -106,22 +110,42 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 									}}
 								/>
 								<span className="toolbar">
-									{idx !== 0? <span
-										onClick={event=> {
-											//debugger
-											this.state.value?.options.splice(idx - 1, 0, ...this.state.value?.options.splice(idx, 1));
-											this.setState(this.state);
+									{idx !== 0 ? (
+										<span
+											onClick={event => {
+												//debugger
+												this.state.value?.options.splice(idx - 1, 0, ...this.state.value?.options.splice(idx, 1));
+												this.optionIds.splice(idx - 1, 0, ...this.optionIds.splice(idx, 1));
+												this.setState(this.state);
+												if (this.props.onChange !== undefined) this.props.onChange(this.state.value);
+											}}>
+											↑
+										</span>
+									) : (
+										<></>
+									)}
+									{idx !== this.state.value?.options.length - 1 ? (
+										<span
+											onClick={event => {
+												this.state.value?.options.splice(idx + 1, 0, ...this.state.value?.options.splice(idx, 1));
+												this.optionIds.splice(idx + 1, 0, ...this.optionIds.splice(idx, 1));
+												this.setState(this.state);
+												if (this.props.onChange !== undefined) this.props.onChange(this.state.value);
+											}}>
+											↓
+										</span>
+									) : (
+										<></>
+									)}
+									<span
+										onClick={event => {
+											const nState = this.state;
+											nState.value.options.splice(idx, 1);
 											if (this.props.onChange !== undefined) this.props.onChange(this.state.value);
-										}}
-									>↑</span>:<></>}
-									{idx !== this.state.value?.options.length -1?<span
-										onClick={event=> {
-											this.state.value?.options.splice(idx + 1, 0, ...this.state.value?.options.splice(idx, 1));
-											this.setState(this.state);
-											if (this.props.onChange !== undefined) this.props.onChange(this.state.value);
-										}}
-									>↓</span>:<></>}
-									<span>✖</span>
+											this.setState(nState);
+										}}>
+										<span style={{ transform: "rotate(45deg)", display: "block" }}>+</span>
+									</span>
 								</span>
 							</span>
 						))}
@@ -130,15 +154,19 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 			</span>
 		);
 	}
+	renderCompact(): ReactNode {
+		return (
+			<div className={`menu-item-compact ${this.props.className !== undefined ? this.props.className : ""}`}>
+				<Meal mealId={this.state.value.mealId} viewMode={ViewModeCode.compact} />
+			</div>
+		);
+	}
 	render(): ReactNode {
 		if (this.state.editMode) return this.renderEditMode();
+		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
 		return (
 			<span className={`menu-item-container${this.state.viewMode === ViewModeCode.maximized ? " maximized" : ""}`}>
-				<Meal 
-					mealId={this.state.value.mealId} 
-					ref={this.mealRef} 
-					onViewModeChange={(oldV, newV)=>this.setState({...this.state, viewMode: newV})}
-				/>
+				<Meal mealId={this.state.value.mealId} ref={this.mealRef} onViewModeChange={(oldV, newV) => this.setState({ ...this.state, viewMode: newV })} />
 				<div className="menu-item-options">
 					{this.state.value.options?.map((option, idx) => (
 						<span
@@ -154,7 +182,7 @@ export default class MenuItem extends Proto<IMenuItemProps, IMenuItemState> {
 									if (this.props.onSelectOption && this.mealRef.current) this.props.onSelectOption(this.mealRef.current.value, this.state.value.options[parseInt(optionId)]);
 								}
 							}}
-							style={this.state.viewMode === ViewModeCode.maximized?{fontSize:"150%"}:{}}>
+							style={this.state.viewMode === ViewModeCode.maximized ? { fontSize: "150%" } : {}}>
 							<span style={{ gridRow: "1 / 3" }}>{this.state.currentOptionSelected === idx ? "☑" : "☐"}</span>
 							<span className="menu-item-option-volume">{this.toString(option.name)}</span>
 							<span className="menu-item-option-price">

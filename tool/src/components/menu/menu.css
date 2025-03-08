@@ -2,7 +2,7 @@
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto auto auto auto 1fr;
+    grid-template-rows: auto auto auto auto auto auto auto 1fr;
     gap: .2em;
     overflow: auto;
     height: 100%;
@@ -43,7 +43,7 @@
     color: var(--background-color);
     background-color: var(--text-color);
 }
-.menu-admin-chapters-nav > span {
+.menu-admin-meals-nav > span, .menu-admin-chapters-nav > span {
     cursor: pointer;
     padding: .1em;
     border: 1px solid;
@@ -51,7 +51,7 @@
     border-radius: .2em;
 }
 
-.menu-admin-chapters-nav > span.selected {
+.menu-admin-chapters-nav > span.selected, .menu-admin-meals-nav > span.selected {
     font-weight: bold;
     color: var(--background-color);
     background-color: var(--text-color);
@@ -61,15 +61,18 @@
     --grid-column: span 2;
 }
 .menu-admin-meals-container {
+    grid-column: span 2;
+}
+.menu-admin-meals-nav {
     display: flex;
     align-items: center;
     gap: .5em;
     flex-wrap: wrap;
-    grid-column: span 2;
     width: 100%;
     height: 100%;
-    overflow: auto;
+    --overflow: auto;
 }
+
 .menu-container {
     --width: fit-content;
     --height: min-content;
@@ -136,7 +139,7 @@
 
 .menu-compact-container{
     --font-size: 80%;
-    border: 1px solid;
+    --border: 1px solid;
     border-radius: .2em;
     padding: .1em;
     --height: fit-content;
