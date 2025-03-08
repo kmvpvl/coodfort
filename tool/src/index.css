@@ -69,9 +69,9 @@ body {
 
 .standalone-toolbar {
   display: flex;
-  gap: .5em;
+  gap: .2em;
   align-items: end;
-  padding: .5em;
+  padding: .2em;
 }
 
 .toolbar > span, .toolbar > label, .standalone-toolbar > span{
@@ -83,6 +83,9 @@ body {
   border: 1px dotted var(--text-color);
   border-radius: .2em;
   background-color: var(--background-color);
+  height: 1.5em;
+  display: flex;
+  align-items: center;
 }
 
 .toolbar > span:hover, .toolbar > label:hover, .standalone-toolbar > span:hover{
@@ -95,7 +98,7 @@ body {
   padding: 0.25em;
   padding-top: 0.75em;
   border: 1px dotted var(--text-color);
-  border-radius: 0.5em;
+  border-radius: 0.2em;
   position: relative;
   margin-top: 0.5em;
 }
@@ -186,6 +189,21 @@ body {
   }
 
 }
+
+.drop-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 5px double;
+  border-radius: 1em;
+}
+.drop-zone::before {
+  content: ">";
+}
+.drop-zone::after {
+  content: "<";
+}
+
 .ready-to-drop {
   animation: ready-to-drop-animation 2s infinite;
 }

@@ -104,7 +104,7 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 				</div>
 				<div className="photos-admin-list-container">
 					<div
-						className="photo-admin-container"
+						className="photo-admin-container drop-zone"
 						onDragEnter={event => {
 							event.preventDefault();
 							event.dataTransfer.dropEffect = "copy";

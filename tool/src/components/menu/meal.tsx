@@ -15,7 +15,7 @@ export interface IMealProps extends IProtoProps {
 	viewMode?: ViewModeCode;
 	onSave?: (newValue: IMeal) => void;
 	onChange?: (newValue: IMeal) => void;
-	onViewModeChange?: (oldValue: ViewModeCode, newValue: ViewModeCode)=>void;
+	onViewModeChange?: (oldValue: ViewModeCode, newValue: ViewModeCode) => void;
 }
 
 export interface IMealState extends IProtoState {
@@ -28,7 +28,7 @@ export interface IMealState extends IProtoState {
 export default class Meal extends Proto<IMealProps, IMealState> {
 	state: IMealState = {
 		value: this.props.defaultValue ? this.props.defaultValue : this.new(),
-		viewMode: this.props.viewMode !== undefined? this.props.viewMode:ViewModeCode.normal
+		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.normal,
 	};
 
 	componentDidMount(): void {
@@ -151,8 +151,17 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 		);
 	}
 
+	renderCompact(): ReactNode {
+		return (
+			<div className="meal-container-compact">
+				<span>{this.props.mealId !== undefined && this.state.value.id === undefined ? "" : this.toString(this.state.value.name)}</span>
+			</div>
+		);
+	}
+
 	render(): ReactNode {
 		if (this.state.editMode) return this.renderEditMode();
+		if (this.state.viewMode === ViewModeCode.compact) return this.renderCompact();
 		return (
 			<span
 				className={`meal-container${this.state.viewMode === ViewModeCode.maximized ? " maximized" : ""}`}
@@ -183,16 +192,16 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 						onClick={event => {
 							const oldV = this.state.viewMode;
 							const nState = this.state;
-							nState.viewMode = this.state.viewMode === ViewModeCode.maximized?ViewModeCode.normal:ViewModeCode.maximized;
+							nState.viewMode = this.state.viewMode === ViewModeCode.maximized ? ViewModeCode.normal : ViewModeCode.maximized;
 							this.setState(nState);
 							if (this.props.onViewModeChange !== undefined) this.props.onViewModeChange(oldV, nState.viewMode);
 						}}>
 						{this.state.viewMode === ViewModeCode.maximized ? "⚊" : "⤢"}
 					</span>
 					{
-					//<span>
-					//	<i className="fa fa-qrcode"></i>
-					//</span>
+						//<span>
+						//	<i className="fa fa-qrcode"></i>
+						//</span>
 					}
 				</div>
 			</span>
