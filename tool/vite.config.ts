@@ -36,6 +36,7 @@ export default defineConfig((config) => {
     define: {
       "process.env.SERVER_BASE_URL": JSON.stringify(env.SERVER_BASE_URL),
       "process.env.QR_BASE_URL": JSON.stringify(env.QR_BASE_URL),
+      "process.env.TG_BOT_URL": JSON.stringify(env.TG_BOT_URL),
       "process.env.LANGUAGES": JSON.stringify(env.LANGUAGES),
       "process.env.MODE": JSON.stringify(config.mode),
     },

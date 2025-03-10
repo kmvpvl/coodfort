@@ -16,6 +16,7 @@
     padding-right: 2em;
     padding-bottom: 0.5em;
     height: fit-content;
+    max-height: 1em;
 }
 
 .tags-container > span > span {

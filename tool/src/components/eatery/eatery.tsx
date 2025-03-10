@@ -300,6 +300,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 						))}
 					</div>
 					<div
+						className="drop-zone"
 						onDragEnter={event => {
 							event.preventDefault();
 							event.currentTarget.classList.toggle("ready-to-drop", true);

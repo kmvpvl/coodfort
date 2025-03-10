@@ -250,9 +250,7 @@ describe('Meals editing', () => {
                 {
                     name: {
                         default: '250 gr',
-                        values: [
-                            ["ru", "250 гр."]
-                        ],
+                        values: [['ru', '250 гр.']],
                     },
                     amount: 89,
                     currency: {
@@ -268,9 +266,7 @@ describe('Meals editing', () => {
                 {
                     name: {
                         default: '350 gr',
-                        values: [
-                            ["ru", "350 гр."]
-                        ],
+                        values: [['ru', '350 гр.']],
                     },
                     amount: 650,
                     currency: {
@@ -286,9 +282,7 @@ describe('Meals editing', () => {
                 {
                     name: {
                         default: '350 gr',
-                        values: [
-                            ["ru", "350 гр."]
-                        ],
+                        values: [['ru', '350 гр.']],
                     },
                     amount: 300,
                     currency: {
@@ -344,7 +338,7 @@ describe('Meals editing', () => {
                         default: 'with honey',
                         values: [
                             ['ru', 'с медом'],
-                            ["sr", "sa medom"]
+                            ['sr', 'sa medom'],
                         ],
                     },
                     amount: 150,

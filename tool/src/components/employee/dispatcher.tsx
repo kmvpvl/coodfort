@@ -352,7 +352,17 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 				break;
 			case LeftMenuItemIdCode.eateryData:
 				//if (this.state.eaterySelected !== undefined)
-				return <Eatery key={this.state.selectedEatery?.id} defaultValue={this.state.selectedEatery} admin={true} editMode={true} />;
+				return (
+					<Eatery
+						key={this.state.selectedEatery?.id}
+						defaultValue={this.state.selectedEatery}
+						admin={true}
+						editMode={true}
+						onSave={eateryData => {
+							this.setState({ ...this.state, selectedEatery: eateryData, selectedEateryId: eateryData.id });
+						}}
+					/>
+				);
 				break;
 			case LeftMenuItemIdCode.employees:
 				return this.state.selectedEatery !== undefined ? <Employees eatery={this.state.selectedEatery} /> : <></>;
@@ -483,7 +493,17 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 						<div className="dispatcher-content-rightmenu">{this.renderRight()}</div>
 					</div>
 				) : (
-					<div>Choose any eatery or create one</div>
+					<div className="dispatcher-start-message">
+						<div className="tip">
+							{this.ML(
+								"At the top is a list of all the establishments that are available to you. If you are a restaurant owner or manager, click the button at the top to create a page for your business.\nIf you are an employee of a previously registered restaurant, ask to be added as an employee. Then your employer will appear in the list of restaurants at the top.\nIn order for your employer to be able to add you as an employee, tell them your account"
+							)}
+						</div>
+						<div className="tip"></div>
+						<div> {this.props.employee.login}</div>
+						<div className="tip"></div>
+						<div className="tip">{this.ML("Never tell your employer your token. We strongly recommend that you keep it secret!")}</div>
+					</div>
 				)}
 				<Pending ref={this.pendingRef} />
 			</div>
