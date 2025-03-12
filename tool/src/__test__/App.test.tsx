@@ -5,7 +5,7 @@ import EmployeeApp from "../employeeApp";
 describe("Simple working test", () => {
 	it("the title is visible", () => {
 		render(<EmployeeApp mode="" />);
-		expect(screen.getByText(/Sign in/i)).toBeInTheDocument();
+		expect(screen.getByText(/Log in/i)).toBeInTheDocument();
 	});
 
 	/*   it('should increment count on click', async () => {

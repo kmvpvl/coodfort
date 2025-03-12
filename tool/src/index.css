@@ -38,8 +38,9 @@ body {
 }
 
 .tip {
-  font-size: small;
+  font-size: 80%;
   font-style: italic;
+  --color: silver;
   padding-bottom: 0.5em;
 }
 

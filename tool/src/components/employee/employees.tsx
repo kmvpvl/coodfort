@@ -78,7 +78,14 @@ export default class Employees extends Proto<IEmployeesProps, IEmployeesState> {
 				</div>
 				<div>
 					{this.state.eatery.employees.map((empl, idx) => (
-						<Employee key={idx} defaultValue={empl} />
+						<Employee
+							key={`${empl.userId}_${empl.roles.length}`}
+							defaultValue={empl}
+							toaster={this.props.toaster}
+							onChange={eatery => {
+								this.setState({ ...this.state, eatery: eatery });
+							}}
+						/>
 					))}
 				</div>
 			</div>

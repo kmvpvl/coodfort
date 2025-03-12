@@ -14,6 +14,7 @@ import ApproveOrderItems from "./approveOrderItems";
 import ProcessingOrderItems from "./processingOrderItems";
 import Table from "../table/table";
 import Employees from "./employees";
+import React from "react";
 
 export interface IDispatcherProps extends IProtoProps {
 	employee: IUser;
@@ -63,6 +64,7 @@ const leftMenu = [
 ];
 
 export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState> {
+	mealsFilterRef: React.RefObject<HTMLInputElement | null> = React.createRef();
 	state: IDispatcherState = {
 		eateriesBrief: [],
 		meals: [],
@@ -340,12 +342,20 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 								}}>
 								+
 							</span>
-							<input placeholder="filter" />
+							<input
+								placeholder="filter"
+								ref={this.mealsFilterRef}
+								onChange={event => {
+									this.setState(this.state);
+								}}
+							/>
 						</div>
 						<div className="dispatcher-meals-list">
-							{this.state.meals.map((meal, idx) => (
-								<Meal key={idx} admin={true} defaultValue={meal} />
-							))}
+							{this.state.meals
+								.filter(meal => (this.mealsFilterRef.current?.value !== undefined ? this.toString(meal?.name).toLowerCase().indexOf(this.mealsFilterRef.current?.value.toLowerCase()) !== -1 : true))
+								.map((meal, idx) => (
+									<Meal key={meal?.id} admin={true} defaultValue={meal} />
+								))}
 						</div>
 					</div>
 				);
@@ -365,7 +375,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 				);
 				break;
 			case LeftMenuItemIdCode.employees:
-				return this.state.selectedEatery !== undefined ? <Employees eatery={this.state.selectedEatery} /> : <></>;
+				return this.state.selectedEatery !== undefined ? <Employees eatery={this.state.selectedEatery} toaster={this.props.toaster} /> : <></>;
 				break;
 			default:
 				ret = <></>;
