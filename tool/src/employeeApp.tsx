@@ -30,6 +30,7 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 		exhibit: EmployeeAppExhibitViewCode.enterToken,
 	};
 	componentDidMount(): void {
+		document.title = "CoodFort eatery tool";
 		this.login();
 	}
 	renderNoToken(): ReactNode {

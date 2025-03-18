@@ -146,7 +146,7 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 										this.setState(nState);
 										if (this.props.onChange !== undefined) this.props.onChange(this.state.value);
 									}}>
-									⤬
+									<span style={{ transform: "rotate(45deg)", display: "block" }}>+</span>
 								</span>
 							</span>
 							<img src={photo.url} />
@@ -195,29 +195,33 @@ export default class Photos extends React.Component<IPhotosProps, IPhotosState> 
 								<img src={emptyDish} />
 							)}
 						</div>
-						<div className="photos-scroll">
-							{this.state.value.map((photo, idx) => (
-								<svg
-									width="8px"
-									height="8px"
-									viewBox="0 0 8 8"
-									data-index={idx}
-									key={idx}
-									onMouseOver={event => {
-										const key = event.currentTarget.attributes.getNamedItem("data-index")?.value;
-										if (key !== undefined) {
-											const i = parseInt(key);
-											if (i !== this.state.currentPhotoIndex) {
-												const nState = this.state;
-												nState.currentPhotoIndex = i;
-												this.setState(nState);
+						{this.state.value.length !== 1 ? (
+							<div className="photos-scroll">
+								{this.state.value.map((photo, idx) => (
+									<svg
+										width="8px"
+										height="8px"
+										viewBox="0 0 8 8"
+										data-index={idx}
+										key={idx}
+										onMouseOver={event => {
+											const key = event.currentTarget.attributes.getNamedItem("data-index")?.value;
+											if (key !== undefined) {
+												const i = parseInt(key);
+												if (i !== this.state.currentPhotoIndex) {
+													const nState = this.state;
+													nState.currentPhotoIndex = i;
+													this.setState(nState);
+												}
 											}
-										}
-									}}>
-									{idx === this.state.currentPhotoIndex ? <circle cx="4" cy="4" r="3" fill="silver" stroke="gray"></circle> : <circle cx="4" cy="4" r="3" fill="transparent" stroke="gray"></circle>}
-								</svg>
-							))}
-						</div>
+										}}>
+										{idx === this.state.currentPhotoIndex ? <circle cx="4" cy="4" r="3" fill="silver" stroke="gray"></circle> : <circle cx="4" cy="4" r="3" fill="transparent" stroke="gray"></circle>}
+									</svg>
+								))}
+							</div>
+						) : (
+							<div></div>
+						)}
 					</div>
 				)}
 			</>

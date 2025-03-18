@@ -13,13 +13,14 @@ export interface IMealProps extends IProtoProps {
 	defaultValue?: IMeal;
 	admin?: boolean;
 	viewMode?: ViewModeCode;
+	editMode?: boolean;
 	onSave?: (newValue: IMeal) => void;
 	onChange?: (newValue: IMeal) => void;
 	onViewModeChange?: (oldValue: ViewModeCode, newValue: ViewModeCode) => void;
 }
 
 export interface IMealState extends IProtoState {
-	editMode?: boolean;
+	editMode: boolean;
 	value: IMeal;
 	changed?: boolean;
 	viewMode: ViewModeCode;
@@ -29,6 +30,7 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 	state: IMealState = {
 		value: this.props.defaultValue ? this.props.defaultValue : this.new(),
 		viewMode: this.props.viewMode !== undefined ? this.props.viewMode : ViewModeCode.normal,
+		editMode: this.props.editMode !== undefined ? this.props.editMode : false,
 	};
 
 	componentDidMount(): void {
@@ -84,7 +86,17 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 			<div className="meal-admin-container has-caption">
 				<div className="caption">MEAL: {this.toString(this.state.value.name)}</div>
 				<div className="toolbar">
-					<span>⤬</span>
+					<span
+						onClick={event => {
+							if (this.state.value.id !== undefined) {
+								const nState = this.state;
+								nState.value.blocked = true;
+								this.setState(nState);
+								this.save();
+							}
+						}}>
+						<span style={{ transform: "rotate(45deg)", display: "block" }}>+</span>
+					</span>
 					<span
 						onClick={event => {
 							const nState = this.state;
@@ -115,16 +127,20 @@ export default class Meal extends Proto<IMealProps, IMealState> {
 							this.setState(nState);
 						}}
 					/>
-					<Tags
-						defaultValue={this.state.value.tags}
-						editMode={true}
-						onChange={newTags => {
-							const nState = this.state;
-							nState.changed = true;
-							nState.value.tags = newTags;
-							this.setState(nState);
-						}}
-					/>
+					{true ? (
+						<></>
+					) : (
+						<Tags
+							defaultValue={this.state.value.tags}
+							editMode={true}
+							onChange={newTags => {
+								const nState = this.state;
+								nState.changed = true;
+								nState.value.tags = newTags;
+								this.setState(nState);
+							}}
+						/>
+					)}
 					<MLStringEditor
 						className="meal-admin-requisites-description"
 						defaultValue={this.state.value?.description}

@@ -111,7 +111,7 @@ export class User extends Document<IUser, IUserDataSchema, IUserWFSchema> {
     }
 
     async mealsList(eateryId?: Types.ObjectId): Promise<IMealRow[]> {
-        const sql = `select \`meals\`.* from \`meals\` where \`userId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ?' : ''}`;
+        const sql = `select \`meals\`.* from \`meals\` where \`blocked\`=0 AND \`userId\` = ? ${eateryId !== undefined ? 'AND `eateryId` = ?' : ''}`;
         const params = [this.id];
         if (eateryId !== undefined) params.push(eateryId);
         mconsole.sqlq(sql, params);

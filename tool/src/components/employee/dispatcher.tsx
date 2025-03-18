@@ -180,6 +180,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	}
 
 	onLeftMenuSelected(item: LeftMenuItemIdCode) {
+		if (this.mealsFilterRef.current) this.mealsFilterRef.current.value = "";
 		this.setState({ ...this.state, mode: item });
 	}
 
@@ -319,13 +320,27 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 											onClick={menuId => {
 												this.setState({ ...this.state, selectedMenuId: menuId });
 											}}
+											key={menu?.id}
 										/>
 									</span>
 								))}
 							</div>
 						</div>
 						<div className="dispatcher-menu-details">
-							{this.state.menus.filter(el => el?.id === this.state.selectedMenuId).length > 0 ? <Menu admin={true} editMode={true} menuId={this.state.selectedMenuId} key={this.state.selectedMenuId} toaster={this.props.toaster} /> : <></>}
+							{this.state.menus.filter(el => el?.id === this.state.selectedMenuId).length > 0 ? (
+								<Menu
+									admin={true}
+									editMode={true}
+									menuId={this.state.selectedMenuId}
+									key={this.state.selectedMenuId}
+									toaster={this.props.toaster}
+									onSave={menu => {
+										this.updateMenusList();
+									}}
+								/>
+							) : (
+								<></>
+							)}
 						</div>
 					</div>
 				);
@@ -354,7 +369,15 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 							{this.state.meals
 								.filter(meal => (this.mealsFilterRef.current?.value !== undefined ? this.toString(meal?.name).toLowerCase().indexOf(this.mealsFilterRef.current?.value.toLowerCase()) !== -1 : true))
 								.map((meal, idx) => (
-									<Meal key={meal?.id} admin={true} defaultValue={meal} />
+									<Meal
+										key={meal ? meal.id : `idx${idx}`}
+										admin={true}
+										defaultValue={meal}
+										editMode={meal?.id === undefined}
+										onSave={meal => {
+											this.updateMealsList();
+										}}
+									/>
 								))}
 						</div>
 					</div>
@@ -409,9 +432,22 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 						<div className="dispatcher-right-meals-container">
 							<div>Available meals</div>
 							<div>
-								{this.state.meals.map((meal, idx) => (
-									<Meal key={idx} defaultValue={meal} viewMode={ViewModeCode.normal} />
-								))}
+								<input
+									placeholder="filter"
+									ref={this.mealsFilterRef}
+									onChange={event => {
+										this.setState(this.state);
+									}}
+								/>
+							</div>
+							<div>
+								{this.state.meals
+									.filter(
+										meal => this.mealsFilterRef.current?.value === undefined || (this.mealsFilterRef.current?.value !== undefined && this.toString(meal?.name).toLowerCase().indexOf(this.mealsFilterRef.current?.value.toLowerCase()) > -1)
+									)
+									.map((meal, idx) => (
+										<Meal key={meal?.id} defaultValue={meal} viewMode={ViewModeCode.normal} />
+									))}
 							</div>
 						</div>
 					);
@@ -422,7 +458,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 						<div>
 							<div>Available menus</div>
 							{this.state.menus.map((menu, idx) => (
-								<Menu key={idx} defaultValue={menu} viewMode={ViewModeCode.compact} />
+								<Menu key={menu?.id} defaultValue={menu} viewMode={ViewModeCode.compact} />
 							))}
 						</div>
 					);

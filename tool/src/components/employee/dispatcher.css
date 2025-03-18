@@ -18,19 +18,24 @@
     border-bottom: 1px solid;
 }
 
+.dispatcher-user-container{
+    padding-left: .5em;
+    padding-right: .5em;
+}
+
 .dispatcher-eateries-container {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     overflow-x: auto;
     scrollbar-width: thin;
-    border-top: 1px solid;
+    border: 1px solid;
     border-left: 1px solid;
     border-right: 1px solid;
 }
 
 .dispatcher-eateries-eatery-container {
-    border-bottom: 1px solid var(--text-color);
+    --border-bottom: 1px solid var(--text-color);
     border-right: 1px solid var(--text-color);
     cursor: pointer;
     position: relative;
@@ -49,7 +54,7 @@
 
 .dispatcher-content-container {
     display: grid;
-    grid-template-columns: auto .5em 1fr .5em auto;
+    grid-template-columns: auto .2em 1fr .2em auto;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -93,6 +98,7 @@
     width: 100%;
     height: 100%;
     flex-wrap: wrap;
+    align-content: flex-start;
 }
 
 .dispatcher-menus-list > span {
@@ -138,12 +144,15 @@
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
     overflow: hidden;
+    padding: .2em;
 }
 
 .dispatcher-right-meals-container > div {
     overflow-y: auto;
+    width: min-content;
+    flex-wrap: wrap;
 }
 
 .dispatcher-content-left-sizer, .dispatcher-content-right-sizer {

@@ -1,5 +1,5 @@
 .logo-container {
-    padding: 1em;
+    --padding: 1em;
     cursor: pointer;
     width: 100%;
     height: 100%;
@@ -16,7 +16,7 @@
     overflow: hidden;
     max-height: 80%;
     margin: auto;
-    box-shadow: 0 0 .5em .2em silver;
+    --box-shadow: 0 0 .5em .2em silver;
     border-radius: 10%;
 }
 
