@@ -29,6 +29,7 @@ interface IToast {
 	saveInHistory?: boolean;
 	/**If Toaster has at least one not shown modal Toast then Toaster covers all accessible area and prohibit interaction with other elements on page. Use modal parameter if you want stop user interaction while user reads the message and close the Toast */
 	modal?: boolean;
+	/**Buttons and their callback functions */
 	buttons?: IToastButton[];
 }
 /** Added extra properties for queue in Toaster */

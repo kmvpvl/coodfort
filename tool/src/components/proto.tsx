@@ -1,7 +1,7 @@
 import React from "react";
 import { Types, IUser, IDocumentError } from "@betypes/prototypes";
 import MLString, { mlStrings } from "../model/mlstring";
-import Toaster from "./toast";
+import Toaster, { ToastType } from "./toast";
 import Pending from "./pending";
 
 export enum ProtoErrorCode {
@@ -201,6 +201,11 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		} else {
 			if (password === undefined && login === undefined) {
 				if (failcb !== undefined) failcb(new ProtoError(ProtoErrorCode.authDataExpected, "Both login and password are undefined. Call to server didn't take place"));
+				this.props.toaster?.current?.addToast({
+					type: ToastType.error,
+					message: "Both login and password are undefined. Call to server didn't take place",
+					description: `command = '${command}'; body = '${body}'`,
+				});
 				return;
 			} else {
 				headers.append("coodfort-login", login !== undefined ? login : "");

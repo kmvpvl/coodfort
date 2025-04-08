@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import "./employeeApp.css";
-import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/proto";
+import Proto, { IProtoProps, IProtoState, ServerStatusCode, ViewModeCode } from "./components/proto";
 
 import Toaster from "./components/toast";
 import Employee from "./components/employee/employee";
@@ -30,6 +30,7 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 		exhibit: EmployeeAppExhibitViewCode.enterToken,
 	};
 	componentDidMount(): void {
+		document.title = "CoodFort eatery tool";
 		this.login();
 	}
 	renderNoToken(): ReactNode {
@@ -43,34 +44,25 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 								nState.exhibit = EmployeeAppExhibitViewCode.newEmployee;
 								this.setState(nState);
 							}}>
-							I'm a new Eployee
+							{this.ML("I'm a new Employee")}
 						</span>
-						<span className="tip">{this.ML(`If you're have no account in CoodFort or you want create new account as an employee`)}</span>
+						<span className="tip">{this.ML(`If you're have no account in CoodFort and you want create new account as an employee`)}</span>
 					</span>
 				) : (
 					<span className="employee-app-enter-info">
 						<h2>{this.ML(`New Employee`)}</h2>
 						<div>
 							<span>
-								<input placeholder={this.ML("Enter your login")}></input>
-								<span className="tip">{this.ML("Employer can see your login name, can find you by it and can invite you")}</span>
-							</span>
-							<span>
-								<input placeholder={this.ML("Enter your password")}></input>
-								<span className="tip">{this.ML("Nobody must see you password. Keep it secret")}</span>
-							</span>
-						</div>
-						<div>
-							<span>
-								<input placeholder={this.ML("Enter your name (alias)")}></input>
-								<span className="tip">{this.ML("All employer and guests can see your name")}</span>
-							</span>
-							<span>
-								<input placeholder={this.ML("Enter your e-mail")}></input>
-								<span className="tip">{this.ML("This e-mail allows you recover your account")}</span>
+								<span className="tip">
+									{this.ML("To be able to restore access to your account in the future, we recommend obtaining an access token through a bot")}
+									<div>
+										<a href={process.env.TG_BOT_URL} target="_blank">
+											{this.ML("Technical support bot")}
+										</a>
+									</div>
+								</span>
 							</span>
 						</div>
-						<span className="tip">{this.ML("We strongly reccomend to you fill information to recover access to your Eatery. Use Telegram or e-mail to be sure that nobody can compromize your data")}</span>
 					</span>
 				)}
 			</>
@@ -86,7 +78,7 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 								nState.exhibit = EmployeeAppExhibitViewCode.newEatery;
 								this.setState(nState);
 							}}>
-							I want to register new Eatery
+							{this.ML("I want to register new Eatery")}
 						</span>
 						<span className="tip">{this.ML(`If you're a manager or owner of the new Eatery and want to register one`)}</span>
 					</span>
@@ -111,14 +103,21 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 								nState.exhibit = EmployeeAppExhibitViewCode.enterToken;
 								this.setState(nState);
 							}}>
-							I have token
+							{this.ML("I have token")}
 						</span>
-						<span className="tip">{this.ML(`You've registered earlier and had token. Insert token or recover your token here`)}</span>
+						<span className="tip">
+							<div>{this.ML(`You've registered earlier and had token. Insert token or recover your token here`)}</div>
+							<div>
+								<a href={process.env.TG_BOT_URL} target="_blank">
+									{this.ML("Technical support bot")}
+								</a>
+							</div>
+						</span>
 					</span>
 				) : (
 					<span className="employee-app-enter-info">
-						<h2>{this.ML(`Sign in`)}</h2>
-						<span className="tip">{this.ML(`The result of your registration was token which we sent to your e-mail or/and Telegram. Check out you token or recover it by Telegram or e-mail`)}</span>
+						<h2>{this.ML(`Log in`)}</h2>
+						<span className="tip">{this.ML(`I already have an account and want to access from a new device`)}</span>
 						<input
 							type="password"
 							placeholder={this.ML("Insert your token here")}
@@ -128,7 +127,14 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 									this.login(token);
 								}
 							}}></input>
-						<span className="tip">{this.ML(`To recover your token use Telegram`)}</span>
+						<span className="tip">
+							<div>{this.ML(`You can get your token on a device where you already have access, or restore it yourself via Telegram or contact support`)}</div>
+							<div>
+								<a href={`${process.env.TG_BOT_URL}?start=support`} target="_blank">
+									{this.ML("Technical support bot")}
+								</a>
+							</div>
+						</span>
 					</span>
 				)}
 			</>
@@ -137,6 +143,7 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 		return (
 			<div className={this.state.exhibit === EmployeeAppExhibitViewCode.none ? "employee-app-container-notoken-none" : "employee-app-container-notoken-choosen"}>
 				<Logo
+					viewMode={ViewModeCode.compact}
 					className="employee-app-logo"
 					onClick={() => {
 						const nState = this.state;
@@ -147,8 +154,12 @@ export default class EmployeeApp extends Proto<IEmployeeAppProps, IEmployeeAppSt
 				{this.state.exhibit === EmployeeAppExhibitViewCode.none || this.state.exhibit === EmployeeAppExhibitViewCode.enterToken ? (
 					<>
 						{havet}
-						{emp}
-						{eat}
+						{
+							//emp
+						}
+						{
+							//eat
+						}
 					</>
 				) : this.state.exhibit === EmployeeAppExhibitViewCode.newEmployee ? (
 					<>

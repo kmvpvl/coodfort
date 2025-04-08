@@ -29,7 +29,7 @@
 
 .mlstring-editor-compact {
     display: grid;
-    grid-template-columns: fit-content 1fr;
+    grid-template-columns: auto 1fr;
     grid-template-rows: min-content min-content;
 }
 
@@ -58,11 +58,14 @@
     border-bottom-left-radius: .2em;
     border-left: 1px solid;
     border-bottom: 1px solid;
-    padding: .2em;
-    --padding-right: .2em;
+    --padding: .2em;
+    padding-right: .2em;
     justify-content: right;
     display: flex;
     gap: .2em;
+    border-right: 1px dashed;
+    border-top: 1px dashed;
+    border-top-right-radius: .2em;
 }
 
 .mlstring-editor-compact > span:nth-child(2) > span {

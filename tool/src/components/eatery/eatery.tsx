@@ -166,16 +166,20 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 							this.setState(nState);
 						}}
 					/>
-					<Tags
-						defaultValue={this.state.value.tags !== undefined ? this.state.value.tags : []}
-						editMode={true}
-						onChange={newTags => {
-							const nState = this.state;
-							nState.value.tags = newTags;
-							nState.changed = true;
-							this.setState(nState);
-						}}
-					/>
+					{true ? (
+						<></>
+					) : (
+						<Tags
+							defaultValue={this.state.value.tags !== undefined ? this.state.value.tags : []}
+							editMode={true}
+							onChange={newTags => {
+								const nState = this.state;
+								nState.value.tags = newTags;
+								nState.changed = true;
+								this.setState(nState);
+							}}
+						/>
+					)}
 					<MLStringEditor
 						className="eatery-admin-description"
 						caption="Description"
@@ -249,16 +253,20 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 										this.setState(nState);
 									}}
 								/>
-								<Tags
-									defaultValue={this.state.value.tables[idx].tags}
-									editMode={true}
-									onChange={newVal => {
-										const nState = this.state;
-										nState.value.tables[idx].tags = newVal;
-										nState.changed = true;
-										this.setState(nState);
-									}}
-								/>
+								{true ? (
+									<></>
+								) : (
+									<Tags
+										defaultValue={this.state.value.tables[idx].tags}
+										editMode={true}
+										onChange={newVal => {
+											const nState = this.state;
+											nState.value.tables[idx].tags = newVal;
+											nState.changed = true;
+											this.setState(nState);
+										}}
+									/>
+								)}
 								<Photos
 									defaultValue={this.state.value.tables[idx].photos}
 									editMode={true}
@@ -300,6 +308,7 @@ export class Eatery extends Proto<IEateryProps, IEateryState> {
 						))}
 					</div>
 					<div
+						className="drop-zone"
 						onDragEnter={event => {
 							event.preventDefault();
 							event.currentTarget.classList.toggle("ready-to-drop", true);

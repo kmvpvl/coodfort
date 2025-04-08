@@ -1,18 +1,20 @@
 .employee-container {
     display: grid;
     grid-template-rows: auto auto 1fr;
-    overflow: hidden;
+    --overflow: hidden;
     width: fit-content;
     height: fit-content;
     position: relative;
-    padding: .5em;
+    --padding: .5em;
     border: 1px solid;
-    border-radius: .5em;
+    border-radius: .2em;
 }
 
 .employee-roles-list {
     display: flex;
     overflow: auto;
+    gap: .5em;
+    flex-wrap: wrap;
 }
 
 .employee-roles-list > span {

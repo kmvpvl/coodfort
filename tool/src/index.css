@@ -38,8 +38,9 @@ body {
 }
 
 .tip {
-  font-size: small;
+  font-size: 80%;
   font-style: italic;
+  --color: silver;
   padding-bottom: 0.5em;
 }
 
@@ -261,7 +262,7 @@ button.default, .button.default {
 .label {
   position: absolute;
   left: .5em;
-  top: -.8em;
+  top: -1.1em;
 }
 
 .circle-img-container {

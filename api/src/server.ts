@@ -7,7 +7,7 @@ import fs from 'fs';
 import { createHmac, randomUUID } from 'crypto';
 import colours from './model/colours';
 import { DocumentError } from './model/protodocument';
-import { startCommand } from './model/tgEvents';
+import { messageToSupport, renewToken, startCommand } from './model/tgEvents';
 import { userEateriesList, userMealsList, userMenusList, newUser, viewUser, userOrdersList, findUser } from './api/user';
 import { updateEatery, newEatery, viewEatery, publishEatery, tableCallWaiterSignalsList, callWaiter, addEateryEmployee } from './api/eatery';
 import { updateMeal, updateMenu, viewMeal, viewMenu } from './api/meal';
@@ -16,6 +16,7 @@ import { Telegraf } from 'telegraf';
 import { User } from './model/user';
 import { eateryOrderList, newPayment, newOrder, viewOrder, wfNextOrder, wfNextOrderItems, updateOrderItem, wfNextOrderItem } from './api/order';
 import { feedbackList, updateFeedback } from './api/feedback';
+import { message } from 'telegraf/filters';
 
 configDotenv();
 const TGTOKEN = process.env.tgtoken;
@@ -32,6 +33,8 @@ try {
     process.once('SIGTERM', () => tgBot.stop('SIGTERM'));
 
     tgBot.command('start', startCommand);
+    tgBot.command('renew_token', renewToken);
+    tgBot.on('text', messageToSupport);
     tgBot.catch(async (err, ctx) => {
         console.log(err, ctx);
     });
@@ -56,6 +59,27 @@ try {
                     //secretToken: randomAlphaNumericString,
                 },
             });
+            await tgBot.telegram.setMyCommands(
+                [
+                    { command: '/start', description: 'Register new user' },
+                    { command: '/renew_token', description: 'Create a new token' },
+                ],
+                { language_code: undefined }
+            );
+            await tgBot.telegram.setMyCommands(
+                [
+                    { command: '/start', description: 'Зарегистрировать нового пользователя' },
+                    { command: '/renew_token', description: 'Создать новый токен' },
+                ],
+                { language_code: 'ru' }
+            );
+            await tgBot.telegram.setMyCommands(
+                [
+                    { command: '/start', description: 'Registrujte novog korisnika' },
+                    { command: '/renew_token', description: 'Kreirajte novi token' },
+                ],
+                { language_code: 'sr' }
+            );
         } catch (e) {
             console.log('TG bot not started', e);
         }

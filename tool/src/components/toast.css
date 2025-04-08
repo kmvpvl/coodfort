@@ -60,11 +60,16 @@
     border-radius: 0.2em;
     margin: 10px;
     position: relative;
+    padding-top: 1em;
 }
 
 .toast-container-error {
     color: white;
     background-color: var(--error-color);
+}
+.toast-container-warning {
+    color: white;
+    background-color: var(--warning-color);
 }
 .toast-container-success {
     color: white;

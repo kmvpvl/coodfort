@@ -6,7 +6,6 @@ import "./guestApp.css";
 import Pending from "./components/pending";
 import Toaster, { ToastType } from "./components/toast";
 import React from "react";
-import Logo from "./components/logo/logo";
 import Pinger from "./components/pinger/pinger";
 import { Html5Qrcode } from "html5-qrcode";
 import { IEatery, ITable } from "@betypes/eaterytypes";
@@ -14,7 +13,7 @@ import { Eatery } from "./components/eatery/eatery";
 import { ViewModeCode } from "./components/proto";
 import { revealTelegramStartAppParams } from "./model/tools";
 import Menu from "./components/menu/menu";
-import GuestOrder, { calcSum } from "./components/order/guestOrder";
+import GuestOrder from "./components/order/guestOrder";
 import { IOrder, IOrderItem } from "@betypes/ordertypes";
 
 export interface IGuestAppProps extends IProtoProps {
@@ -49,6 +48,10 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		tableId: this.props.tableId,
 		eateriesInfo: [],
 	};
+
+	componentDidMount(): void {
+		document.title = "CoodFort guest tool";
+	}
 
 	init() {
 		this.login(

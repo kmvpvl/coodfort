@@ -14,6 +14,7 @@ import ApproveOrderItems from "./approveOrderItems";
 import ProcessingOrderItems from "./processingOrderItems";
 import Table from "../table/table";
 import Employees from "./employees";
+import React from "react";
 
 export interface IDispatcherProps extends IProtoProps {
 	employee: IUser;
@@ -63,6 +64,7 @@ const leftMenu = [
 ];
 
 export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState> {
+	mealsFilterRef: React.RefObject<HTMLInputElement | null> = React.createRef();
 	state: IDispatcherState = {
 		eateriesBrief: [],
 		meals: [],
@@ -178,6 +180,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 	}
 
 	onLeftMenuSelected(item: LeftMenuItemIdCode) {
+		if (this.mealsFilterRef.current) this.mealsFilterRef.current.value = "";
 		this.setState({ ...this.state, mode: item });
 	}
 
@@ -317,13 +320,29 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 											onClick={menuId => {
 												this.setState({ ...this.state, selectedMenuId: menuId });
 											}}
+											key={menu?.id}
 										/>
 									</span>
 								))}
 							</div>
 						</div>
 						<div className="dispatcher-menu-details">
-							{this.state.menus.filter(el => el?.id === this.state.selectedMenuId).length > 0 ? <Menu admin={true} editMode={true} menuId={this.state.selectedMenuId} key={this.state.selectedMenuId} toaster={this.props.toaster} /> : <></>}
+							{this.state.menus.filter(el => el?.id === this.state.selectedMenuId).length > 0 ? (
+								<Menu
+									admin={true}
+									editMode={true}
+									menuId={this.state.selectedMenuId}
+									key={this.state.selectedMenuId}
+									toaster={this.props.toaster}
+									onSave={menu => {
+										this.updateMenusList();
+									}}
+								/>
+							) : (
+								<div className="dispatcher-start-message">
+									<div className="tip">Select menu above for editing</div>
+								</div>
+							)}
 						</div>
 					</div>
 				);
@@ -340,22 +359,48 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 								}}>
 								+
 							</span>
-							<input placeholder="filter" />
+							<input
+								placeholder="filter"
+								ref={this.mealsFilterRef}
+								onChange={event => {
+									this.setState(this.state);
+								}}
+							/>
 						</div>
 						<div className="dispatcher-meals-list">
-							{this.state.meals.map((meal, idx) => (
-								<Meal key={idx} admin={true} defaultValue={meal} />
-							))}
+							{this.state.meals
+								.filter(meal => (this.mealsFilterRef.current?.value !== undefined ? this.toString(meal?.name).toLowerCase().indexOf(this.mealsFilterRef.current?.value.toLowerCase()) !== -1 : true))
+								.map((meal, idx) => (
+									<Meal
+										key={meal ? meal.id : `idx${idx}`}
+										admin={true}
+										defaultValue={meal}
+										editMode={meal?.id === undefined}
+										onSave={meal => {
+											this.updateMealsList();
+										}}
+									/>
+								))}
 						</div>
 					</div>
 				);
 				break;
 			case LeftMenuItemIdCode.eateryData:
 				//if (this.state.eaterySelected !== undefined)
-				return <Eatery key={this.state.selectedEatery?.id} defaultValue={this.state.selectedEatery} admin={true} editMode={true} />;
+				return (
+					<Eatery
+						key={this.state.selectedEatery?.id}
+						defaultValue={this.state.selectedEatery}
+						admin={true}
+						editMode={true}
+						onSave={eateryData => {
+							this.setState({ ...this.state, selectedEatery: eateryData, selectedEateryId: eateryData.id });
+						}}
+					/>
+				);
 				break;
 			case LeftMenuItemIdCode.employees:
-				return this.state.selectedEatery !== undefined ? <Employees eatery={this.state.selectedEatery} /> : <></>;
+				return this.state.selectedEatery !== undefined ? <Employees eatery={this.state.selectedEatery} toaster={this.props.toaster} /> : <></>;
 				break;
 			default:
 				ret = <></>;
@@ -389,9 +434,22 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 						<div className="dispatcher-right-meals-container">
 							<div>Available meals</div>
 							<div>
-								{this.state.meals.map((meal, idx) => (
-									<Meal key={idx} defaultValue={meal} viewMode={ViewModeCode.normal} />
-								))}
+								<input
+									placeholder="filter"
+									ref={this.mealsFilterRef}
+									onChange={event => {
+										this.setState(this.state);
+									}}
+								/>
+							</div>
+							<div>
+								{this.state.meals
+									.filter(
+										meal => this.mealsFilterRef.current?.value === undefined || (this.mealsFilterRef.current?.value !== undefined && this.toString(meal?.name).toLowerCase().indexOf(this.mealsFilterRef.current?.value.toLowerCase()) > -1)
+									)
+									.map((meal, idx) => (
+										<Meal key={meal?.id} defaultValue={meal} viewMode={ViewModeCode.normal} />
+									))}
 							</div>
 						</div>
 					);
@@ -402,7 +460,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 						<div>
 							<div>Available menus</div>
 							{this.state.menus.map((menu, idx) => (
-								<Menu key={idx} defaultValue={menu} viewMode={ViewModeCode.compact} />
+								<Menu key={menu?.id} defaultValue={menu} viewMode={ViewModeCode.compact} />
 							))}
 						</div>
 					);
@@ -483,7 +541,17 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 						<div className="dispatcher-content-rightmenu">{this.renderRight()}</div>
 					</div>
 				) : (
-					<div>Choose any eatery or create one</div>
+					<div className="dispatcher-start-message">
+						<div className="tip">
+							{this.ML(
+								"At the top is a list of all the establishments that are available to you. If you are a restaurant owner or manager, click the button at the top to create a page for your business.\nIf you are an employee of a previously registered restaurant, ask to be added as an employee. Then your employer will appear in the list of restaurants at the top.\nIn order for your employer to be able to add you as an employee, tell them your account"
+							)}
+						</div>
+						<div className="tip"></div>
+						<div> {this.props.employee.login}</div>
+						<div className="tip"></div>
+						<div className="tip">{this.ML("Never tell your employer your token. We strongly recommend that you keep it secret!")}</div>
+					</div>
 				)}
 				<Pending ref={this.pendingRef} />
 			</div>

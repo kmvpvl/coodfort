@@ -97,16 +97,20 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 		return (
 			<div className="menu-admin-container" style={this.state.adminFocus !== AdminFocusCode.All ? { gridTemplateRows: "" } : {}}>
 				<div className="menu-admin-view-focus-list">
-					{Object.keys(AdminFocusCode).map((key, idx) => (
-						<span
-							className={this.state.adminFocus === key ? "selected" : ""}
-							key={idx}
-							onClick={event => {
-								this.setState({ ...this.state, adminFocus: Object.values(AdminFocusCode)[idx] });
-							}}>
-							{key}
-						</span>
-					))}
+					{false ? (
+						Object.keys(AdminFocusCode).map((key, idx) => (
+							<span
+								className={this.state.adminFocus === key ? "selected" : ""}
+								key={idx}
+								onClick={event => {
+									this.setState({ ...this.state, adminFocus: Object.values(AdminFocusCode)[idx] });
+								}}>
+								{key}
+							</span>
+						))
+					) : (
+						<></>
+					)}
 				</div>
 				<div className="standalone-toolbar">
 					<span onClick={this.save.bind(this)}>
@@ -136,6 +140,7 @@ export default class Menu extends Proto<IMenuProps, IMenuState> {
 						<div>
 							<span>Menu name</span>
 							<input
+								key={this.state.value.name}
 								type="text"
 								defaultValue={this.state.value.name}
 								onChange={event => {

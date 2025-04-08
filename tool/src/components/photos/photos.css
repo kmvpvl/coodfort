@@ -1,6 +1,7 @@
 .photos-admin-edit-container {
     width: 100%;
     display: flex;
+    height: fit-content;
 }
 
 .photos-admin-list-container {
