@@ -339,7 +339,9 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 									}}
 								/>
 							) : (
-								<></>
+								<div className="dispatcher-start-message">
+									<div className="tip">Select menu above for editing</div>
+								</div>
 							)}
 						</div>
 					</div>

@@ -49,6 +49,10 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		eateriesInfo: [],
 	};
 
+	componentDidMount(): void {
+		document.title = "CoodFort guest tool";
+	}
+
 	init() {
 		this.login(
 			undefined,
