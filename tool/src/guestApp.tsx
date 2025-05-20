@@ -350,7 +350,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 							{this.state.activeOrders?.map((order, idx) => {
 								const eatery_arr = this.state.eateriesInfo.filter(e => e.id === order.eateryId);
 								return (
-									<GuestOrder onClick={order => this.chooseEateryAndTable(order.eateryId, order.tableId)} viewMode={ViewModeCode.normal} key={idx} orderId={order.id} eatery={eatery_arr[0]} eateryId={order.eateryId} tableId={order.eateryId} />
+									<GuestOrder onClick={order => this.chooseEateryAndTable(order.eateryId, order.tableId)} viewMode={ViewModeCode.normal} key={idx} orderId={order.id} eatery={eatery_arr[0]} eateryId={order.eateryId} tableId={order.tableId} />
 								);
 							})}
 						</div>
