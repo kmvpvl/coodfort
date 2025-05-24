@@ -217,9 +217,9 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		}
 		return (
 			<div className="guest-app-greetings-container">
-				<div style={{ textAlign: "center", fontSize: "120%" }}>Давайте познакомимся</div>
+				<div style={{ textAlign: "center", fontSize: "120%" }}>{this.ML("Let's get acquainted")}</div>
 				<div>
-					<span>{"Your default lang. We have other languages. Choose"}</span>
+					<span>{this.ML("We have taken your default language for the settings. But you can choose another one")}</span>
 					<select defaultValue={tgUser?.language_code || this.getLanguage()}>
 						{process.env.LANGUAGES?.split(",").map((lang, idx) => (
 							<option key={idx} value={lang}>
@@ -228,12 +228,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 						))}
 					</select>
 				</div>
-				<div className="guest-app-greetings-text">
-					Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. Richard McClintock, a Latin professor at Hampden-Sydney College in Virginia,
-					looked up one of the more obscure Latin words, consectetur, from a Lorem Ipsum passage, and going through the cites of the word in classical literature, discovered the undoubtable source. Lorem Ipsum comes from sections 1.10.32 and 1.10.33
-					of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance. The first line of Lorem Ipsum, "Lorem ipsum dolor sit
-					amet..", comes from a line in section 1.10.32.
-				</div>
+				<div className="guest-app-greetings-text">{this.ML("")}</div>
 				<div className="guest-app-greetings-requisites">
 					<div>
 						{tgUser ? (
@@ -245,18 +240,18 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 						)}
 					</div>
 					<div>
-						<div>{tgUser ? "We've got your name and photo from Telegram" : "Enter your name"}</div>
-						<input id="name" type="text" style={{ width: "100%" }} defaultValue={tgUser ? [tgUser.first_name, tgUser.last_name].join(" ") : undefined} />
+						<div>{tgUser ? this.ML("Restaurant and cafe staff will see your avatar in Telegram") : this.ML("Enter your name")}</div>
+						<input id="name" type="text" style={{ width: "100%" }} defaultValue={tgUser ? [tgUser.first_name, tgUser.last_name].join(" ") : undefined} placeholder={this.ML("Enter your name")} />
 					</div>
 
 					<div>
-						<div>Say smth about you</div>
+						<div>{this.ML("Say smth about you")}</div>
 						<textarea id="bio" style={{ width: "100%" }} />
 					</div>
 				</div>
 				<div>
 					<button
-						style={{ width: "100%" }}
+						//style={{ width: "100%" }}
 						onClick={event => {
 							this.serverCommand(
 								"user/new",
@@ -273,7 +268,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 								err => {}
 							);
 						}}>
-						Everything is correct. Let's move on
+						{this.ML("Everything is correct. Let's move on")}
 					</button>
 				</div>
 			</div>
