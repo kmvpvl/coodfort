@@ -655,14 +655,14 @@ export const mlStrings = new Map([
 		]),
 	],
 	[
-		``,
+		`Oops disconnected... We're solving the issue`,
 		new Map([
 			[`de`, undefined],
 			[`fr`, undefined],
 			[`es`, undefined],
-			[`ru`, undefined],
+			[`ru`, "Упс, соединение прервано... Мы решаем проблему"],
 			[`it`, undefined],
-			[`sr`, undefined],
+			[`sr`, "Ups, veza je prekinuta... Rešavamo problem"],
 		]),
 	],
 	[

@@ -22,6 +22,16 @@
     gap: 1em;
 }
 
+.guest-app-disconnected-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.guest-app-disconnected-container > div {
+  font-size: 150%;
+  text-align: center;
+}
+
 .guest-app-greetings-text {
   text-align: justify;
 }

@@ -307,7 +307,11 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		);
 	}
 	renderDisconnected(): ReactNode {
-		return <div>⚠ Oops disconnected</div>;
+		return (
+			<div className="guest-app-disconnected-container">
+				<div>⚠ {this.ML(`Oops disconnected... We're solving the issue`)}</div>
+			</div>
+		);
 	}
 	startScanner() {
 		const nState = this.state;
@@ -484,7 +488,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	}
 	render(): ReactNode {
 		let content: ReactNode;
-		if (this.state.connected === undefined || !this.state.connected || this.state.serverStatus === ServerStatusCode.connecting) {
+		if (this.state.connected === undefined || this.state.serverStatus === ServerStatusCode.connecting) {
 			content = <div></div>;
 		} else {
 			if (this.state.connected === undefined || !this.state.connected) {
