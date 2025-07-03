@@ -191,8 +191,8 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 			});
 	}
 
-	protected serverCommand(command: string, body?: BodyInit, successcb?: (res: any) => void, failcb?: (err: ProtoError) => void) {
-		const [login, password] = this.getTokenPair(this.token);
+	protected serverCommand(command: string, body?: BodyInit, successcb?: (res: any) => void, failcb?: (err: ProtoError) => void, token?: string) {
+		const [login, password] = this.getTokenPair(token === undefined ? this.token : token);
 		const headers: Headers = new Headers();
 
 		if (window.Telegram !== undefined && "user" in window.Telegram?.WebApp.initDataUnsafe) {

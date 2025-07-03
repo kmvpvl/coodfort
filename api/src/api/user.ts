@@ -11,7 +11,8 @@ export async function newUser(c: Context, req: Request, res: Response, user: Use
     const tguid = req.headers['coodfort-tguid'] as string;
     const tgcheckstring = req.headers['coodfort-tgquerycheckstring'] as string;
     const name = req.body.name;
-    const bios = req.body.bios;
+    const bio = req.body.bio;
+    const photo = req.body.photo;
     const tags = req.body.tags;
     let lgn: string;
     let psw: string;
@@ -28,7 +29,8 @@ export async function newUser(c: Context, req: Request, res: Response, user: Use
             login: lgn,
             hash: User.calcHash(lgn, psw),
             name: name,
-            bios: bios,
+            photo: photo,
+            bio: bio,
             tags: tags,
         });
         await newUser.save(lgn);

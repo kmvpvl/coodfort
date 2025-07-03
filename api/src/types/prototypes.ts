@@ -115,8 +115,8 @@ export interface IUser extends IDocument {
     login: string /**Telegram ID or login or phone */;
     hash: string /** */;
     name?: string;
-    photos?: IPhoto[];
-    bios?: Types.MLString[];
+    photo?: IPhoto;
+    bio?: string;
     tags?: ITag[];
 }
 export interface IDocumentError {
