@@ -14,20 +14,23 @@
     gap: 0.2em;
 }
 
-.guest-app-greetings-container {
+.guest-app-greetings-container, .guest-app-wrongtoken-container {
     width: 100%;
     height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    -align-items: center;
     gap: 1em;
 }
 
-.guest-app-greetings-container > div > button {
+.guest-app-greetings-container button, .guest-app-wrongtoken-container  button {
   padding: .5em;
   font-weight: bold;
+  display: inline;
 }
-
+.guest-app-wrongtoken-container > div {
+  text-align: center;
+}
 .guest-app-disconnected-container {
   display: flex;
   justify-content: center;
@@ -39,18 +42,23 @@
 }
 
 .guest-app-greetings-text {
-  text-align: justify;
+  text-align: center;
 }
 .guest-app-greetings-requisites {
   display: grid;
-  grid-template-columns: 20% 1fr;
+  grid-template-columns: 100px 1fr;
   grid-template-rows: auto auto;
   gap: 0.2em;
 }
 
-.guest-app-greetings-requisites div:first-child {
+.guest-app-wrongtoken-container div:first-child
+{
+  font-size: 120%;
+  font-weight: bold;
+}
+.guest-app-greetings-requisites div:first-child{
   margin: auto;
-  grid-row: span 2;
+  grid-row: span 5;
 }
 
 .guest-app-greetings-requisites div:first-child > img {

@@ -1,4 +1,4 @@
-import { Types, WorkflowStatusCode } from "@betypes/prototypes";
+import { IPhoto, Types, WorkflowStatusCode } from "@betypes/prototypes";
 
 import { Fragment, ReactNode } from "react";
 import Proto, { IProtoProps, IProtoState, ServerStatusCode } from "./components/proto";
@@ -15,6 +15,7 @@ import { revealTelegramStartAppParams } from "./model/tools";
 import Menu from "./components/menu/menu";
 import GuestOrder from "./components/order/guestOrder";
 import { IOrder, IOrderItem } from "@betypes/ordertypes";
+import Avatar from "./components/auth/avatar";
 
 export interface IGuestAppProps extends IProtoProps {
 	mode?: string;
@@ -43,6 +44,12 @@ export interface IGuestAppState extends IProtoState {
 export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	protected toasterRef = React.createRef<Toaster>();
 	protected orderRef = React.createRef<GuestOrder>();
+	protected loginRef = React.createRef<HTMLInputElement>();
+	protected nameRef = React.createRef<HTMLInputElement>();
+	protected pswRef = React.createRef<HTMLInputElement>();
+	protected psw2Ref = React.createRef<HTMLInputElement>();
+	protected bioRef = React.createRef<HTMLTextAreaElement>();
+	protected avatarRef = React.createRef<Avatar>();
 	state: IGuestAppState = {
 		eateryId: this.props.eateryId,
 		tableId: this.props.tableId,
@@ -168,6 +175,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	}
 
 	checkEateryId() {
+		if (this.state.eateryId === undefined) return;
 		this.serverCommand(
 			"eatery/view",
 			JSON.stringify({ id: this.state.eateryId }),
@@ -202,6 +210,18 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			}
 		);
 	}
+	renderAuth20(): ReactNode {
+		return (
+			<button
+				style={{ display: "inline-flex", gap: ".5em" }}
+				onClick={event => {
+					window.open(process.env.QR_BASE_URL, "_blank");
+				}}>
+				<span style={{ display: "inline-block", width: "2em", height: "2em", backgroundImage: 'url("telegram_logo.svg"', backgroundSize: "contain", backgroundRepeat: "no-repeat", backgroundOrigin: "content-box" }}></span>
+				{this.ML("Authorize by Telegram")}
+			</button>
+		);
+	}
 	/**
 	 * 3-state interface
 	 * passwordWrong and user are undefined both - greetings new user
@@ -209,6 +229,13 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 	 * user is not undefined - successful login attempt
 	 */
 	renderGreetings(): ReactNode {
+		const MoveOnEnable = () => {
+			return (
+				(window.Telegram !== undefined && "user" in window.Telegram?.WebApp.initDataUnsafe ? window.Telegram?.WebApp.initDataUnsafe.user : null) ||
+				(this.nameRef.current?.value !== "" && this.psw2Ref.current?.value !== undefined && this.psw2Ref.current?.value !== "" && this.pswRef.current?.value === this.psw2Ref.current.value)
+			);
+			return false;
+		};
 		const tgUser = window.Telegram !== undefined && "user" in window.Telegram?.WebApp.initDataUnsafe ? window.Telegram?.WebApp.initDataUnsafe.user : null;
 		if (tgUser?.photo_url !== undefined) {
 			//            URI2DataURL(tgUser.photo_url, userpic=> {
@@ -219,84 +246,179 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 			<div className="guest-app-greetings-container">
 				<div style={{ textAlign: "center", fontSize: "120%" }}>{this.ML("Let's get acquainted")}</div>
 				<div>
-					<span>{this.ML("We have taken your default language for the settings. But you can choose another one")}</span>
-					<select defaultValue={tgUser?.language_code || this.getLanguage()}>
-						{process.env.LANGUAGES?.split(",").map((lang, idx) => (
-							<option key={idx} value={lang}>
-								{lang}
-							</option>
-						))}
-					</select>
+					<span>{this.ML("We have taken your default language for the settings. But you can choose another one")} </span>
+					{
+						//<select defaultValue={tgUser?.language_code || this.getLanguage()}>
+						//{process.env.LANGUAGES?.split(",").map((lang, idx) => (
+						//	<option key={idx} value={lang}>
+						//		{lang}
+						//	</option>
+						//))}
+						//</select>
+					}
 				</div>
-				<div className="guest-app-greetings-text">{this.ML("")}</div>
+				{!tgUser ? (
+					<div className="guest-app-greetings-text">
+						<button
+							onClick={event => {
+								this.setState({ ...this.state, passwordWrong: true });
+							}}>
+							{this.ML("I already have an account")}
+						</button>
+					</div>
+				) : (
+					<></>
+				)}
+				{!tgUser ? <div className="guest-app-greetings-text">{this.renderAuth20()}</div> : <></>}
 				<div className="guest-app-greetings-requisites">
+					<Avatar defaultValue={tgUser ? tgUser.photo_url : undefined} ref={this.avatarRef} />
 					<div>
-						{tgUser ? (
-							<div style={{ height: "100%" }}>
-								<img id="user_pic" src={tgUser.photo_url} />
-							</div>
-						) : (
-							<></>
-						)}
+						<div>{tgUser ? this.ML("Restaurant and cafe staff will see your avatar in Telegram") : this.ML("")}</div>
+						<input
+							type="text"
+							style={{ width: "100%" }}
+							defaultValue={tgUser ? [tgUser.first_name, tgUser.last_name].join(" ") : undefined}
+							placeholder={this.ML("Enter your name")}
+							ref={this.nameRef}
+							onInput={event => {
+								this.setState(this.state);
+							}}
+						/>
 					</div>
+					{!tgUser ? (
+						<div>
+							<input
+								type="password"
+								placeholder={this.ML("Сome up with a password")}
+								style={{ width: "50%" }}
+								ref={this.pswRef}
+								onInput={event => {
+									this.setState(this.state);
+								}}
+							/>
+							<input
+								type="password"
+								placeholder={this.ML("Repeat password")}
+								style={{ width: "50%" }}
+								ref={this.psw2Ref}
+								onInput={event => {
+									this.setState(this.state);
+								}}
+							/>
+						</div>
+					) : (
+						<></>
+					)}
 					<div>
-						<div>{tgUser ? this.ML("Restaurant and cafe staff will see your avatar in Telegram") : this.ML("Enter your name")}</div>
-						<input id="name" type="text" style={{ width: "100%" }} defaultValue={tgUser ? [tgUser.first_name, tgUser.last_name].join(" ") : undefined} placeholder={this.ML("Enter your name")} />
-					</div>
-
-					<div>
-						<div>{this.ML("Say smth about you")}</div>
-						<textarea id="bio" style={{ width: "100%" }} />
+						<textarea
+							id="bio"
+							style={{ width: "100%" }}
+							placeholder={this.ML("Say smth about youself")}
+							ref={this.bioRef}
+							onInput={event => {
+								this.setState(this.state);
+							}}
+						/>
 					</div>
 				</div>
-				<div>
-					<button
-						//style={{ width: "100%" }}
-						onClick={event => {
-							this.serverCommand(
-								"user/new",
-								JSON.stringify({
-									name: document.getElementById("name")?.attributes.getNamedItem("value")?.value,
-									bio: document.getElementById("bio")?.attributes.getNamedItem("value")?.value,
-								}),
-								res => {
-									const nState = this.state;
-									nState.user = res.user;
-									this.setState(nState);
-									this.checkEateryId();
-								},
-								err => {}
-							);
-						}}>
-						{this.ML("Everything is correct. Let's move on")}
-					</button>
+				<div style={{ textAlign: "center" }}>
+					{MoveOnEnable() ? (
+						<button
+							onClick={event => {
+								const token = tgUser ? undefined : `${this.nameRef.current?.value}:${this.pswRef.current?.value}`;
+								this.serverCommand(
+									"user/new",
+									JSON.stringify({
+										name: this.nameRef.current?.value,
+										bio: this.bioRef.current?.value,
+										photo: { url: this.avatarRef.current?.value },
+									}),
+									res => {
+										const nState = this.state;
+										nState.user = res.user;
+										if (token !== undefined) this.login(token);
+										this.setState(nState);
+										this.init();
+										this.checkEateryId();
+									},
+									err => {
+										console.log(err);
+									},
+									token
+								);
+							}}>
+							{this.ML("Everything is correct. Let's move on")}
+						</button>
+					) : (
+						<span className="tooltip" style={{ color: "var(--error-color)" }}>
+							{this.nameRef.current?.value === "" || this.nameRef.current?.value === undefined ? <div>⤫ {this.ML("Name shouldn't be empty")}</div> : <></>}
+							{this.pswRef.current?.value === "" || this.pswRef.current?.value === undefined ? <div>⤫ {this.ML("The password shouldn't be empty")}</div> : <></>}
+							{this.pswRef.current?.value !== this.psw2Ref.current?.value ? <div>⤫ {this.ML("Both passwords should be identical")}</div> : <></>}
+						</span>
+					)}
 				</div>
 			</div>
 		);
 	}
 	renderWrongToken(): ReactNode {
+		const moveOnEnable = () => {
+			return this.nameRef.current?.value !== undefined && this.nameRef.current?.value !== "" && this.pswRef.current?.value !== undefined && this.pswRef.current?.value !== "";
+		};
 		return (
-			<div>
-				<div style={{ textAlign: "center", fontSize: "120%" }}>Your credential are wrong. Try recover your token in Telegram</div>
-				<div>
-					There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of
-					Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the
-					Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected
-					humour, or non-characteristic words etc.
-				</div>
+			<div className="guest-app-wrongtoken-container">
+				<div>{this.ML("Welcome back")}</div>
 				<div>
 					<button
 						onClick={event => {
-							localStorage.removeItem("coodforttoken");
-							const nState = this.state;
-							nState.passwordWrong = undefined;
-							this.setState(nState);
+							this.setState({ ...this.state, passwordWrong: undefined });
 						}}>
-						I want create new user
+						{this.ML("I have no account")}
 					</button>
 				</div>
+				<div className="guest-app-greetings-text">{this.renderAuth20()}</div>
 				<div>
-					<button>I want recover my token</button>
+					<div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: ".5em" }}>
+						<input
+							id="name"
+							type="text"
+							placeholder={this.ML("Enter your name")}
+							ref={this.nameRef}
+							onInput={event => {
+								this.setState(this.state);
+							}}
+						/>
+						<input
+							id="password"
+							type="password"
+							placeholder={this.ML("Enter your password")}
+							ref={this.pswRef}
+							onInput={event => {
+								this.setState(this.state);
+							}}
+						/>
+					</div>
+				</div>
+				<div>
+					{moveOnEnable() ? (
+						<button
+							onClick={event => {
+								if (this.state.stage === undefined && this.state.eateryId !== undefined && this.state.tableId !== undefined) this.setState({ ...this.state, stage: "menu" });
+
+								const login = this.nameRef.current?.value;
+								const psw = this.pswRef.current?.value;
+								this.login(`${login}:${psw}`, res => {
+									this.init();
+								});
+							}}>
+							{this.ML("Everything is correct. Let's move on")}
+						</button>
+					) : (
+						<span className="tooltip" style={{ color: "var(--error-color)" }}>
+							{this.nameRef.current?.value === "" || this.nameRef.current?.value === undefined ? <div>⤫ {this.ML("Name shouldn't be empty")}</div> : <></>}
+							{this.pswRef.current?.value === "" || this.pswRef.current?.value === undefined ? <div>⤫ {this.ML("The password shouldn't be empty")}</div> : <></>}
+							{this.pswRef.current?.value !== this.psw2Ref.current?.value ? <div>⤫ {this.ML("Both passwords should be identical")}</div> : <></>}
+						</span>
+					)}
 				</div>
 			</div>
 		);
@@ -401,7 +523,6 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 				tableId={this.state.tableId}
 				toaster={this.toasterRef}
 				onChange={order => {
-					//debugger
 					const nState = this.state;
 					nState.order = order;
 					this.setState(nState);
@@ -492,7 +613,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 				content = this.renderGreetings();
 			} else if (this.state.user === undefined) {
 				content = this.renderWrongToken();
-			} else
+			} else {
 				switch (this.state.stage) {
 					case "checkin":
 						content = this.renderCheckIn();
@@ -506,6 +627,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 					default:
 						content = <div>Something went wrong!</div>;
 				}
+			}
 		}
 		return (
 			<div className="guest-app-container">
