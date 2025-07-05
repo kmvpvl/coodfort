@@ -118,12 +118,12 @@ components:
             name:
               type: string
               description: Visible name of user
-            photos:
+            photo:
               description: avatars or Pictures of user
               type: array
               items:
                 $ref: "#/components/schemas/photo"
-            bios:
+            bio:
               description: Long text about user
               type: string
             tags:
