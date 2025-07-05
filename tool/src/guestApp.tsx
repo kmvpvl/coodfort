@@ -16,6 +16,7 @@ import Menu from "./components/menu/menu";
 import GuestOrder from "./components/order/guestOrder";
 import { IOrder, IOrderItem } from "@betypes/ordertypes";
 import Avatar from "./components/auth/avatar";
+import User from "./components/user/user";
 
 export interface IGuestAppProps extends IProtoProps {
 	mode?: string;
@@ -536,7 +537,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		return (
 			<div className="guest-app-nav-top">
 				<div className="guest-app-nav-top-choosen">
-					<span>{this.state.user?.name}</span>
+					{this.state.user !== undefined ? <User defaultValue={this.state.user} /> : <></>}
 					{this.state.choosenEatery !== undefined && this.state.stage !== "checkin" ? (
 						<Eatery viewMode={ViewModeCode.compact} defaultValue={this.state.choosenEatery} toaster={this.toasterRef} tableToCompactRender={this.state.choosenTable?.id} />
 					) : (
