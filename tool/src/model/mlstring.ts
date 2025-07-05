@@ -875,14 +875,14 @@ export const mlStrings = new Map([
 		]),
 	],
 	[
-		``,
+		`Are you sure you want to log off?`,
 		new Map([
 			[`de`, undefined],
 			[`fr`, undefined],
 			[`es`, undefined],
-			[`ru`, undefined],
+			[`ru`, "Вы уверены, что хотите выйти?"],
 			[`it`, undefined],
-			[`sr`, undefined],
+			[`sr`, "Da li ste sigurni da želite da se odjavite?"],
 		]),
 	],
 	[

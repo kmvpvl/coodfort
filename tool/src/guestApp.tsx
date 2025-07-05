@@ -537,7 +537,7 @@ export default class GuestApp extends Proto<IGuestAppProps, IGuestAppState> {
 		return (
 			<div className="guest-app-nav-top">
 				<div className="guest-app-nav-top-choosen">
-					{this.state.user !== undefined ? <User defaultValue={this.state.user} /> : <></>}
+					{this.state.user !== undefined ? <User defaultValue={this.state.user} toaster={this.toasterRef} /> : <></>}
 					{this.state.choosenEatery !== undefined && this.state.stage !== "checkin" ? (
 						<Eatery viewMode={ViewModeCode.compact} defaultValue={this.state.choosenEatery} toaster={this.toasterRef} tableToCompactRender={this.state.choosenTable?.id} />
 					) : (
