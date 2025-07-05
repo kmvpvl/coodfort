@@ -504,7 +504,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 						</div>
 					</div>
 					<div className="dispatcher-user-container">
-						<User defaultValue={this.props.employee} />
+						<User defaultValue={this.props.employee} toaster={this.props.toaster} />
 					</div>
 				</div>
 				{this.state.selectedEateryId !== undefined || this.state.eateriesBrief.includes(undefined) ? (

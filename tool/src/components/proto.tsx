@@ -90,6 +90,12 @@ export default class Proto<IProps extends IProtoProps, IState extends IProtoStat
 		);
 	}
 
+	logoff() {
+		localStorage.removeItem("coodforttoken");
+		this.setState({ ...this.state, user: undefined });
+		if (this.props.onSignOut !== undefined) this.props.onSignOut();
+	}
+
 	protected getLanguage(): string {
 		if (window.Telegram?.WebApp.initDataUnsafe?.user?.language_code !== undefined) return window.Telegram.WebApp.initDataUnsafe.user.language_code;
 		if (this.props.lang !== undefined) return this.props.lang;
