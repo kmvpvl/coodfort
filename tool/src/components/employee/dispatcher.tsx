@@ -15,6 +15,7 @@ import ProcessingOrderItems from "./processingOrderItems";
 import Table from "../table/table";
 import Employees from "./employees";
 import React from "react";
+import User from "../user/user";
 
 export interface IDispatcherProps extends IProtoProps {
 	employee: IUser;
@@ -503,7 +504,7 @@ export default class Dispatcher extends Proto<IDispatcherProps, IDispatcherState
 						</div>
 					</div>
 					<div className="dispatcher-user-container">
-						<span>{this.props.employee.name}</span>
+						<User defaultValue={this.props.employee} />
 					</div>
 				</div>
 				{this.state.selectedEateryId !== undefined || this.state.eateriesBrief.includes(undefined) ? (

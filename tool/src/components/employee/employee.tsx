@@ -106,7 +106,7 @@ export default class Employee extends Proto<IEmployeeProps, IEmployeeState> {
 							roles.pop();
 						}}></span>
 				</div>
-				<div>{this.state.user?.bios}</div>
+				<div>{this.state.user?.bio}</div>
 				<div className="has-caption">
 					<div className="caption">Roles</div>
 					<div className="employee-roles-list">
